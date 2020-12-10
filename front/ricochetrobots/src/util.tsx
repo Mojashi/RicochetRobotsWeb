@@ -1,18 +1,26 @@
-import blackRobotImg from "./Game/img/robot/black.png"
-import blueRobotImg from "./Game/img/robot/blue.png"
-import greenRobotImg from "./Game/img/robot/green.png"
-import redRobotImg from "./Game/img/robot/red.png"
-import yellowRobotImg from "./Game/img/robot/yellow.png"
+import blackRobotImg from "./img/robot/black.png"
+import blueRobotImg from "./img/robot/blue.png"
+import greenRobotImg from "./img/robot/green.png"
+import redRobotImg from "./img/robot/red.png"
+import yellowRobotImg from "./img/robot/yellow.png"
 
-const colors = ['black', 'blue', 'green', 'red', 'yellow'] as const
+export const API_SERVER = "localhost:3000/api"
+
+export const Red = "red"
+export const Black = "black"
+export const Blue = "blue"
+export const Green = "green"
+export const Yellow = "yellow"
+
+const colors = [Black, Blue, Green, Yellow, Red] as const
 export type Color = typeof colors[number]
 
 export function robotImg(color : Color){
     switch(color) {
-        case 'black': return blackRobotImg
-        case 'blue': return blueRobotImg
-        case 'green': return greenRobotImg
-        case 'red': return redRobotImg
-        case 'yellow': return yellowRobotImg
+        case Black: return blackRobotImg
+        case Blue: return blueRobotImg
+        case Green: return greenRobotImg
+        case Red: return redRobotImg
+        case Yellow: return yellowRobotImg
     } 
 }

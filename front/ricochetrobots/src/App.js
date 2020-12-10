@@ -1,4 +1,4 @@
-import Arena from "./Arena"
+import Arena from "./arena/arena"
 
 function App() {
   return (

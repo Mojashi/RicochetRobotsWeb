@@ -1,14 +1,17 @@
 package arena
 
-type ClientEvent struct {
-	EventName string `json:"event_name"`
+import "github.com/Mojashi/RicochetRobotsWeb/api/game"
 
-	Submit *SubmitCEvent `json:"submit"`
-	Join   *JoinCEvent   `json:"join"`
+type ClientEvent struct {
+	//EventName string `json:"event_name"`
+
+	Submit *SubmitCEvent `json:"submit,omitempty"`
+	// Join   *JoinCEvent   `json:"join"`
 }
 
 type SubmitCEvent struct {
+	Hands []game.Hand `json:"hands"`
 }
 
-type JoinCEvent struct {
-}
+// type JoinCEvent struct {
+// }
