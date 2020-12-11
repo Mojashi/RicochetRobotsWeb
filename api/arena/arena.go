@@ -17,7 +17,7 @@ var (
 )
 
 type ArenaGame struct {
-	board      game.Board
+	problem    game.Problem
 	finishDate time.Time
 }
 
@@ -47,7 +47,11 @@ func readHandler(c *room.Client, msg []byte) error {
 	if event.Submit != nil && len(event.Submit.Hands) > 0 {
 		log.Println("event:submit")
 		log.Println(string(msg))
-		sendEvent(hub.Broadcast, ServerEvent{Submit: &SubmitSEvent{Hands: event.Submit.Hands}})
+		if game.CheckSolution(curGame.problem.Game, event.Submit.Hands) {
+			sendEvent(hub.Broadcast, ServerEvent{Submit: &SubmitSEvent{Hands: event.Submit.Hands}})
+		} else {
+			log.Println("invalid solution was sent to server")
+		}
 	}
 
 	return nil
@@ -59,7 +63,7 @@ func joinHandler(c *room.Client) error {
 		return err
 	}
 
-	if err := sendEvent(c.Send, ServerEvent{Start: &StartSEvent{Board: curGame.board, FinishDate: curGame.finishDate}}); err != nil {
+	if err := sendEvent(c.Send, ServerEvent{Start: &StartSEvent{Board: curGame.problem.Game.Board, FinishDate: curGame.finishDate}}); err != nil {
 		log.Print(err)
 		return err
 	}
@@ -77,12 +81,14 @@ func Arena(g *echo.Group) {
 	hub = room.NewHub()
 	board := game.NewBoard(10, 10)
 	board.Cells[2][2].Walls[3] = true
-	ma := game.Red
-	board.Cells[4][5].Mark = &ma
+	// ma := game.Red
+	// board.Cells[4][5].Mark = &ma
 	mi := game.RMIRROR
 	board.Cells[6][8].Mirror = &mi
 	board.Cells[9][2].Goal = true
-	curGame = ArenaGame{board: board, finishDate: time.Now().Add(10 * time.Minute)}
+
+	curGame = ArenaGame{problem: game.NewProblem(), finishDate: time.Now().Add(10 * time.Minute)}
+	curGame.problem.Game.Board.Cells = board.Cells
 
 	g.GET("/ws", func(c echo.Context) error {
 		return room.ServeWs(hub, c, readHandler)

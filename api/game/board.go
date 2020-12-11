@@ -14,8 +14,8 @@ const (
 type Cell struct {
 	Walls  [4]bool `json:"walls"`
 	Mirror *MIRROR `json:"mirror,omitempty"`
-	Mark   *Color  `json:"mark,omitempty"`
-	Goal   bool    `json:"goal"`
+	// Mark   int     `json:"mark,omitempty"`
+	Goal bool `json:"goal"`
 }
 
 //Board ぼーどぜんたい
@@ -31,8 +31,12 @@ func NewBoard(width int, height int) Board {
 	for i := 0; i < height; i++ {
 		cells[i] = make([]Cell, width)
 		for j := 0; j > width; j++ {
-			cells[i][j] = Cell{Walls: [4]bool{false, false, false, false}, Mirror: nil, Mark: nil, Goal: false}
+			cells[i][j] = Cell{Walls: [4]bool{false, false, false, false}, Mirror: nil, Goal: false}
 		}
 	}
 	return Board{Height: height, Width: width, Cells: cells}
+}
+
+func (b *Board) get(pos Pos) Cell {
+	return b.Cells[pos.Y][pos.X]
 }

@@ -12,6 +12,6 @@ const (
 
 //Hand ロボットを動かす手
 type Hand struct {
-	Color Color `json:"color"`
-	Dir   Dir   `json:"dir"`
+	Robot int `json:"robot"`
+	Dir   Dir `json:"dir"`
 }
