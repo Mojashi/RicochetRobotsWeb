@@ -37,6 +37,6 @@ func NewBoard(width int, height int) Board {
 	return Board{Height: height, Width: width, Cells: cells}
 }
 
-func (b *Board) get(pos Pos) Cell {
+func (b *Board) Get(pos Pos) Cell {
 	return b.Cells[pos.Y][pos.X]
 }

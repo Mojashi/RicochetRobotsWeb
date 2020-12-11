@@ -61,5 +61,5 @@ func CheckSolution(game Game, hands []Hand) bool {
 		}
 	}
 
-	return game.Board.get(curPos[game.MainRobot]).Goal
+	return game.Board.Get(curPos[game.MainRobot]).Goal
 }
