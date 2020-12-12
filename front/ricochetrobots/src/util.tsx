@@ -12,8 +12,17 @@ export const Blue = "blue"
 export const Green = "green"
 export const Yellow = "yellow"
 
-const colors = [Black, Blue, Green, Yellow, Red] as const
+const colors = [Blue, Red, Green, Yellow, Black] as const
 export type Color = typeof colors[number]
+
+export interface Pos {
+    x:number
+    y:number
+}
+
+export function robotColor(idx : number) : Color {
+    return colors[idx]
+}
 
 export function robotImg(color : Color){
     switch(color) {

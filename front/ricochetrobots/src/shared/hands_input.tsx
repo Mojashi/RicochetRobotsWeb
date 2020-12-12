@@ -1,6 +1,5 @@
 import {Dir, UP,RT,DN,LT, Hand} from "../game/hand"
 import {useState} from "react"
-import { Color, Red, Black, Green, Yellow, Blue } from "../util"
 
 
 interface Props {
@@ -12,16 +11,10 @@ function parseHands(str : string): Hand[] {
     if(ret.length % 2 !== 0) throw new Error("invalid format")
     
     for(var i = 0; i < str.length; i+=2){
-        var col : Color
+        var robot : number
         var dir : Dir
-        switch(str[i]){
-            case "0": col = Red;break;
-            case "1": col = Black;break;
-            case "2": col = Green;break;
-            case "3": col = Yellow;break;
-            case "4": col = Blue;break;
-            default:  throw new Error("invalid color")
-        }
+        
+        robot = parseInt(str[i])
         switch(str[i + 1]){
             case "u": dir = UP;break;
             case "r": dir = RT;break;
@@ -29,7 +22,7 @@ function parseHands(str : string): Hand[] {
             case "l": dir = LT;break;
             default:  throw new Error("invalid direction")
         }
-        ret.push({color:col, dir:dir})
+        ret.push({robot:robot, dir:dir})
     }
 
     return ret

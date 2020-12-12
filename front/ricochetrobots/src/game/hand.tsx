@@ -9,6 +9,6 @@ export const DN: Dir = "dn"
 export const LT: Dir = "lt"
 
 export interface Hand {
-	color: Color
+	robot: number
     dir :  Dir
 }

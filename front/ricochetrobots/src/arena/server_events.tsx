@@ -1,6 +1,8 @@
 import {Hand} from "../game/hand"
 import { BoardModel } from '../game/board'
-
+import {Game} from '../game/game'
+import User from "../shared/user"
+import {SubmissionModel} from "../shared/subrank"
 
 export interface ServerEvent {
     start: StartSEvent | undefined
@@ -11,23 +13,24 @@ export interface ServerEvent {
 }
 
 export interface StartSEvent {
-    board:      BoardModel
+    game:      Game
+    subs:   SubmissionModel[]
     finishdate: Date
 }
 
 export interface FinishSEvent {
-    winner: string
+    winner: User
     hands:  Hand[]
 }
 
 export interface SubmitSEvent  {
-    hands: Hand[]
+    sub: SubmissionModel
 }
 
 export interface JoinSEvent{
-    name: string
+    user: User
 }
 
 export interface LeaveSEvent{
-    name: string
+    user: User
 }

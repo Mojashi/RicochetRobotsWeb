@@ -5,7 +5,7 @@ import centerImg from "../img/center.png"
 import goalImg from "../img/goal.png"
 import styled from "styled-components"
 
-import Player, {PlayerModel} from "./player"
+import Robot, {RobotModel} from "./robot"
 import {Color} from "../util"
 import { cast, Castable } from '@bitr/castable';
 
@@ -13,7 +13,7 @@ import { cast, Castable } from '@bitr/castable';
 class CellModel {
     walls : [boolean, boolean, boolean, boolean]
     mirror : '/' | '\\' | undefined
-    mark: Color | undefined
+    // mark: Color | undefined
     goal: boolean
     constructor (){
         this.walls = [false,false,false,false]
@@ -81,11 +81,12 @@ const Grid = styled("div")<{cellSize: number, w: number, h:number}>`
 interface Props{
     board : BoardModel
     cellSize: number
-    players : PlayerModel[]
+    robots : RobotModel[]
+    mainRobot: number
 }
 
 export default function Board(props : Props) {
-    const {board, cellSize, players} = props
+    const {board, cellSize, robots, mainRobot} = props
     
     return (
         <Grid cellSize={cellSize} w={board.width} h={board.height}>
@@ -97,14 +98,15 @@ export default function Board(props : Props) {
                 </Row>
             })}
             {
-                players.map(player => 
-                    <Player player={player}  cellSize={cellSize}/>
+                robots.map(robot => 
+                    <Robot robot={robot}  cellSize={cellSize}/>
                 )
             }
+            <Robot robot={{idx:mainRobot, pos:{x:board.width/2-0.5, y:board.height/2-0.5}}}  cellSize={cellSize}/>
         </Grid>
     );
 }
 
 Board.defaultProps = {
-    players : []
+    robots : []
 }
