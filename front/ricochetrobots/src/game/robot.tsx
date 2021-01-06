@@ -4,13 +4,14 @@ import {Color, Pos, robotColor, robotImg} from "../util"
 
 export interface RobotModel{
     pos : Pos
+    glow?: boolean
     idx : number
 }
 
 
 const RobotImg = styled("img")<{cellSize:number, x:number, y:number}>`
      position:absolute;
-     transition: transform 1s;
+     transition: transform 0.2s;
      width:${p=>p.cellSize}px;
      height:${p=>p.cellSize}px;
      top:0px;

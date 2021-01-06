@@ -10,7 +10,8 @@ type ClientEvent struct {
 }
 
 type SubmitCEvent struct {
-	Hands []game.Hand `json:"hands"`
+	GameID int         `json:"game_id"`
+	Hands  []game.Hand `json:"hands"`
 }
 
 // type JoinCEvent struct {

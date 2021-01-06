@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/Mojashi/RicochetRobotsWeb/api/site"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
@@ -20,7 +21,7 @@ const (
 	pingPeriod = (pongWait * 9) / 10
 
 	// Maximum message size allowed from peer.
-	maxMessageSize = 512
+	maxMessageSize = 2048
 )
 
 var (
@@ -44,6 +45,8 @@ type Client struct {
 	Send chan []byte
 
 	readHandler func(*Client, []byte) error
+
+	User *site.User
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -121,7 +124,12 @@ func ServeWs(hub *Hub, c echo.Context, readHandler func(*Client, []byte) error) 
 	if err != nil {
 		return err
 	}
-	client := &Client{hub: hub, conn: conn, Send: make(chan []byte, 512), readHandler: readHandler}
+	var user *site.User = nil
+	if c.Get("authorized").(bool) {
+		buf := c.Get("user").(site.User)
+		user = &buf
+	}
+	client := &Client{hub: hub, conn: conn, Send: make(chan []byte, 512), readHandler: readHandler, User: user}
 
 	go client.writePump()
 	go client.readPump()

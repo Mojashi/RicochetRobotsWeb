@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Mojashi/RicochetRobotsWeb/api/game"
+	"github.com/Mojashi/RicochetRobotsWeb/api/site"
 )
 
 type ServerEvent struct {
@@ -17,22 +18,25 @@ type ServerEvent struct {
 }
 
 type StartSEvent struct {
-	Board      game.Board `json:"board"`
-	FinishDate time.Time  `json:"finishdate"`
+	GameID      int          `json:"game_id"`
+	Game        game.Game    `json:"game"`
+	Submissions []Submission `json:"subs"`
+	FinishDate  time.Time    `json:"finishdate"`
 }
 
 type FinishSEvent struct {
-	Winner string      `json:"winner"`
-	Hands  []game.Hand `json:"hands"`
+	GameID     int        `json:"game_id"`
+	Submission Submission `json:"sub"`
 }
 
 type SubmitSEvent struct {
-	Hands []game.Hand `json:"hands"`
+	GameID     int        `json:"game_id"`
+	Submission Submission `json:"sub"`
 }
 
 type JoinSEvent struct {
-	Name string `json:"name"`
+	User site.User `json:"user"`
 }
 type LeaveSEvent struct {
-	Name string `json:"name"`
+	User site.User `json:"user"`
 }

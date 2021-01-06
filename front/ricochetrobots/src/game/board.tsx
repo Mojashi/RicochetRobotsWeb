@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import wallImg from "../img/wall.png"
 import groundImg from "../img/ground.png"
 import centerImg from "../img/center.png"
@@ -88,18 +88,22 @@ interface Props{
 export default function Board(props : Props) {
     const {board, cellSize, robots, mainRobot} = props
     
+    // useEffect(()=>{
+    //     console.log(board)
+    // },[board])
+
     return (
         <Grid cellSize={cellSize} w={board.width} h={board.height}>
             {board.cells.map((row,idx) => {
-                return <Row h={board.height} id={"row"+idx.toString()}>
+                return <Row h={board.height} key={"row"+idx.toString()}>
                 {row.map((cell,idx2) => {
-                    return <Cell cell={cell}/>
+                    return <Cell cell={cell} key={"cell"+idx2.toString()}/>
                 })}
                 </Row>
             })}
             {
-                robots.map(robot => 
-                    <Robot robot={robot}  cellSize={cellSize}/>
+                robots.map((robot,idx) => 
+                    <Robot robot={robot} cellSize={cellSize} key={"robot"+idx.toString()}/>
                 )
             }
             <Robot robot={{idx:mainRobot, pos:{x:board.width/2-0.5, y:board.height/2-0.5}}}  cellSize={cellSize}/>

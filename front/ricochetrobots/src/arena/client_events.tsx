@@ -5,5 +5,6 @@ export interface ClientEvent {
 }
 
 export interface SubmitCEvent {
+    game_id: number
     hands: Hand[]
 }

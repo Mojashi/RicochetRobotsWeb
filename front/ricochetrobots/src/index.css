@@ -1,6 +1,8 @@
 * {
     margin: 0px;
     padding: 0px;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 #root{
@@ -9,3 +11,10 @@
     overflow: hidden;
     position: relative;
 }
+
+.simplebar-mask {
+    position: unset!important;
+}
+/* .simplebar-content-wrapper {
+    height:100%;
+} */

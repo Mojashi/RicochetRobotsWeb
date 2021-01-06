@@ -8,7 +8,7 @@ type Pos struct {
 //ボードとプレイヤースタート位置のセット
 type Game struct {
 	Board     Board `json:"board"`
-	MainRobot int   `json:"main"`
+	MainRobot int   `json:"main_robot"`
 	RobotPoss []Pos `json:"poss"`
 }
 
