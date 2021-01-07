@@ -1,8 +1,8 @@
-import React from "react"
+import React, { useRef } from "react"
 import { Dir, UP, RT, DN, LT, Hand } from "../game/hand"
 import { useEffect, useState } from "react"
 import { robotColor, robotImg, useKeyPress } from "../util"
-import styled, {css} from "styled-components"
+import styled, {css, keyframes} from "styled-components"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward"
@@ -12,15 +12,8 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 import SendIcon from '@material-ui/icons/Send';
 import SimpleBar from "simplebar-react"
 import 'simplebar/dist/simplebar.min.css';
+import { CircularProgress } from "@material-ui/core"
 
-interface Props {
-    addHand: (hands: Hand) => void
-    rmHand: () => void
-    clearHands: () => void
-    onSubmit: () => void
-    disabled: boolean
-    hands: Hand[]
-}
 function parseHands(str: string): Hand[] {
     var ret: Hand[] = []
     if (ret.length % 2 !== 0) throw new Error("invalid format")
@@ -49,6 +42,15 @@ const DirText = styled("div")`
     font-size:xx-large;
 `
 
+const slide = keyframes`
+    0%{
+        transform:translateY(-100%);
+    }
+    100%{
+        transform:translateY(0);
+    }
+`  
+
 const HandBoxi = styled("div")`
     display:flex;
     flex-wrap:nowrap;
@@ -66,6 +68,8 @@ const HandBoxi = styled("div")`
     text-decoration: none;
     overflow:hidden;
     z-index:-1;
+    /* animation:${slide} 1s ease-in-out;
+    transition:all 0.5s;  */
 `
 
 
@@ -139,6 +143,7 @@ const InnerBox = styled("div")`
     background-color: rgba(0,0,0,0.05);
     position:relative;
     min-height:100vh;
+    padding:0.5em 0.5em 1em 0.5em;
 /* box-shadow: 0px 0px 10px 0px saddlebrown inset; */
     /* border-radius: 10px; */
     justify-content:flex-end;
@@ -149,9 +154,14 @@ const InnerBox = styled("div")`
 
 function HandsBox(props: { hands: Hand[] }) {
     const { hands } = props;
-    
+    const ref = useRef<HTMLDivElement>(null)
+    useEffect(()=>{
+        if(ref.current === null) return;
+        ref.current.scrollTop = 0
+    }, [hands])
+
     return (
-        <ScrollBox forceVisible="y" autoHide={false}>
+        <ScrollBox autoHide={true} scrollableNodeProps={{ ref: ref }}>
             <InnerBox>
             {hands.map((hand, idx) => <HandBox hand={hand} key={"hand" + idx.toString()} r={hands.length - idx}/>)}
             </InnerBox>
@@ -202,9 +212,18 @@ const WoodButton = styled("button")`
     }
 `
 
+interface Props {
+    addHand: (hands: Hand) => void
+    rmHand: () => void
+    clearHands: () => void
+    onSubmit: () => void
+    disabled: boolean
+    sending: boolean
+    hands: Hand[]
+}
 
 export default function HandsInput(props: Props) {
-    const {hands, addHand, rmHand, clearHands, onSubmit, disabled} = props
+    const {hands, addHand, rmHand, clearHands, onSubmit, disabled, sending} = props
 
     const robotPressed = useKeyPress(["1", "2", "3", "4", "0"])
     const arrowPressed = useKeyPress(["ArrowUp", "ArrowRight", "ArrowLeft", "ArrowDown"])
@@ -268,8 +287,8 @@ export default function HandsInput(props: Props) {
         <HandsInputRoot>
             {/* <div > */}
             <div style={{ gridColumnStart: "1", gridColumnEnd: "2", width:"100%", height:"100%" }} >
-                <WoodButton disabled={!props.disabled} onClick={handleSubmit}>
-                    <SendIcon fontSize="inherit"/>
+                <WoodButton disabled={!disabled} onClick={handleSubmit} id="SendButton">
+                    {sending ?  <CircularProgress color="inherit"/> : <SendIcon fontSize="inherit"/>}
                 </WoodButton>
             </div>
             <div style={{ gridColumnStart: "2", gridColumnEnd: "3" }} >

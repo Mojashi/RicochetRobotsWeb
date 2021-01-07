@@ -7,6 +7,7 @@ import blueRobotImg from "./img/robot/blue.png"
 import greenRobotImg from "./img/robot/green.png"
 import redRobotImg from "./img/robot/red.png"
 import yellowRobotImg from "./img/robot/yellow.png"
+import { SubmissionModel } from "./shared/subrank"
 import User from "./shared/user"
 
 export const API_SERVER = "api"
@@ -125,6 +126,12 @@ export async function fetchMeAPI() : Promise<User> {
     return await u
 }
 
+export function compSub(a:SubmissionModel,b:SubmissionModel):number{
+    if(a.hands.length === b.hands.length){
+        return a.date > b.date ? 1 : -1
+    }
+    return a.hands.length > b.hands.length ? 1 : -1
+}
 
 export function useKeyPress(targets : string[]) {
 	// State for keeping track of whether key is pressed

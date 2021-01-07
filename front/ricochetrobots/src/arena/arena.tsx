@@ -2,7 +2,7 @@ import Board, {BoardModel} from "../game/board"
 import {RobotModel} from "../game/robot"
 import {useState, useEffect, useRef, useReducer} from "react"
 import styled from "styled-components"
-import {API_SERVER, eqPos, go, Pos, simulate} from "../util"
+import {API_SERVER, compSub, eqPos, go, Pos, simulate} from "../util"
 import {ServerEvent} from "./server_events"
 import {ClientEvent, SubmitCEvent} from "./client_events"
 import HandsInput from "../shared/hands_input"
@@ -55,6 +55,8 @@ function Arena() {
     const user = useRecoilValue(userState)
     var bBox = useRef<HTMLDivElement>(null)
     const ws = useRef<WebSocket|null>(null);
+    const [sending,setSending] = useState<boolean>(false)
+    const [animSubs, setAnimSubs] = useState<number[]>([])
 
     const [inputState, inputDispatch] = useReducer((state:{robots:RobotModel[], his:Pos[][], hands:Hand[], reached:boolean}, action:any) => {
         if(game === undefined) return state
@@ -108,15 +110,24 @@ function Arena() {
         if(event.submit){
             console.log("event:submit")
             const sub = event.submit.sub
-            if(sub.user.id === user?.id && sub.opt){
+            if(sub.user.id === user?.id){
+                if(sub.opt){
                 console.log("optimal")
+                }
+                setSending(false)
             }
+
+            setAnimSubs(s=>{
+                const ss = s.slice()
+                ss.push(sub.id)
+                return ss
+            })
 
             setSubs(subs => {
                 console.log(subs)
-                var nsubs = subs.slice(0, Math.min(subs.length, 4))
+                var nsubs = subs.slice()
                 nsubs.push(sub)
-                return nsubs
+                return nsubs.sort(compSub).slice(0, Math.min(nsubs.length, 5))
             })
         }
     }
@@ -125,9 +136,10 @@ function Arena() {
         const hands = inputState.hands
         if(hands.length === 0) return;
         if(!ws.current)return; 
+        setSending(true)
         var ev:SubmitCEvent = {game_id: game_id, hands:hands}
         ws.current.send(JSON.stringify({submit:ev}))
-        console.log("submit:" + hands)
+        console.log("submit:" + JSON.stringify({submit:ev}))
     }
 
 
@@ -135,7 +147,6 @@ function Arena() {
         ws.current = new WebSocket(`ws://localhost:3000/${API_SERVER}/arena/ws`)
         ws.current.onopen = () => console.log("ws opened")
         ws.current.onclose = () => console.log("ws closed")
-
         ws.current.onmessage = e => {
             try{
                 console.log("received:"+e.data)
@@ -146,6 +157,8 @@ function Arena() {
             }
         };
         return () => {
+            setSending(false)
+            
             if(ws.current !== null){
                 ws.current.close();
             }
@@ -177,13 +190,13 @@ function Arena() {
         {/* <Screen>aaa</Screen> */}
         <CenterBox>
         <div style={{width:`20%`, margin:"1vw"}}>
-            <SubRanking subs = {subs}/>
+            <SubRanking subs = {subs} animate={animSubs}/>
         </div>
         <div style={{width:`${sq}px`, position:"relative"}}>
             {game && <Board board={game.board} cellSize={cellSize} robots={inputState.robots} mainRobot={game.main_robot}/>}
         </div>
         {/* <div style={{width:`${(rectSize[1] - sq)/2}px`}}> */}
-        <HandsInput disabled={inputState.reached} onSubmit={handleSubmit} addHand={(hand)=>{inputDispatch({type:"add",hand:hand})}} rmHand={()=>{inputDispatch({type:"del"})}} clearHands={()=>{inputDispatch({type:"clear"})}} hands={inputState.hands}/>
+        <HandsInput disabled={inputState.reached} onSubmit={handleSubmit} addHand={(hand)=>{inputDispatch({type:"add",hand:hand})}} rmHand={()=>{inputDispatch({type:"del"})}} clearHands={()=>{inputDispatch({type:"clear"})}} hands={inputState.hands} sending={sending}/>
         {/* </div> */}
         </CenterBox>
         </ArenaBox>

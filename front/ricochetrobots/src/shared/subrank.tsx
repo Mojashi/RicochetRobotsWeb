@@ -1,6 +1,11 @@
 import { Hand } from "../game/hand"
 import User from "./user"
 import styled, { keyframes } from "styled-components"
+import { useRecoilValue } from "recoil"
+import { userState } from "../recoil_states"
+import { useEffect, useRef, useState } from "react"
+import { CSSTransition } from "react-transition-group"
+import { compSub } from "../util"
 
 
 export interface SubmissionModel {
@@ -11,12 +16,7 @@ export interface SubmissionModel {
     opt : Boolean
 }
 
-function compSub(a:SubmissionModel,b:SubmissionModel):number{
-    if(a.hands.length === b.hands.length){
-        return a.date > b.date ? 1 : -1
-    }
-    return a.hands.length > b.hands.length ? 1 : -1
-}
+/* transform: translateY(${t}) translateX(${0}px); */
 
 const shine = keyframes`
   0% {
@@ -37,11 +37,9 @@ const shine = keyframes`
   }
 `
 
-const ResBox = styled('div')<{rank:number, opt?:Boolean}>`
-    box-sizing:border-box;
-    width:100%;
+const ResBox = styled('div')<{opt:Boolean}>`
     padding: 12px 12px 12px 5px;
-    margin: 12px 12px 12px 0px;
+
     font-weight: bold;
     /* border: inset 4px #a4c7cc;*/
     border-radius:7px;
@@ -52,14 +50,15 @@ const ResBox = styled('div')<{rank:number, opt?:Boolean}>`
     -webkit-text-decoration: none;
     text-decoration: none;
     display:grid;
-    grid-template-rows: 60% 40%;
-    grid-template-columns: 20% 40% 40%;
-    position:absolute;
-    left:0px;
-    top:0px;
-    transform: translateY(${p=>p.rank}%);
-    transition:transform 0.5s; 
+    grid-template-rows: 6fr 4fr;
+    grid-template-columns: 2fr 4fr 4fr;
     overflow:hidden;
+    z-index:10;
+    /* position:absolute; */
+    height:100%;
+    width:100%;
+    box-sizing:border-box;
+    position:relative;
     
     &::before{ 
         content: '';
@@ -74,9 +73,6 @@ const ResBox = styled('div')<{rank:number, opt?:Boolean}>`
         transform: rotate(45deg);
     }
 `
-ResBox.defaultProps = {
-    opt:false,
-}
 
 const MainBox = styled.div`
     text-align:center;
@@ -115,7 +111,7 @@ function Submission(props : {rank:number, sub : SubmissionModel}) {
     const {rank, sub} = props
 
     return (
-        <ResBox rank={rank *  110} opt={sub.opt}>
+        <ResBox opt={sub.opt}>
             <RankBox><div style={{marginLeft:"auto", marginRight:"auto"}}>{(rank + 1).toString()}</div></RankBox>
             <MainBox>{sub.hands.length.toString().padStart(2," ") +" moves"} </MainBox>
             <NameText>{`by ${sub.user.name}`}</NameText>
@@ -143,15 +139,64 @@ const SubmissoinsBox = styled("div")`
     width:100%;
 `
 
-export default function SubRanking(props : {subs : SubmissionModel[]}){
-    const {subs} = props
+const appear = (x:string, y:string, t:string) => keyframes`
+    0%{
+        transform: translateY(${y}) translateX(${x});
+        opacity:0;
+    }
+    50%{
+        transform: translateY(${y}) translateX(${x});
+        opacity:1;
+    }
+    100%{
+        transform: translateY(${t}) translateX(${0});
+        opacity:1;
+    }
+`
+const AnimSubmission = styled("div")<{pos:string, animate:boolean, mine:boolean, sx:string,sy:string}>`
+    position:absolute;
+    transform: translateY(${p=>p.pos});
+    transition:transform 0.5s; 
+    animation:${p=>p.animate ? (p.mine?appear(p.sx,p.sy,p.pos):appear("0", "100vh",p.pos)):""} 2s ease-in-out;
+    box-sizing:border-box;
+    width:100%;
+    margin: 12px 12px 12px 0px;
+    z-index:10;
+    height:8ex;
+`
+
+export default function SubRanking(props : {subs : SubmissionModel[], animate: number[]}){
+    const {subs, animate} = props
+    const [sButtonPos, setSButtonPos] = useState([0,0])
+    const ref = useRef<HTMLDivElement>(null)
+    const animated = useRef(new Map<number,boolean>())
+    const user = useRecoilValue(userState)
+
+    useEffect(()=>{
+        if(animated.current === null) return;
+        animate.forEach((a)=>{
+            if(!animated.current.has(a)){
+                animated.current.set(a, true)
+            }
+        })
+    },[animate])
+
+    useEffect(()=>{
+        if(ref.current === null) return;
+        const belm = document.getElementById("SendButton")
+        if(!belm) return;
+        setSButtonPos([belm.getBoundingClientRect().left - ref.current.getBoundingClientRect().left, belm.getBoundingClientRect().top - ref.current.getBoundingClientRect().top])
+        console.log([belm.getBoundingClientRect().left, ref.current.getBoundingClientRect().left])
+    },[ref.current])
 
     return (
         <RankingBox>
         <RankingTitle>SUBMISSIONS</RankingTitle>
-        <SubmissoinsBox>
+        <SubmissoinsBox ref={ref}>
         {subs.sort(compSub).map((sub, idx) =>
-            <Submission key={sub.id} rank={idx} sub={sub}/>
+            <AnimSubmission key={sub.id.toString()} pos={`${idx*110}%`} sx={sButtonPos[0]+"px"} sy={sButtonPos[1]+"px"} mine={user!==null && user.id===sub.user.id} animate={animated.current.get(sub.id) as boolean} onAnimationEnd={()=>{animated.current.set(sub.id, false)}}>
+                <Submission sub={sub} rank={idx}/>
+            </AnimSubmission>
         )}
         </SubmissoinsBox>
         </RankingBox>
