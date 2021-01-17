@@ -174,7 +174,7 @@ const HandsInputRoot = styled("div")`
     width:15vw; 
     height:100%;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 5em 1fr;
+    grid-template-rows: auto 1fr;
 `
 
 const WoodButton = styled("button")`
@@ -287,7 +287,7 @@ export default function HandsInput(props: Props) {
         <HandsInputRoot>
             {/* <div > */}
             <div style={{ gridColumnStart: "1", gridColumnEnd: "2", width:"100%", height:"100%" }} >
-                <WoodButton disabled={!disabled} onClick={handleSubmit} id="SendButton">
+                <WoodButton disabled={disabled} onClick={handleSubmit} id="SendButton">
                     {sending ?  <CircularProgress color="inherit"/> : <SendIcon fontSize="inherit"/>}
                 </WoodButton>
             </div>

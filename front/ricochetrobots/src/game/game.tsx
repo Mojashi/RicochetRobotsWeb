@@ -1,8 +1,15 @@
-import { Pos } from "../util"
-import Board, { BoardModel } from "./board"
+import { SubmissionModel } from "../shared/subrank"
+import { Problem } from "./problem"
+
+
+export type Rule = string
+
+const WankoSoba  :Rule = "wanko"
+const DontBeLate :Rule = "dblate"
 
 export interface Game {
-    board : BoardModel
-    main_robot  :   number
-    poss    :   Pos[]
+	id          :number
+	rule        :Rule
+	problem     :Problem
+	subs :SubmissionModel[]
 }

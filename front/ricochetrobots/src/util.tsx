@@ -101,8 +101,8 @@ export function go(board:BoardModel, poss:Pos[], hand:Hand) : Pos[] {
 	return ret
 }
 
-export function simulate({board:board, poss:poss, main_robot:main_robot} : Game, hands : Hand[]) : Pos[][] {
-	var curPos = poss.slice()
+export function simulate(board:BoardModel, hands : Hand[]) : Pos[][] {
+	var curPos = board.poss.slice()
 	var history:Pos[][] = [curPos.slice()]
 
     hands.forEach((hand) => {

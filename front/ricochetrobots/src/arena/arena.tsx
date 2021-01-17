@@ -11,6 +11,7 @@ import SubRanking, {SubmissionModel} from "../shared/subrank"
 import {Game} from "../game/game"
 import { useRecoilValue, useSetRecoilState } from "recoil"
 import { fetchMe, userState } from "../recoil_states"
+import CircleTimer from "./timer"
 
 const CenterBox = styled("div")`
     position:absolute;
@@ -57,25 +58,27 @@ function Arena() {
     const ws = useRef<WebSocket|null>(null);
     const [sending,setSending] = useState<boolean>(false)
     const [animSubs, setAnimSubs] = useState<number[]>([])
+    
 
     const [inputState, inputDispatch] = useReducer((state:{robots:RobotModel[], his:Pos[][], hands:Hand[], reached:boolean}, action:any) => {
         if(game === undefined) return state
+        const board = game.problem.board
         const {robots,his,hands, reached} = state
         var np:Pos[] = []
         var mp:Pos
         switch(action.type){
             case "add":
-                np = go(game.board, his[his.length-1], action.hand)
+                np = go(board, his[his.length-1], action.hand)
                 // his.push(np)
                 if(eqPos(np[action.hand.robot], his[his.length-1][action.hand.robot])) return state
-                mp = np[game.main_robot]
-                return {robots:assignRobotsPos(np),his: [...his,np], hands: [...hands, action.hand], reached:game.board.cells[mp.y][mp.x].goal}
+                mp = np[board.main_robot]
+                return {robots:assignRobotsPos(np),his: [...his,np], hands: [...hands, action.hand], reached:board.cells[mp.y][mp.x].goal}
             case "del":
                 if(hands.length === 0) return state
                 var np = his[his.length - 2]
                 // his.pop()
-                mp = np[game.main_robot]
-                return {robots:assignRobotsPos(np),his:his.slice(0,his.length-1), hands:hands.slice(0,hands.length-1), reached:game.board.cells[mp.y][mp.x].goal}
+                mp = np[board.main_robot]
+                return {robots:assignRobotsPos(np),his:his.slice(0,his.length-1), hands:hands.slice(0,hands.length-1), reached:board.cells[mp.y][mp.x].goal}
             case "init":
                 return {robots:assignRobotsPos(action.pos), his:[action.pos], hands:[], reached:false}
             case "clear":
@@ -99,12 +102,11 @@ function Arena() {
         }
         if(event.start){
             console.log("event:start")
-            console.log("until:",event.start.finishdate)
             const g = event.start.game
             setSubs(event.start.subs.slice(0,Math.min(event.start.subs.length, 5)))
             setGame(g)
-            inputDispatch({type:"init", pos:g.poss}) // ここめちゃくちゃ怪しいね
-            setGameId(event.start.game_id)
+            inputDispatch({type:"init", pos:g.problem.board.poss}) // ここめちゃくちゃ怪しいね
+            setGameId(event.start.game.id)
             // setBoard(event.start.game.board)
         }
         if(event.submit){
@@ -133,8 +135,12 @@ function Arena() {
     }
 
     const handleSubmit = () => {
+        if(!inputState.reached) return;
+        if(user === null){
+            alert("提出するにはLOGIN済みである必要があります")
+            return;
+        }
         const hands = inputState.hands
-        if(hands.length === 0) return;
         if(!ws.current)return; 
         setSending(true)
         var ev:SubmitCEvent = {game_id: game_id, hands:hands}
@@ -144,7 +150,7 @@ function Arena() {
 
 
     useEffect(() => {
-        ws.current = new WebSocket(`ws://localhost:3000/${API_SERVER}/arena/ws`)
+        ws.current = new WebSocket(`ws://${document.domain}:3000/${API_SERVER}/arena/ws`)
         ws.current.onopen = () => console.log("ws opened")
         ws.current.onclose = () => console.log("ws closed")
         ws.current.onmessage = e => {
@@ -184,7 +190,7 @@ function Arena() {
         return () => window.removeEventListener("resize", handleResize);
       }, []);
     const sq = Math.min(rectSize[0], rectSize[1])
-    const cellSize = game ? Math.min(rectSize[0] / game.board.height, rectSize[1] / game.board.width):0
+    const cellSize = game ? Math.min(rectSize[0] / game.problem.board.height, rectSize[1] / game.problem.board.width):0
     return (
         <ArenaBox ref={bBox}>
         {/* <Screen>aaa</Screen> */}
@@ -193,11 +199,18 @@ function Arena() {
             <SubRanking subs = {subs} animate={animSubs}/>
         </div>
         <div style={{width:`${sq}px`, position:"relative"}}>
-            {game && <Board board={game.board} cellSize={cellSize} robots={inputState.robots} mainRobot={game.main_robot}/>}
+            {game && <Board board={game.problem.board} cellSize={cellSize} robots={inputState.robots} mainRobot={game.problem.board.main_robot}/>}
         </div>
-        {/* <div style={{width:`${(rectSize[1] - sq)/2}px`}}> */}
-        <HandsInput disabled={inputState.reached} onSubmit={handleSubmit} addHand={(hand)=>{inputDispatch({type:"add",hand:hand})}} rmHand={()=>{inputDispatch({type:"del"})}} clearHands={()=>{inputDispatch({type:"clear"})}} hands={inputState.hands} sending={sending}/>
-        {/* </div> */}
+        <div style={{display:"flex", flexDirection:"column"}}>
+            <div style={{minHeight:"50%"}}>
+            <HandsInput disabled={!inputState.reached} onSubmit={handleSubmit} addHand={(hand)=>{inputDispatch({type:"add",hand:hand})}} rmHand={()=>{inputDispatch({type:"del"})}} clearHands={()=>{inputDispatch({type:"clear"})}} hands={inputState.hands} sending={sending}/>
+            </div>
+            {   
+                <div style={{maxHeight:"50%"}}>
+                    <CircleTimer duration={10}/>
+                </div>
+            }
+        </div>
         </CenterBox>
         </ArenaBox>
     );

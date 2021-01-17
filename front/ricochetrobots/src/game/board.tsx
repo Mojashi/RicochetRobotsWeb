@@ -6,7 +6,7 @@ import goalImg from "../img/goal.png"
 import styled from "styled-components"
 
 import Robot, {RobotModel} from "./robot"
-import {Color} from "../util"
+import {Color, Pos} from "../util"
 import { cast, Castable } from '@bitr/castable';
 
 
@@ -21,22 +21,12 @@ class CellModel {
     }
 }
 
-export class BoardModel {
+export interface BoardModel {
     height:number
     width: number
     cells: CellModel[][]
-
-    constructor (width:number, height:number){
-        this.width = width
-        this.height = height
-        this.cells = []
-        for(var i:number = 0; height > i; i++){
-            this.cells[i] = []
-            for(var j:number = 0; width > j; j++){
-                this.cells[i][j] = new CellModel();
-            }
-        }
-    }
+    main_robot: number
+    poss: Pos[]
 }
 
 
