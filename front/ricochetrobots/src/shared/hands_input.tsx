@@ -10,9 +10,10 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import SvgIcon from "@material-ui/icons/ArrowBack"
 import RefreshIcon from '@material-ui/icons/Refresh';
 import SendIcon from '@material-ui/icons/Send';
-import SimpleBar from "simplebar-react"
-import 'simplebar/dist/simplebar.min.css';
+
+import { Scrollbars } from 'react-custom-scrollbars';
 import { CircularProgress } from "@material-ui/core"
+import { FitSvgIcon } from "./useful"
 
 function parseHands(str: string): Hand[] {
     var ret: Hand[] = []
@@ -50,29 +51,6 @@ const slide = keyframes`
         transform:translateY(0);
     }
 `  
-
-const HandBoxi = styled("div")`
-    display:flex;
-    flex-wrap:nowrap;
-    text-align:center; 
-
-    box-sizing:border-box;
-    /* width:100%; */
-    font-weight: bold;
-    border-radius:7px;
-    background-color: floralwhite; 
-    color: black;
-    text-shadow: 0 0 1px black;
-    box-shadow: 1px 1px 4px #8c6d55;
-    margin:2px 2px 2px 2px;
-    text-decoration: none;
-    overflow:hidden;
-    z-index:-1;
-    /* animation:${slide} 1s ease-in-out;
-    transition:all 0.5s;  */
-`
-
-
 const ResBox = styled('div')`
     box-sizing:border-box;
     width:100%;
@@ -108,21 +86,43 @@ function toArrow(dir: Dir) {
     }
 }
 
+
+const HandBoxi = styled("div")`
+    text-align:center;
+    display:grid;
+    grid-template-columns:1em calc(( 100% - 1em ) / 2) calc(( 100% - 1em ) / 2);
+
+    box-sizing:border-box;
+    /* width:100%; */
+    font-weight: bold;
+    border-radius:7px;
+    background-color: floralwhite; 
+    color: black;
+    text-shadow: 0 0 1px black;
+    box-shadow: 1px 1px 4px #8c6d55;
+    margin:2px 2px 2px 2px;
+    text-decoration: none;
+    overflow:hidden;
+    z-index:-1;
+    /* animation:${slide} 1s ease-in-out;
+    transition:all 0.5s;  */
+`
+
 function HandBox(props: { hand: Hand , r: number}) {
     const { hand, r } = props;
 
     return (
         <HandBoxi>
             {r}
-            <img style={{ objectFit: "cover", margin: "0.5em", width: "5em", height: "5em", alignSelf: "center" }} src={robotImg(robotColor(hand.robot))} />
-            <div style={{ fontSize: "4em", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                <SvgIcon component={toArrow(hand.dir)} fontSize="inherit" style={{ alignSelf: "center" }} />
+            <img style={{ objectFit: "cover", maxWidth:"4em", marginRight:"auto", marginLeft:"auto",  width: "100%", height: "100%", alignSelf: "center" }} src={robotImg(robotColor(hand.robot))} />
+            <div style={{ display: "flex", maxWidth:"4em", marginRight:"auto", marginLeft:"auto", flexDirection: "column", justifyContent: "center" }}>
+                <FitSvgIcon fontSize="inherit" style={{ alignSelf: "center" }} component={toArrow(hand.dir)} />
             </div>
         </HandBoxi>
     )
 }
 
-const ScrollBox = styled(SimpleBar)`
+const ScrollBox = styled(Scrollbars)`
     /* border: solid saddlebrown; */
     height:100%;
     /* border-radius: 10px; */
@@ -154,16 +154,16 @@ const InnerBox = styled("div")`
 
 function HandsBox(props: { hands: Hand[] }) {
     const { hands } = props;
-    const ref = useRef<HTMLDivElement>(null)
+    const ref = useRef<Scrollbars>(null)
     useEffect(()=>{
         if(ref.current === null) return;
-        ref.current.scrollTop = 0
+        ref.current.scrollTop(0)
     }, [hands])
 
     return (
-        <ScrollBox autoHide={true} scrollableNodeProps={{ ref: ref }}>
+        <ScrollBox autoHide={true} ref={ref}>
             <InnerBox>
-            {hands.map((hand, idx) => <HandBox hand={hand} key={"hand" + idx.toString()} r={hands.length - idx}/>)}
+            {hands.map((hand, idx) => <HandBox hand={hand} key={"hand" + idx.toString()} r={idx}/>)}
             </InnerBox>
         </ScrollBox>
     )
@@ -171,7 +171,7 @@ function HandsBox(props: { hands: Hand[] }) {
 
 const HandsInputRoot = styled("div")`
     display:grid;
-    width:15vw; 
+    width:100%; 
     height:100%;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;

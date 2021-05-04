@@ -8,10 +8,19 @@
             "name": "Launch",
             "type": "go",
             "request": "launch",
-            "mode": "debug",
+            "mode": "auto",
             "program": "${workspaceFolder}/main.go",
             "env": {},
-            "args": []
+            "args": [],
+        },
+        {
+            "name": "Launch gen",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/main.go",
+            "env": {},
+            "args": ["gen"],
         }
     ]
 }

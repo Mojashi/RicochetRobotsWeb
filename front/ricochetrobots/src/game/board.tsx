@@ -12,7 +12,7 @@ import { cast, Castable } from '@bitr/castable';
 
 class CellModel {
     walls : [boolean, boolean, boolean, boolean]
-    mirror : '/' | '\\' | undefined
+    mirror? : '/' | '\\'
     // mark: Color | undefined
     goal: boolean
     constructor (){
@@ -68,15 +68,16 @@ const Grid = styled("div")<{cellSize: number, w: number, h:number}>`
     height:${props=>props.cellSize*props.h}px;
 `
 
-interface Props{
+export interface BoardProps{
     board : BoardModel
     cellSize: number
     robots : RobotModel[]
     mainRobot: number
+    onTransitionEnd?: ()=>void
 }
 
-export default function Board(props : Props) {
-    const {board, cellSize, robots, mainRobot} = props
+export default function Board(props : BoardProps) {
+    const {board, cellSize, robots, mainRobot, onTransitionEnd} = props
     
     // useEffect(()=>{
     //     console.log(board)
@@ -93,7 +94,7 @@ export default function Board(props : Props) {
             })}
             {
                 robots.map((robot,idx) => 
-                    <Robot robot={robot} cellSize={cellSize} key={"robot"+idx.toString()}/>
+                    <Robot onTransitionEnd={onTransitionEnd} robot={robot} cellSize={cellSize} key={"robot"+idx.toString()}/>
                 )
             }
             <Robot robot={{idx:mainRobot, pos:{x:board.width/2-0.5, y:board.height/2-0.5}}}  cellSize={cellSize}/>

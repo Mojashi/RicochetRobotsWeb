@@ -64,7 +64,7 @@ func rngBoard() board {
 	return mp
 }
 
-func rngGame() game.Game {
+func rngGame() game.Board {
 	board := rngBoard()
 
 	candnum := []int{}
@@ -83,19 +83,15 @@ func rngGame() game.Game {
 	}
 
 	goalpos := cand[5]
-	robotposs := cand[:5]
-	mainrobot := rand.Intn(5)
+	board.RobotPoss = cand[:5]
+	board.MainRobot = rand.Intn(5)
 	board.Cells[goalpos.Y][goalpos.X].Goal = true
-	return game.Game{
-		Board:     board,
-		RobotPoss: robotposs,
-		MainRobot: mainrobot,
-	}
+	return board
 }
 
-func stringify(g game.Game) string {
+func stringify(g game.Board) string {
 	instr := ""
-	b := g.Board
+	b := g
 	var goalpos pos
 
 	for i := 0; 16 > i; i++ {
@@ -127,7 +123,7 @@ func stringify(g game.Game) string {
 	return instr
 }
 
-func parseHands(g game.Game, str string) ([]hand, error) {
+func parseHands(g game.Board, str string) ([]hand, error) {
 	poss := make([]pos, len(g.RobotPoss))
 	copy(poss, g.RobotPoss)
 	strs := strings.Split(str, "\n")
@@ -160,7 +156,7 @@ func parseHands(g game.Game, str string) ([]hand, error) {
 		poss[robot] = nex
 	}
 
-	if !g.Board.Get(poss[g.MainRobot]).Goal {
+	if !g.Get(poss[g.MainRobot]).Goal {
 		return []hand{}, fmt.Errorf("invalid solution(couldnt reach goal)")
 	}
 
@@ -196,7 +192,7 @@ func rngProblem() game.Problem {
 			if err == nil {
 				log.Println(hands)
 				return game.Problem{
-					Game:     g,
+					Board:    g,
 					OptHands: hands,
 				}
 			}

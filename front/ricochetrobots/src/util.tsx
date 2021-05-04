@@ -7,7 +7,7 @@ import blueRobotImg from "./img/robot/blue.png"
 import greenRobotImg from "./img/robot/green.png"
 import redRobotImg from "./img/robot/red.png"
 import yellowRobotImg from "./img/robot/yellow.png"
-import { SubmissionModel } from "./shared/subrank"
+import { SubmissionModel } from "./shared/submission"
 import User from "./shared/user"
 
 export const API_SERVER = "api"
@@ -28,6 +28,12 @@ export interface Pos {
 
 export function robotColor(idx : number) : Color {
     return colors[idx]
+}
+
+export function getRandomInt(min:number, max:number) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
 export function robotImg(color : Color){

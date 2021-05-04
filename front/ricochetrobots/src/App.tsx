@@ -1,4 +1,4 @@
-import Arena from "./arena/arena"
+import Arena from "./game/arena"
 import Header from "./header"
 import styled from "styled-components"
 import Login from "./login"

@@ -8,25 +8,25 @@ import (
 	"os"
 	"time"
 
-	"github.com/Mojashi/RicochetRobotsWeb/api/game"
+	"github.com/Mojashi/RicochetRobotsWeb/api/db"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 )
 
-var db *sqlx.DB
+var DBCon *sqlx.DB
 
 func dbInit() {
 	DBName := os.Getenv("DB")
 	DBUser := os.Getenv("DB_USER")
 	DBPass := os.Getenv("DB_PASS")
 	var err error
-	db, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s", DBUser, DBPass, DBName))
+	DBCon, err = sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s", DBUser, DBPass, DBName))
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	db.MustExec(game.ProblemSchema)
+	DBCon.MustExec(db.ProblemSchema)
 }
 
 func main() {
@@ -39,12 +39,16 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	problem := rngProblem()
 
-	j, err := json.Marshal(problem)
+	jb, err := json.Marshal(problem.Board)
+	if err != nil {
+		log.Print(err.Error())
+	}
+	jo, err := json.Marshal(problem.OptHands)
 	if err != nil {
 		log.Print(err.Error())
 	}
 
-	_, err = db.Exec("INSERT INTO problem (problem) VALUES (?)", j)
+	_, err = DBCon.Exec("INSERT INTO problem (board,opt_hands) VALUES (?,?)", jb, jo)
 	if err != nil {
 		log.Print(err.Error())
 	}

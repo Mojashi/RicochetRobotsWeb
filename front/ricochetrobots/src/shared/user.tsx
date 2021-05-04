@@ -6,7 +6,3 @@ export default interface User {
     win_count: number
     twitter_id : string
 }
-
-function fetchUser(name : string, me:boolean = false){
-    
-}
