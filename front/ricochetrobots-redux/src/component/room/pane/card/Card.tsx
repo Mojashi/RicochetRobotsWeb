@@ -9,11 +9,12 @@ type Props = {
     children : React.ReactNode,
     className? : string,
     selected : boolean,
+    onClick?: ()=>void,
 }
 
-export function Card({children, index, indexColor, color, selected, className} : Props) {
+export function Card({children, index, indexColor, color, selected, className, onClick} : Props) {
     return (
-        <div style={{position:"relative"}}>
+        <div style={{position:"relative"}} onClick={onClick}>
         {selected && <Stroke/>}
         <Div color={color} className={className}>
             <ChipDiv color={indexColor}>{index}</ChipDiv>
@@ -57,6 +58,7 @@ const Stroke = styled("div")`
     left:calc(-${habay});
     top:calc(-${habay});
     position:absolute;
+    pointer-events:none;
 
     background: linear-gradient(90deg, #F1FF51 50%, transparent 50%), linear-gradient(90deg, #F1FF51 50%, transparent 50%), linear-gradient(0deg, #F1FF51 50%, transparent 50%), linear-gradient(0deg, #F1FF51 50%, transparent 50%);
     background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
@@ -81,5 +83,5 @@ const ChipDiv = styled("div")<{color:string}>`
     font-style: normal;
     font-weight: bold;
     font-size:1.2em;
-    transform:translate(-0.8em, -0.5em);
+    transform:translate(-0.6em, -0.5em);
 `

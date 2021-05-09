@@ -11,5 +11,7 @@ export const PALETTE = {
     orange: "#FED958",
     white : "#ffffff",
     gold : "#FFDB1B",
+    paleGold : "#F1FF51",
     paper : "#FEFAEF",
+    wood : "#854710",
 }

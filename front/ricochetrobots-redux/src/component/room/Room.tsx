@@ -11,29 +11,46 @@ import { LeaderBoard } from "../../container/LeaderBoard"
 import { Header } from "../../container/Header"
 import { ResultView } from "./pane/Result"
 import { Result } from "../../container/Result"
+import { WoodButton } from "./pane/Input/WoodButton"
+import { PALETTE } from "../../app/palette"
+import { Title } from "./pane/Title"
+import { GameSettingPanel } from "../../container/GameSettingPanel"
+import { RoomInfo } from "../../model/RoomInfo"
+import ReactTooltip from "react-tooltip"
 
 interface Props {
-    room : Room,
+    room? : RoomInfo,
+    isAdmin : boolean,
     onGame : boolean,
     interval : boolean,
-    startButton : ()=>void,
+    readyToNext : boolean,
+    onNextClick : ()=>void,
 }
 
-export function RoomView({room, onGame, interval, startButton} : Props){
+export function RoomView({room, onGame, interval, onNextClick, isAdmin,readyToNext} : Props){
     return (
         <Div>
             <HeaderStyled/>
             <Content>
             <SideDiv>
                 <SideDivContent>
-                <ShortestStyled/>
-                {interval ? <ResultStyled/>:
-                <SubmissionsStyled/>}
+                {interval ? <>
+                    <ResultStyled/>
+                    <div data-tip="親の開始を待っています">
+                        <WoodButtonStyled disable={!readyToNext && onGame && !isAdmin} onClick={onNextClick}>
+                            <Title style={{border:"none"}}>{onGame ? "NEXT" : "FINISH"}</Title>
+                        </WoodButtonStyled> 
+                    </div>
+                    {(!readyToNext && onGame && !isAdmin) && <ReactTooltip place="right" type="dark" effect="float"/>}
+                </>:<>
+                    <ShortestStyled/>
+                    <SubmissionsStyled/>
+                </>}
                 </SideDivContent>
             </SideDiv>
             <CenterDiv>
-                {onGame ? 
-                <Problem/> : <button onClick={startButton}>START GAME</button>}
+                {onGame || interval ? 
+                <Problem/> : <GameSettingPanel/>}
             </CenterDiv>
             <SideDiv>
                 <SideDivContent>
@@ -57,10 +74,13 @@ const ShortestStyled = styled(Shortest) `
     margin-bottom:1.5em;
     flex-shrink:0;
 `
-
+const WoodButtonStyled = styled(WoodButton)`
+    padding:0.5em 0 0.5em 0;
+`
 const ResultStyled = styled(Result) `
 flex-shrink:1;
 height:100%;
+margin-bottom:1em;
 `
 const SubmissionsStyled = styled(Submissions)`
     flex-shrink:1;

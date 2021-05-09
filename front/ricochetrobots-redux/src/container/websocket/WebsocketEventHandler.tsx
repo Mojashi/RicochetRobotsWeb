@@ -13,6 +13,8 @@ import { StartTimelimitMessage } from "./serverMessage/startTimelimitMessage";
 import { FinishGameMessage } from "./serverMessage/finishGameMessage";
 import { FinishProblemMessage } from "./serverMessage/finishProblemMessage";
 import { StartGameMessage } from "./serverMessage/startGameMessage";
+import { SyncRoomMessage } from "./serverMessage/setRoomInfoMessage";
+import { notify } from "../GameSlice";
 
 export type MessageType = number
 
@@ -20,6 +22,7 @@ export const CJoin: MessageType = 0
 export const CLeave: MessageType = 1
 export const CSubmit: MessageType = 2
 export const CStart: MessageType = 3
+export const CNextProblem : MessageType = 4
 
 export const SAddHiddenSubmission: MessageType = 0
 export const SSetShortest: MessageType = 1
@@ -33,6 +36,8 @@ export const SSetProblem: MessageType = 8
 export const SStartTimelimit : MessageType = 9
 export const SFinishProblem : MessageType = 10
 export const SStartGame : MessageType = 11
+export const SSetRoomInfo : MessageType = 12
+export const STellUser : MessageType = 13
 
 
 export interface Message {
@@ -63,6 +68,7 @@ function serverEventHander(msg: any, dispatch: Dispatch<any>) {
         case SSetProblem : smsg = new SetProblemMessage(msg); break;
         case SStartTimelimit : smsg = new StartTimelimitMessage(msg); break;
         case SStartGame : smsg = new StartGameMessage(msg); break;
+        case SSetRoomInfo : smsg = new SyncRoomMessage(msg); break;
         default: console.error("unknown message type" + msg.type); return;
     }
     smsg.handle(dispatch)
@@ -75,13 +81,17 @@ export function useServer(url: string) : WsDispatch{
     useEffect(() => {
         ws.current = new WebSocket(url)
         ws.current.onopen = () => console.log("ws opened")
-        ws.current.onclose = () => console.log("ws closed")
+        ws.current.onclose = () => {
+            console.log("ws closed");
+            dispatch(notify("room not found"))
+        }
         ws.current.onmessage = e => {
             try {
                 console.log("received:" + e.data)
                 serverEventHander(JSON.parse(e.data), dispatch)
             } catch (err) {
                 console.error(err)
+                dispatch(notify("failed to send"))
             }
         };
         return () => {

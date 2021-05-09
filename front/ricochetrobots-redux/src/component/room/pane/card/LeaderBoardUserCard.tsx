@@ -40,6 +40,7 @@ const UserNameDiv = styled("div")`
 `
 const Div = styled("div")`
     display:flex;
+    justify-content: space-evenly;
 `
 const CardStyled = styled(Card)`
     margin-top:0.5em;
@@ -56,7 +57,6 @@ const PointDiv = styled("div")`
     margin-right:0.1em;
 `
 const UserDiv = styled("div")`
-    flex-grow:1;
     font-size:0.9em;
     max-width:10em;
     text-align:center;

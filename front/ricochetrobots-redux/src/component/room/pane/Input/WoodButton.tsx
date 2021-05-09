@@ -34,7 +34,10 @@ const Div = styled("div")`
     cursor:pointer;
 
     &.disable {
-
+        pointer-events:none;
+        cursor:not-allowed;
+        filter: grayscale(80%);
+        opacity : 0.6;
     }
     &.pushed {
         border-style:inset;

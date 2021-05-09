@@ -1,7 +1,9 @@
 package model
 
 type GameConfig struct {
-	Rule      Rule `json:"rule"`
-	Interval  int  `json:"interval"`
-	Timelimit int  `json:"timelimit"`
+	Rule          Rule `json:"rule"`
+	Timelimit     int  `json:"timeLimit"`
+	GoalPoint     int  `json:"goalPoint"`
+	PointForFirst int  `json:"pointForFirst"`
+	PointForOther int  `json:"pointForOther"`
 }

@@ -30,7 +30,8 @@ export function UserNavPopView({className, onClickLogIn, onClickLogOut, onClickS
 const Div = styled("div")`
     background-color: ${PALETTE.night};
     position:absolute;
-    box-shadow: 0 4px 4px rgba(0,0,0,0.25);
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    border:solid 2px white;
     border-radius:0.4em;
     transform:translateX(calc(3.2em - 100%));
     z-index:100;

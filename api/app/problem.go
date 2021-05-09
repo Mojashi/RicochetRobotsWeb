@@ -27,11 +27,15 @@ type IProblemOutput interface {
 type ProblemApp struct {
 	output IProblemOutput
 	model.ProblemState
+	gameConfig model.GameConfig
+
+	finishProblemMessage *serverMessage.FinishProblemMessage
 }
 
-func NewProblemApp(problem model.ProblemWithSolution, output IProblemOutput) IProblemApp {
+func NewProblemApp(problem model.ProblemWithSolution, gameConfig model.GameConfig, output IProblemOutput) IProblemApp {
 	return &ProblemApp{
 		output:       output,
+		gameConfig:   gameConfig,
 		ProblemState: model.NewProblemState(problem),
 	}
 }
@@ -42,13 +46,20 @@ func (a *ProblemApp) SyncAll() error {
 }
 func (a *ProblemApp) Sync(dest model.UserID) error {
 	a.output.Send(dest, serverMessage.NewSyncProblemMessage(&a.ProblemState))
+	if a.finishProblemMessage != nil {
+		a.output.Send(dest, a.finishProblemMessage)
+	}
 	return nil
 }
 
 func (a *ProblemApp) Submit(sub model.Submission) error {
+	if a.finishProblemMessage != nil {
+		return errors.New("game has already been finished")
+	}
 	if !a.Problem.IsValid(sub.Hands) {
 		return errors.New("invalid solution")
 	}
+	sub.ID = len(a.Submissions) //提出の永続化はあとでやるのでいまは適当なID
 	a.Submissions = append(a.Submissions, sub)
 	if a.Shortest == nil || sub.Length < a.Shortest.Length {
 		a.output.Broadcast(serverMessage.NewSetShortestMessage(sub))
@@ -67,8 +78,8 @@ func (a *ProblemApp) StartTimelimit() {
 		return
 	}
 	a.Timelimit = true
-	a.output.Broadcast(serverMessage.NewStartTimelimitMessage(10))
-	time.AfterFunc(10*time.Second, func() {
+	a.output.Broadcast(serverMessage.NewStartTimelimitMessage(a.gameConfig.Timelimit))
+	time.AfterFunc(time.Duration(a.gameConfig.Timelimit)*time.Second, func() {
 		a.Finish()
 	})
 }
@@ -81,14 +92,29 @@ func (a *ProblemApp) Finish() {
 		}
 		return ranking[i].Length < ranking[j].Length
 	})
-	optSubs := []model.Submission{}
+	pointDiffs := a.CalcPointDiff(ranking)
+	al := map[model.UserID]bool{}
+
+	optSubs := []model.ResultSubmission{}
 	for _, sub := range ranking {
 		if sub.Optimal {
-			optSubs = append(optSubs, sub)
+			ap := pointDiffs[sub.User.ID]
+			if al[sub.User.ID] {
+				ap = 0
+			}
+			al[sub.User.ID] = true
+			optSubs = append(optSubs, model.ResultSubmission{
+				Submission: sub,
+				SolHash:    sub.Hands.Hash(a.Problem.Problem),
+				AddedPoint: ap,
+			})
 		}
 	}
-	a.output.Broadcast(serverMessage.NewFinishProblemMessage(optSubs))
-	a.output.OnFinishProblem(a.CalcPointDiff(ranking))
+	buf := serverMessage.NewFinishProblemMessage(optSubs)
+	a.finishProblemMessage = &buf
+
+	a.output.Broadcast(a.finishProblemMessage)
+	a.output.OnFinishProblem(pointDiffs)
 }
 func (a *ProblemApp) CalcPointDiff(ranking []model.Submission) map[model.UserID]int {
 	diff := map[model.UserID]int{}
@@ -97,11 +123,11 @@ func (a *ProblemApp) CalcPointDiff(ranking []model.Submission) map[model.UserID]
 	}
 	for _, sub := range ranking {
 		if sub.Optimal {
-			diff[ranking[0].User.ID] = 3
+			diff[ranking[0].User.ID] = a.gameConfig.PointForOther
 		}
 	}
 	if ranking[0].Optimal {
-		diff[ranking[0].User.ID] = 10
+		diff[ranking[0].User.ID] = a.gameConfig.PointForFirst
 	}
 	return diff
 }
@@ -109,6 +135,8 @@ func (a *ProblemApp) Reducer(user model.User, msg clientMessage.ClientMessage) e
 	switch m := msg.(type) {
 	case clientMessage.SubmitMessage:
 		a.Submit(m.GetSubmission(user, len(a.Problem.Solution)))
+	default:
+		return errors.New("unknown messageType")
 	}
 	return nil
 }

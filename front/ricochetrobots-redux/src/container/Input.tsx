@@ -1,8 +1,9 @@
-import React, { useCallback, useContext, useEffect, useRef } from "react"
+import React, { useCallback, useContext, useEffect, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { InputView } from "../component/room/pane/Input/Input"
 import { Dir, DN, LT, RT, UP } from "../model/game/Dir"
-import { addHand, handsSelector, removeHand, resetHand, selectRobot} from "./GameSlice"
+import { addHandFromInput, addMySubmission, viewHandsSelector, removeHandFromInput, resetHandFromInput, selectRobot, inputAcceptableSelector, lastMySubTimeSelector, possSelector, isGoalSelector} from "./GameSlice"
+import { Problem } from "./Problem"
 import { WsDispatchContext } from "./Room"
 import { SubmitMessage } from "./websocket/clientMessage/submitMessage"
 
@@ -12,24 +13,31 @@ type Props = {
 }
 
 export function Input({disable, className} : Props){
-    const hands = useSelector(handsSelector)
+    const hands = useSelector(viewHandsSelector)
+    const isGoal = useSelector(isGoalSelector)
+    const myLastSubTime = useSelector(lastMySubTimeSelector)
     const pushed = useRef<boolean[]>([false,false,false,false,false])
     const dispatch = useDispatch()
     const wsDispatch = useContext(WsDispatchContext)
     const beforeEventTime = useRef(Array.from({length:10}, _=>Date.now()));
+    const enableControls = useSelector(inputAcceptableSelector)
 
     const handleSubmit = useCallback(()=>{
-        if(wsDispatch)
-            wsDispatch(new SubmitMessage(hands))
-    }, [wsDispatch, hands])
+        if(!isGoal) return;
+        if(Date.now() - myLastSubTime > 1000) {
+            dispatch(addMySubmission(hands))
+            if(wsDispatch)
+                wsDispatch(new SubmitMessage(hands))
+            }
+    }, [wsDispatch, hands, isGoal, myLastSubTime])
 
-    const handleRemove = useCallback(()=>dispatch(removeHand()),[removeHand, dispatch])
-    const handleReset = useCallback(()=>dispatch(resetHand()), [dispatch, resetHand])
+    const handleRemove = useCallback(()=>dispatch(removeHandFromInput()),[removeHandFromInput, dispatch])
+    const handleReset = useCallback(()=>dispatch(resetHandFromInput()), [dispatch, resetHandFromInput])
 
     useEffect(()=>{
         const handlePushArrow=(dir:Dir)=>{
             pushed.current.forEach((p,id)=>{
-                if(p) dispatch(addHand({dir:dir, robot:id}));
+                if(p) dispatch(addHandFromInput({dir:dir, robot:id}));
             })
         }
         const fire = (idx:number, func : ()=>any)=>{
@@ -41,7 +49,7 @@ export function Input({disable, className} : Props){
         const pushNum = (id : number, selected : boolean)=>{
             if(pushed.current[id] !== selected){
                 pushed.current[id] = selected
-                dispatch(selectRobot({id:id, selected:selected}))
+                dispatch(selectRobot({robot:id, selected:selected}))
             }
         }
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -80,7 +88,8 @@ export function Input({disable, className} : Props){
         }
     }, [disable, handleSubmit])
 
-    return <InputView hands={hands} onReset={handleReset} onSubmit={handleSubmit} className={className}/>
+    return <InputView hands={hands} onReset={handleReset} onSubmit={handleSubmit} className={className}
+        disableControls={!enableControls} disableSubmit={false}/>
     
 }
 

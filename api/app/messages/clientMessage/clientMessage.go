@@ -46,6 +46,10 @@ func ToClientMessage(msg []byte) (ClientMessage, error) {
 		var smsg StartGameRequestMessage
 		err = json.Unmarshal(msg, &smsg)
 		m = smsg
+	case NextProblem:
+		var smsg NextProblemRequestMessage
+		err = json.Unmarshal(msg, &smsg)
+		m = smsg
 	default:
 		err = errors.New("unknown message")
 	}
@@ -58,8 +62,9 @@ func ToClientMessage(msg []byte) (ClientMessage, error) {
 type Type = int
 
 const (
-	Join      Type = 0
-	Leave     Type = 1
-	Submit    Type = 2
-	StartGame Type = 3
+	Join        Type = 0
+	Leave       Type = 1
+	Submit      Type = 2
+	StartGame   Type = 3
+	NextProblem Type = 4
 )

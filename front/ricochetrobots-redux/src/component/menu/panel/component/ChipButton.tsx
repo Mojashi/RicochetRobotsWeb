@@ -10,15 +10,19 @@ type Props = {
     onClick: ()=>void,
     children?: React.ReactNode,
     className?: string,
+    disabled: boolean,
 }
-export function ChipButton({fill,selectedFill,color,selected, onClick, children, className} : Props){
+export function ChipButton({fill,selectedFill,color,selected, onClick, children, className, disabled} : Props){
     return (
-        <div onClick={onClick}>
-        <ChipDiv fill={selected&&selectedFill?selectedFill:fill} color={color} className={className + (selected?" selected":"")}>
+        <div onClick={disabled ? undefined : onClick}>
+        <ChipDiv fill={selected&&selectedFill?selectedFill:fill} color={color} className={className + (disabled?" disabled":"") + (selected?" selected":"")}>
             {children}
         </ChipDiv>
         </div>
     )
+}
+ChipButton.defaultProps = {
+    disabled : false,
 }
 
 const ChipDiv = styled(Chip)`
@@ -28,5 +32,9 @@ const ChipDiv = styled(Chip)`
     box-shadow: 0 4px 4px rgba(0,0,0,0.25);
     &.selected{
         box-shadow: 0 4px 4px 4px rgba(0,0,0,0.25) inset;
+    }
+    &.disabled {
+        opacity : 0.4;
+        cursor: default;
     }
 `

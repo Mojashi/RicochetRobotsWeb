@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
-import { User, UserID } from "../../../model/User";
-import { join, leave } from "../../GameSlice";
+import { User, UserID } from "../../../model/User"
+import { leaveFromRoom } from "../../GameSlice";
 import { MessageType, ServerMessage, SJoin, SLeave, SSetPoint } from "../WebsocketEventHandler";
 import { ServerHiddenSubmissionDto } from "./addHiddenSubmissionMessage";
 import { ServerSubmissionDto } from "./addSubmissionMessage";
@@ -14,6 +14,6 @@ export class LeaveMessage implements ServerMessage {
         Object.assign(this, init);
     }
     handle(dispatch : Dispatch<any>){
-        dispatch(leave(this.userID))
+        dispatch(leaveFromRoom(this.userID))
     }
 }

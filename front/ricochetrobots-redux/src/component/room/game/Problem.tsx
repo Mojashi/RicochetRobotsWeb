@@ -12,9 +12,10 @@ type Props = {
     problem : Problem,
     robotPoss : Pos[],
     selectedRobot : boolean[],
+    onTransitionEnd? : ()=>void,
 }
 
-export function ProblemView({problem, robotPoss, selectedRobot, className} : Props) {
+export function ProblemView({problem, robotPoss, selectedRobot, className, onTransitionEnd} : Props) {
     return (
         <Div className={className} viewBox={"0 0 160 160"}>
             <BoardView board={problem ? problem.board : EmptyBoard}/>
@@ -24,7 +25,8 @@ export function ProblemView({problem, robotPoss, selectedRobot, className} : Pro
                  height={selectedRobot[idx]?12:10} 
                  x={r.x*10} 
                  y={r.y*10}
-                 transform={selectedRobot[idx]?`translate(-1, -1)`:``}/>
+                 transform={selectedRobot[idx]?`translate(-1, -1)`:``}
+                 onTransitionEnd={onTransitionEnd}/>
             )}
             <RobotIconStyled rid={problem.mainRobot} 
                  width={10} 

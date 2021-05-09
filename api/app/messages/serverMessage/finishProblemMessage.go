@@ -2,15 +2,25 @@ package serverMessage
 
 import "github.com/Mojashi/RicochetRobots/api/model"
 
-type FinishProblemMessage struct {
-	Type Type            `json:"type"`
-	Subs []SubmissionDto `json:"subs"`
+type ResultSubmissionDto struct {
+	SubmissionDto
+	SolHash    model.SolutionHash `json:"solHash"`
+	AddedPoint int                `json:"addedPoint"`
 }
 
-func NewFinishProblemMessage(result []model.Submission) FinishProblemMessage {
-	subs := []SubmissionDto{}
+type FinishProblemMessage struct {
+	Type Type                  `json:"type"`
+	Subs []ResultSubmissionDto `json:"subs"`
+}
+
+func NewFinishProblemMessage(result []model.ResultSubmission) FinishProblemMessage {
+	subs := []ResultSubmissionDto{}
 	for _, sub := range result {
-		subs = append(subs, ToDto(sub))
+		subs = append(subs, ResultSubmissionDto{
+			SubmissionDto: ToDto(sub.Submission),
+			SolHash:       sub.SolHash,
+			AddedPoint:    sub.AddedPoint,
+		})
 	}
 	return FinishProblemMessage{
 		Type: FinishProblem,

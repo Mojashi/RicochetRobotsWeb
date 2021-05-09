@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from "styled-components"
 
 type Props = {
@@ -7,25 +7,34 @@ type Props = {
     defaultValue?: string|number,
     disabled?:boolean,
     children? : React.ReactNode,
-    onChange?:(text:string)=>void,
-    isValid?: (text:string)=>boolean,
-    className?: string,
     type: string,
+    onChange?:(text:string|number)=>void,
+    isValid?: (text:string|number)=>boolean,
+    className?: string,
+    tail? : React.ReactNode,
 }
 
-export function InputBase({title, placeHolder, disabled, defaultValue, onChange, isValid, type,children, className} : Props){
+export function InputBase({title, placeHolder, disabled, defaultValue,tail, onChange, isValid, type,children, className} : Props){
+    const [value, setValue] = useState(defaultValue)
     const validateChange = (event:React.ChangeEvent<HTMLInputElement>)=>{
-        const value = event.target.value;
-        if(onChange)
-            if(!isValid || isValid(value)) onChange(value);
+        var value: string | number = event.target.value;
+        if(type === "number"){
+            if(value == "") value = 0
+            else value = parseInt(value)
+        }
+        if(!isValid || isValid(value)) {
+            if(onChange)onChange(value)
+            setValue(value.toString())
+        };
     }
 
     return (
         <div className={className}>
             <Box>
                 {children}
-                <input className="input" type={type} placeholder={placeHolder} onChange={validateChange} 
-                 defaultValue={defaultValue} disabled={disabled}/>
+                <InputStyled className="input" type={type} placeholder={placeHolder} onChange={validateChange} 
+                     defaultValue={defaultValue} disabled={disabled} value={value}/>
+                <span className="tail">{tail}</span>
             </Box>
             <div className="title">{title}</div>
         </div>
@@ -36,6 +45,8 @@ InputBase.defaultProps = {
     type: "text",
 };
 
+const InputStyled = styled("input")`
+`
 
 const Box = styled("div")`
     display:inline;

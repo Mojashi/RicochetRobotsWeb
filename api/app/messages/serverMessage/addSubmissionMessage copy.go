@@ -9,7 +9,7 @@ type SubmissionDto struct {
 	UserID    model.UserID    `json:"userID"`
 	Hands     model.Hands     `json:"hands"`
 	TimeStamp model.TimeStamp `json:"timeStamp"`
-	Optimal   bool            `json:"opt"`
+	Optimal   bool            `json:"optimal"`
 }
 
 func ToDto(s model.Submission) SubmissionDto {

@@ -2,4 +2,4 @@ package model
 
 type Rule = int
 
-const TestRule Rule = 0
+const FirstToWin Rule = 0

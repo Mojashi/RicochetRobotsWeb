@@ -12,14 +12,16 @@ type Props = {
     className? : string,
     onReset : ()=>void,
     onSubmit : ()=>void,
+    disableControls : boolean,
+    disableSubmit : boolean,
 }
 
-export function InputView({hands,onReset,onSubmit, className} : Props) {
+export function InputView({hands,onReset,onSubmit, className, disableControls, disableSubmit} : Props) {
     return (
         <Div className = {className}>
             <ButtonDiv>
-                <WoodButtonStyled onClick={onSubmit}><SendIconStyled/></WoodButtonStyled>
-                <WoodButtonStyled onClick={onReset}><ResetIconStyled/></WoodButtonStyled>
+                <WoodButtonStyled onClick={onSubmit} disable={disableControls || disableSubmit}><SendIconStyled/></WoodButtonStyled>
+                <WoodButtonStyled onClick={onReset} disable={disableControls}><ResetIconStyled/></WoodButtonStyled>
             </ButtonDiv>
             <LaneStyled>
                 {hands.slice().reverse().map((hand, idx) => 
@@ -29,6 +31,7 @@ export function InputView({hands,onReset,onSubmit, className} : Props) {
         </Div>
     )
 }
+
 const ResetIconStyled = styled(ResetIcon)`
     height:100%;
 `

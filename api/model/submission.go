@@ -10,3 +10,9 @@ type Submission struct {
 	TimeStamp TimeStamp `json:"timeStamp"`
 	Optimal   bool      `json:"optimal"`
 }
+
+type ResultSubmission struct {
+	Submission
+	SolHash    SolutionHash `json:"solHash"`
+	AddedPoint int          `json:"addedPoint"`
+}

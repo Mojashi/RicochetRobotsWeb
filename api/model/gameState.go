@@ -2,17 +2,14 @@ package model
 
 import (
 	"sync"
-
-	"github.com/Mojashi/RicochetRobots/api/utils"
 )
 
 type GameState struct {
 	ID     int
 	Config GameConfig
 
-	Participants sync.Map //map[userID]user roomとは違って、一度でも参加したらずっと
-	Points       sync.Map
-	Interval     bool
+	Points   sync.Map
+	Interval bool
 }
 
 func NewGameState(users *sync.Map, conf GameConfig) *GameState {
@@ -23,10 +20,9 @@ func NewGameState(users *sync.Map, conf GameConfig) *GameState {
 	})
 
 	return &GameState{
-		Config:       conf,
-		Participants: *utils.CopySyncMap(users),
-		Points:       points,
-		ID:           0,
-		Interval:     false,
+		Config:   conf,
+		Points:   points,
+		ID:       0,
+		Interval: true,
 	}
 }

@@ -1,5 +1,5 @@
 import { Dispatch } from "redux"
-import { setTimeleft } from "../../GameSlice"
+import { notify, setTimeleft } from "../../GameSlice"
 import { MessageType, SStartTimelimit } from "../WebsocketEventHandler"
 
 export class StartTimelimitMessage {
@@ -10,7 +10,10 @@ export class StartTimelimitMessage {
     }
     handle(dispatch : Dispatch<any>){
         const f = (nex : Function, left:number) => {
-            dispatch(setTimeleft(left))
+            if(left > 0)
+                dispatch(notify(`${left}`))
+            else
+                dispatch(notify("FINISH"))
             if(left > 0)
                 setTimeout(nex, 1000, nex, left - 1)
         }

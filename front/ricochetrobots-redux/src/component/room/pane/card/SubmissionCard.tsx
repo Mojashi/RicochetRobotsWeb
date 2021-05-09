@@ -30,7 +30,7 @@ const CardStyled = styled(Card)`
 const MovesDiv = styled("div")`
     font-size:1.5em;
     font-weight:bold;
-
+    padding:0 0.7em 0 0.7em;
 `
 const AuthorDiv = styled("div")`
     font-size:0.9em;

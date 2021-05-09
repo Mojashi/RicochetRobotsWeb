@@ -19,4 +19,6 @@ const (
 	StartTimelimit      Type = 9
 	FinishProblem       Type = 10
 	StartGame           Type = 11
+	SetRoomInfo         Type = 12
+	TellUser            Type = 13
 )

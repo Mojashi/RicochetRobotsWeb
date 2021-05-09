@@ -30,11 +30,13 @@
     "react-scripts": "4.0.3",
     "react-scroll": "^1.8.2",
     "react-scrollbar": "^0.5.6",
+    "react-tooltip": "^4.2.19",
     "react-transition-group": "^4.4.1",
     "react-zdog": "^1.0.11",
     "styled-component": "^2.8.0",
     "styled-components": "^5.2.2",
     "typescript": "~3.8.2",
+    "use-immer": "^0.5.1",
     "zdog": "^1.1.2"
   },
   "scripts": {

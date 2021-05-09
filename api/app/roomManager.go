@@ -9,7 +9,7 @@ import (
 )
 
 type IRoomManager interface {
-	NewRoom() IRoomApp
+	NewRoom(user model.User) IRoomApp
 	Get(id int) (IRoomApp, error)
 	Delete(id int) error
 	Join(id int, c Client) error
@@ -17,23 +17,26 @@ type IRoomManager interface {
 
 type RoomManager struct {
 	rooms             *sync.Map //map[int]IRoomApp
+	roomCount         int
 	problemRepository repository.IProblemWithSolutionRepository
 }
 
 func NewRoomManager(problemRepository repository.IProblemWithSolutionRepository) IRoomManager {
-	return &RoomManager{rooms: &sync.Map{}, problemRepository: problemRepository}
+	return &RoomManager{rooms: &sync.Map{}, roomCount: 0, problemRepository: problemRepository}
 }
 
-func (m RoomManager) NewRoom() IRoomApp {
+func (m RoomManager) NewRoom(user model.User) IRoomApp {
 	// room, _ := m.RoomRepository.Create(model.Room{Name: ""})
 	roomInfo := model.RoomInfo{
-		ID:         0,
+		ID:         m.roomCount,
+		Admin:      user,
 		Name:       "test_room",
 		GameConfig: model.GameConfig{},
 		OnGame:     false,
 	}
 	room := NewRoomApp(roomInfo, m.problemRepository)
 	m.rooms.Store(roomInfo.ID, room)
+	m.roomCount++
 	return room
 }
 
