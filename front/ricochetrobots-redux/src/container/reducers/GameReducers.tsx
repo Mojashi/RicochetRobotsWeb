@@ -2,64 +2,68 @@ import { Action, PayloadAction } from "@reduxjs/toolkit"
 import { Hand } from "../../model/game/Hand"
 import {current, Draft, produce} from "immer"
 import { moveRobot } from "../../model/game/board/Board"
-import {animStart, State, selectGame, selectRoomState} from "../GameSlice"
+import {animStart, State, getGameState, getProblemState, getRoomState, getResultState} from "../GameSlice"
 import { Problem } from "../../model/game/Problem"
 import { OptSubSample, ResultSubmission, Submission, SubSample } from "../../model/game/Submission"
 import Game from "../../model/game/Game"
 import { UnknownUser, User, UserExample, UserID } from "../../model/User"
 import { initBoardView } from "./BoardViewReducers"
 import { animStartFunc, initResultState, resetRobots } from "./ResultReducers"
-import { WritableDraft } from "immer/dist/internal"
 import { Room } from "../../model/Room"
 import { Hands } from "../../model/game/Hands"
 
-export const setProblemFunc = (draft : Draft<State>, problem : Problem)=> {
-    if(draft.gameState) {
-        draft.problemState = {
+export function setProblemFunc (draft : Draft<State>, problem : Problem) {
+    if(getGameState(draft)) {
+        getRoomState(draft).problemState = {
             problem: problem,
             submissions : [],
             mySubmissions : [],
         }
-        if(draft.resultState === undefined){
+        if(getResultState(draft) === undefined){
             startProblemFunc(draft)
         }
     }
 }
-export const setShortestFunc = (draft : Draft<State>, sub : Submission)=> {
-    if(draft.problemState)
-        draft.problemState.shortest = sub
+export function setShortestFunc (draft : Draft<State>, sub : Submission) {
+    const problem = getProblemState(draft)
+    if(problem)
+        problem.shortest = sub
 }
-export const addSubmissionFunc = (draft : Draft<State>, sub : Submission)=> {
-    draft.problemState?.submissions.push(sub)
+export function addSubmissionFunc (draft : Draft<State>, sub : Submission) {
+    const problem = getProblemState(draft)
+    problem?.submissions.push(sub)
 }
 export const setPointFunc = (draft : Draft<State>, userID : UserID, point : number)=> {
-    const game = selectGame(draft)
+    const game = getGameState(draft)
     if(game){
         game.points[userID] = point
-        if(!selectRoomState(draft).participants.hasOwnProperty(userID)){
-            selectRoomState(draft).participants[userID] = UnknownUser
+        if(!getRoomState(draft).participants.hasOwnProperty(userID)){
+            getRoomState(draft).participants[userID] = UnknownUser
         }
     }
 }
 
 export function finishProblemFunc(draft : Draft<State>, subs : ResultSubmission[]) {
-    if(draft.problemState){
-        initResultState(draft, draft.problemState.problem, subs)
+    const problem = getProblemState(draft)
+    if(problem){
+        initResultState(draft, problem.problem, subs)
         animStartFunc(draft, subs[0])
-        draft.problemState = undefined
+        getRoomState(draft).problemState = undefined
     }
 }
 
-export function startProblemFunc(draft : WritableDraft<State>) {
-    if(draft.problemState){
-        draft.resultState = undefined
-        initBoardView(draft, draft.problemState.problem)
+export function startProblemFunc(draft : Draft<State>) {
+    const problem = getProblemState(draft)
+    if(problem){
+        getRoomState(draft).resultState = undefined
+        initBoardView(draft, problem.problem)
     }
 }
-export function joinToGameFunc(draft : WritableDraft<State>, user : User) {
-    if(selectG){
-        if(!draft.gameState.points.hasOwnProperty(user.id))
-            draft.gameState.points[user.id] = 0
+export function joinToGameFunc(draft : Draft<State>, user : User) {
+    const game = getGameState(draft)
+    if(game){
+        if(!game.points.hasOwnProperty(user.id))
+            game.points[user.id] = 0
     }
 }
 
@@ -78,14 +82,16 @@ export const GameReducers = {
     ),
     setTimeleft: (state : State, action : PayloadAction<number>) => (
         produce(state, draft => {
-            if(draft.problemState)
-                draft.problemState.timeleft = action.payload
+            const problem = getProblemState(state)
+            if(problem)
+                problem.timeleft = action.payload
         })
     ),
     finishGame: (state : State, action : Action) => (
         produce(state, draft => {
-            draft.problemState = undefined
-            draft.gameState = undefined
+            const room = getRoomState(draft)
+            room.problemState = undefined
+            room.gameState = undefined
         })
     ),
     finishProblem: (state : State, action : PayloadAction<ResultSubmission[]>) => (
@@ -93,18 +99,20 @@ export const GameReducers = {
     ),
     startGame: (state : State, action : PayloadAction<number>) => (
         produce(state, draft => {
-            if (draft.gameState === undefined || draft.gameState?.gameID !== action.payload) {
-                draft.gameState = {
+            const game = getGameState(draft)
+            const room = getRoomState(draft)
+            if (game === undefined || game?.gameID !== action.payload) {
+                room.gameState = {
                     gameID : action.payload,
                     points : {},
                 }
-                draft.resultState = undefined
+                room.resultState = undefined
             }
         })
     ),
     addMySubmission : (state : State, action : PayloadAction<Hands>) => (
         produce(state, draft => {
-            draft.problemState?.mySubmissions.push({
+            getProblemState(draft)?.mySubmissions.push({
                 hands : action.payload,
                 timeStamp : Date.now(),
             })
