@@ -4,6 +4,7 @@ import { UserIcon } from "../../../../model/UserIcon"
 import { LeaderBoardUser } from "../LeaderBoard"
 import { Card } from "./Card"
 import ScrollArea from "react-scrollbar"
+import { PALETTE } from "../../../../app/palette"
 
 type Props = {
     className? : string,
@@ -13,7 +14,7 @@ type Props = {
 
 export function LeaderBoardUserCard({rank, user, className} : Props) {
     return (
-        <CardStyled index={rank} className={className}>
+        <CardStyled index={rank} className={(className?className:"") + (user.online ? " online" : " offline")}>
             <Div>
             <PointDiv>{user.point}pt</PointDiv>
             <UserDiv>
@@ -44,6 +45,13 @@ const Div = styled("div")`
 `
 const CardStyled = styled(Card)`
     margin-top:0.5em;
+
+    &.online {
+        border: solid 2px ${PALETTE.paleGreen};
+    }
+    &.offline {
+        border: solid 2px ${PALETTE.orange};
+    }
 `
 
 const PointDiv = styled("div")`

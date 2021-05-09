@@ -21,4 +21,5 @@ const (
 	StartGame           Type = 11
 	SetRoomInfo         Type = 12
 	TellUser            Type = 13
+	UnauthError         Type = 14
 )

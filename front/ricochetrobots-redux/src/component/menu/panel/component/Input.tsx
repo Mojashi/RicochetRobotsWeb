@@ -16,6 +16,9 @@ export const Input = styled(InputBase)`
         &:focus{
             outline:0;
         }
+        &::disabled {
+            pointer-events:none;
+        }
     }
     & #title{
         text-align:left;

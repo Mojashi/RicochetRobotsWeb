@@ -15,6 +15,8 @@ import { FinishProblemMessage } from "./serverMessage/finishProblemMessage";
 import { StartGameMessage } from "./serverMessage/startGameMessage";
 import { SyncRoomMessage } from "./serverMessage/setRoomInfoMessage";
 import { notify } from "../GameSlice";
+import { TellUserMessage } from "./serverMessage/tellUserMessage";
+import { UnauthErrorMessage } from "./serverMessage/unauthErrorMessage";
 
 export type MessageType = number
 
@@ -38,7 +40,7 @@ export const SFinishProblem : MessageType = 10
 export const SStartGame : MessageType = 11
 export const SSetRoomInfo : MessageType = 12
 export const STellUser : MessageType = 13
-
+export const SUnauth : MessageType = 14
 
 export interface Message {
     type: MessageType,
@@ -69,6 +71,8 @@ function serverEventHander(msg: any, dispatch: Dispatch<any>) {
         case SStartTimelimit : smsg = new StartTimelimitMessage(msg); break;
         case SStartGame : smsg = new StartGameMessage(msg); break;
         case SSetRoomInfo : smsg = new SyncRoomMessage(msg); break;
+        case STellUser : smsg = new TellUserMessage(msg); break;
+        case SUnauth : smsg = new UnauthErrorMessage(msg); break;
         default: console.error("unknown message type" + msg.type); return;
     }
     smsg.handle(dispatch)
@@ -80,6 +84,10 @@ export function useServer(url: string) : WsDispatch{
 
     useEffect(() => {
         ws.current = new WebSocket(url)
+        ws.current.onerror = (ev) => {
+            console.log(ev)
+            dispatch(notify("connection error"))
+        }
         ws.current.onopen = () => console.log("ws opened")
         ws.current.onclose = () => {
             console.log("ws closed");
@@ -91,7 +99,7 @@ export function useServer(url: string) : WsDispatch{
                 serverEventHander(JSON.parse(e.data), dispatch)
             } catch (err) {
                 console.error(err)
-                dispatch(notify("failed to send"))
+                dispatch(notify("failed to parse"))
             }
         };
         return () => {

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router"
 import { RoomView } from "../component/room/Room"
 import { FirstToWin } from "../model/game/Rule"
-import { intervalSelector, onGameSelector, finishResult, problemExistsSelector, roomInfoSelector } from "./GameSlice"
+import { intervalSelector, onGameSelector, finishResult, problemExistsSelector, roomInfoSelector, needToAuthSelector } from "./GameSlice"
 import { useServer, WsDispatch } from "./websocket/WebsocketEventHandler"
 import { StartGameRequestMessage } from "./websocket/clientMessage/startGameRequestMessage"
 import { userSelector } from "./SiteSlice"
@@ -21,6 +21,8 @@ export function Room(){
     const wsDispatch = useServer(`ws://${document.domain}:3000/api/join/${roomID}`)
     const dispatch = useDispatch()
     const isAdmin = user.id === room?.admin.id
+    const needToAuth = useSelector(needToAuthSelector)
+
     return (
         <WsDispatchContext.Provider value={wsDispatch}>
             <RoomView 
@@ -33,6 +35,7 @@ export function Room(){
                     ()=>{dispatch(finishResult())}
                 }
                 readyToNext={readyToNext}
+                needToAuth={needToAuth}
             />
         </WsDispatchContext.Provider>
     )

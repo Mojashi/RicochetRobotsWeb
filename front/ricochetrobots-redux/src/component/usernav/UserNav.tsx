@@ -44,8 +44,8 @@ export function UserNavView({children, className, img} : Props){
     }
 
     return (
-        <div ref={ref}>
-        <Div className={className + (pushed ? " pushed":"") + (hover ? " hover":"")} 
+        <div ref={ref} className={className}>
+        <Div className={(pushed ? " pushed":"") + (hover ? " hover":"")} 
             onClick={onClick} onMouseDown={()=>setPushed(true)} onMouseUp={()=>setPushed(false)}
             onMouseLeave={()=>{setPushed(false);setHover(false);}}
             onMouseEnter={()=>setHover(true)}>

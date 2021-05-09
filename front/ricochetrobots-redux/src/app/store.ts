@@ -11,7 +11,6 @@ const middleware = getDefaultMiddleware({ serializableCheck: false });
 export const store = configureStore({
   reducer: {
     game:gameSlice.reducer,
-    site: siteSlice.reducer,
   },
   middleware,
 });

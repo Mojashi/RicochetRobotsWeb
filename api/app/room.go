@@ -19,6 +19,7 @@ type Client interface {
 
 type IRoomApp interface {
 	Delete()
+	Auth(password string) bool
 
 	Broadcast(msg serverMessage.ServerMessage)
 	Send(userID model.UserID, msg serverMessage.ServerMessage) error
@@ -49,6 +50,10 @@ func NewRoomApp(
 	return &RoomApp{participants: sync.Map{}, roomInfo: room, problemRepository: problemRepository}
 }
 
+func (r *RoomApp) Auth(password string) bool {
+	return !r.roomInfo.Private || r.roomInfo.Password == password
+}
+
 func (r *RoomApp) Delete() {
 	r.participants.Range(func(key, value interface{}) bool {
 		value.(Client).Delete()
@@ -72,6 +77,26 @@ func (r *RoomApp) Send(userID model.UserID, msg serverMessage.ServerMessage) err
 
 func (r *RoomApp) Join(c Client) error {
 	c.Run(r)
+	r.Participate(c, "")
+	return nil
+}
+func (r *RoomApp) authorize(user model.User, password string) bool {
+	return !r.roomInfo.Private || r.roomInfo.Password == password || r.IsRoomAdmin(user)
+}
+func (r *RoomApp) IsRoomAdmin(user model.User) bool {
+	return r.roomInfo.Admin.ID == user.ID
+}
+func (r *RoomApp) isParticipant(user model.User) bool {
+	_, parted := r.participants.Load(user.ID)
+	return parted
+}
+
+func (r *RoomApp) Participate(c Client, password string) error {
+	if !r.authorize(c.GetUser(), password) {
+		c.Send(serverMessage.NewUnauthMessage())
+		return errors.New("password is incorrect")
+	}
+
 	bc, loaded := r.participants.LoadAndDelete(c.GetUser().ID)
 	if loaded {
 		bc.(Client).Delete()
@@ -84,14 +109,13 @@ func (r *RoomApp) Join(c Client) error {
 		r.gameApp.Join(c.GetUser())
 	}
 	r.Sync(c.GetUser().ID)
-
 	return nil
 }
 func (r *RoomApp) Leave(c Client) {
 	r.participants.Delete(c.GetUser().ID)
 	if r.roomInfo.Admin.ID == c.GetUser().ID {
 		r.participants.Range(func(key, value interface{}) bool {
-			r.roomInfo.Admin = value.(model.User)
+			r.roomInfo.Admin = value.(Client).GetUser()
 			return false
 		})
 		if r.roomInfo.Admin.ID == c.GetUser().ID { //つまり、更新されなかった、誰もルームにいない
@@ -103,6 +127,7 @@ func (r *RoomApp) Leave(c Client) {
 	if r.roomInfo.OnGame {
 		r.gameApp.Leave(c.GetUser())
 	}
+	r.Broadcast(serverMessage.NewLeaveMessage(c.GetUser()))
 }
 func (r *RoomApp) SetGameConfig(conf model.GameConfig) {
 	r.roomInfo.GameConfig = conf
@@ -127,13 +152,21 @@ func (r *RoomApp) StartGame(gameConfig model.GameConfig) error {
 }
 
 func (r *RoomApp) Reducer(c Client, msg clientMessage.ClientMessage) error {
+	joinM, ok := msg.(clientMessage.JoinMessage)
+	if ok {
+		r.Participate(c, joinM.GetPassword())
+	}
+	if !r.isParticipant(c.GetUser()) { //まだ認証突破してない
+		return c.Send(serverMessage.NewUnauthMessage())
+	}
+
 	switch m := msg.(type) {
-	case clientMessage.JoinMessage:
-		return r.Join(c)
 	case clientMessage.LeaveMessage:
 		r.Leave(c)
 	case clientMessage.StartGameRequestMessage:
-		r.StartGame(m.GameConfig)
+		if r.IsRoomAdmin(c.GetUser()) {
+			r.StartGame(m.GameConfig)
+		}
 	default:
 		if r.roomInfo.OnGame {
 			return r.gameApp.Reducer(c.GetUser(), msg)
@@ -165,7 +198,7 @@ func (r *RoomApp) getParticipantsMap() map[model.UserID]model.User {
 	ret := map[model.UserID]model.User{}
 
 	r.participants.Range(func(userID, c interface{}) bool {
-		ret[userID.(model.UserID)] = c.(model.User)
+		ret[userID.(model.UserID)] = c.(Client).GetUser()
 		return true
 	})
 	return ret

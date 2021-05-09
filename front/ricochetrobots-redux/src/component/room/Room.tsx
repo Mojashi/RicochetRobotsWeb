@@ -17,6 +17,8 @@ import { Title } from "./pane/Title"
 import { GameSettingPanel } from "../../container/GameSettingPanel"
 import { RoomInfo } from "../../model/RoomInfo"
 import ReactTooltip from "react-tooltip"
+import { AuthDialogView } from "./AuthDialog"
+import { AuthDialog } from "../../container/AuthDialog"
 
 interface Props {
     room? : RoomInfo,
@@ -25,40 +27,51 @@ interface Props {
     interval : boolean,
     readyToNext : boolean,
     onNextClick : ()=>void,
+    needToAuth : boolean,
 }
 
-export function RoomView({room, onGame, interval, onNextClick, isAdmin,readyToNext} : Props){
+export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyToNext} : Props){
+    const CenterElem = <CenterDiv>
+    {onGame || interval ? 
+        <Problem/> : 
+        isAdmin ?
+            <GameSettingPanel/> :
+            <Text>開始を待っています...</Text>
+    }
+</CenterDiv>
+
+    const ContentElem = 
+    <Content>
+    <SideDiv>
+        <SideDivContent>
+        {interval ? <>
+            <ResultStyled/>
+            <div data-tip="親の開始を待っています">
+                <WoodButtonStyled disable={!readyToNext && onGame && !isAdmin} onClick={onNextClick}>
+                    <Title style={{border:"none"}}>{onGame ? "NEXT" : "FINISH"}</Title>
+                </WoodButtonStyled> 
+            </div>
+            {(!readyToNext && onGame && !isAdmin) && <ReactTooltip place="right" type="dark" effect="float"/>}
+        </>:<>
+            <ShortestStyled/>
+            <SubmissionsStyled/>
+        </>}
+        </SideDivContent>
+    </SideDiv>
+    {CenterElem}
+    <SideDiv>
+        <SideDivContent>
+        <InputStyled/>
+        <LeaderBoardStyled/>
+        </SideDivContent>
+    </SideDiv>
+    </Content>
+    
+
     return (
         <Div>
             <HeaderStyled/>
-            <Content>
-            <SideDiv>
-                <SideDivContent>
-                {interval ? <>
-                    <ResultStyled/>
-                    <div data-tip="親の開始を待っています">
-                        <WoodButtonStyled disable={!readyToNext && onGame && !isAdmin} onClick={onNextClick}>
-                            <Title style={{border:"none"}}>{onGame ? "NEXT" : "FINISH"}</Title>
-                        </WoodButtonStyled> 
-                    </div>
-                    {(!readyToNext && onGame && !isAdmin) && <ReactTooltip place="right" type="dark" effect="float"/>}
-                </>:<>
-                    <ShortestStyled/>
-                    <SubmissionsStyled/>
-                </>}
-                </SideDivContent>
-            </SideDiv>
-            <CenterDiv>
-                {onGame || interval ? 
-                <Problem/> : <GameSettingPanel/>}
-            </CenterDiv>
-            <SideDiv>
-                <SideDivContent>
-                <InputStyled/>
-                <LeaderBoardStyled/>
-                </SideDivContent>
-            </SideDiv>
-            </Content>
+            {needToAuth ? <Content><AuthDialog/></Content> : ContentElem}       
         </Div>
     )
 }
@@ -123,4 +136,13 @@ const SideDivContent = styled("div")`
     justify-content:flex-start;
     flex-direction:column;
     width:fit-content;
+`
+const Text = styled("div")`
+    font-size:2em;
+    font-weight:bold;
+    color : ${PALETTE.wood};
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
 `

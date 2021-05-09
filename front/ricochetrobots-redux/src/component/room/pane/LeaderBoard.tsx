@@ -8,6 +8,7 @@ import {Title} from "./Title"
 export type LeaderBoardUser = {
     user : User,
     point:number,
+    online : boolean,
 }
 
 type Props = {

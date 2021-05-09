@@ -69,7 +69,7 @@ export function GameSettingPanelView({className,onClickStart} : Props) {
         <ReactTooltip place="right" type="dark" effect="float"/>
 
         <StartButton onClick={onClickStart?()=>{onClickStart(gameConfig)}:undefined}
-             color={PALETTE.night} fill={PALETTE.white} text="はじめる" fontSize="2em"></StartButton>
+             color={PALETTE.night} fill={PALETTE.white} text="はじめる" fontSize="2em"/>
         </ContentDiv>
         </ScrollArea>
     </Div>

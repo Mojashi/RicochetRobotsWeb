@@ -36,7 +36,7 @@ func (h JoinHandler) Handle(c echo.Context) error {
 		return err
 	}
 
-	_, err = h.roomManager.Get(roomID)
+	roomApp, err := h.roomManager.Get(roomID)
 	if err != nil {
 		return c.String(404, err.Error())
 	}
@@ -45,8 +45,7 @@ func (h JoinHandler) Handle(c echo.Context) error {
 		return err
 	}
 	client, _ := NewClient(conn, user)
-	err = h.roomManager.Join(roomID, client)
-	if err != nil {
+	if err := roomApp.Join(client); err != nil {
 		return err
 	}
 

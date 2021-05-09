@@ -23,6 +23,7 @@ type IGameOutput interface {
 	Broadcast(msg serverMessage.ServerMessage)
 	Send(dest model.UserID, msg serverMessage.ServerMessage) error
 	OnFinishGame()
+	IsRoomAdmin(user model.User) bool
 }
 
 type GameApp struct {
@@ -46,11 +47,11 @@ func NewGameApp(users *sync.Map, conf model.GameConfig, output IGameOutput, prob
 }
 
 func (u *GameApp) Init() error {
+	u.SyncAll()
 	err := u.StartProblem()
 	if err != nil {
 		return err
 	}
-	u.SyncAll()
 	return nil
 }
 
@@ -64,6 +65,7 @@ func (u *GameApp) StartProblem() error {
 	}
 	u.problem = NewProblemApp(problem, u.Config, u)
 	u.GameState.Interval = false
+	u.problem.SyncAll()
 	return nil
 }
 func (u *GameApp) SyncAll() error {
@@ -97,11 +99,13 @@ func (u *GameApp) Finish() error {
 func (u *GameApp) Reducer(user model.User, msg clientMessage.ClientMessage) error {
 	switch m := msg.(type) {
 	case clientMessage.JoinMessage:
-		u.Join(m.GetUser())
+		u.Join(user)
 	case clientMessage.LeaveMessage:
 		u.Leave(m.GetUser())
 	case clientMessage.NextProblemRequestMessage:
-		u.StartProblem()
+		if u.output.IsRoomAdmin(user) {
+			u.StartProblem()
+		}
 	default:
 		if !u.GameState.Interval {
 			u.problem.Reducer(user, msg)
@@ -117,6 +121,7 @@ func (u *GameApp) Send(dest model.UserID, msg serverMessage.ServerMessage) error
 	return u.output.Send(dest, msg)
 }
 func (u *GameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
+	u.Interval = true
 	msgs := []serverMessage.SetPointMessage{}
 	for userID, diff := range pointDiff {
 		bef, ok := u.Points.Load(userID)

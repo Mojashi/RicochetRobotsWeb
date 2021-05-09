@@ -23,7 +23,7 @@ export function RoomsPanel({className, rooms} : Props){
             <InnerDiv>
                 <ScrollArea horizontal={false} vertical={true}>
                 <Header>
-                    <SearchBox placeHolder="🔎ルーム名"/>
+                    <SearchBox placeHolder="🔎ルーム名" defaultValue=""/>
                     <Button color={PALETTE.paleBlue} fill={PALETTE.white} text="進行中を表示" onClick={toggleShowProg} selected={showProg}/>
                     <Button color={PALETTE.paleBlue} fill={PALETTE.white} text="待機中を表示" onClick={toggleShowWait} selected={showWait}/>
                 </Header>

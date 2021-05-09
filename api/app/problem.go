@@ -123,7 +123,7 @@ func (a *ProblemApp) CalcPointDiff(ranking []model.Submission) map[model.UserID]
 	}
 	for _, sub := range ranking {
 		if sub.Optimal {
-			diff[ranking[0].User.ID] = a.gameConfig.PointForOther
+			diff[sub.User.ID] = a.gameConfig.PointForOther
 		}
 	}
 	if ranking[0].Optimal {

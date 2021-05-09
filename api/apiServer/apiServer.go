@@ -72,7 +72,7 @@ func Run() {
 	g.GET("/twitter/signin", singinHandler.Handle)
 	g.GET("/twitter/callback", callbackHandler.Handle)
 
-	g.GET("/makeRoom", makeRoomHandler.Handle)
+	g.POST("/makeRoom", makeRoomHandler.Handle)
 	g.GET("/join/:roomID", joinHandler.Handle)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))

@@ -4,7 +4,7 @@ import styled from "styled-components"
 type Props = {
     title?: string,
     placeHolder?: string,
-    defaultValue?: string|number,
+    defaultValue: string|number,
     disabled?:boolean,
     children? : React.ReactNode,
     type: string,

@@ -5,10 +5,6 @@ import produce, { current } from "immer"
 import { RootState } from "../app/store"
 import { User, AnonymousUser } from "../model/User"
 
-type SiteState = {
-    user : User,
-}
-
 const initialState :SiteState = {
     user : AnonymousUser,
 }

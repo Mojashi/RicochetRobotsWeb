@@ -34,6 +34,7 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
     )
 }
 const UserNavStyled = styled(UserNav)`
+    z-index: 1000;
     position : absolute;
     right : 0;
     top : 50%;

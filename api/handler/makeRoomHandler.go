@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"math/rand"
 	"net/http"
 
@@ -24,7 +25,21 @@ func (h MakeRoomHandler) Handle(c echo.Context) error {
 	} else {
 		user = model.User{ID: model.UserID(rand.Intn(1000000)), Name: "guest", TwitterID: ""}
 	}
-	room := h.roomManager.NewRoom(user)
 
-	return c.JSON(http.StatusOK, room)
+	settings := model.RoomSettings{}
+	if err := c.Bind(&settings); err != nil {
+		return err
+	}
+
+	roomID, err := h.roomManager.NewRoom(user, settings)
+	if err != nil {
+		return err
+	}
+	type Ret = struct {
+		RoomID int `json:"roomID"`
+	}
+	str, _ := json.Marshal(Ret{
+		RoomID: roomID,
+	})
+	return c.String(http.StatusOK, string(str))
 }

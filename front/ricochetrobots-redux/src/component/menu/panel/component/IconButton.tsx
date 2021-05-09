@@ -28,6 +28,7 @@ const Div = styled("div")<{fill?:string}>`
     flex-direction:column;
     align-items:center;
     background-color: ${p=>p.fill};
+    cursor: pointer;
 
     box-shadow: 0 4px 4px rgba(0,0,0,0.25);
 
