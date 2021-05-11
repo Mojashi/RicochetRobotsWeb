@@ -2,7 +2,6 @@ package app
 
 import (
 	"errors"
-	"sync"
 
 	"github.com/Mojashi/RicochetRobots/api/app/messages/clientMessage"
 	"github.com/Mojashi/RicochetRobots/api/app/messages/serverMessage"
@@ -11,7 +10,7 @@ import (
 	"github.com/Mojashi/RicochetRobots/api/utils"
 )
 
-type IGameApp interface {
+type IGameApp interface { //かならず１スレッドからしか触られない前提(Roomが１個ずつしか通さないので)
 	Join(user model.User)
 	Leave(user model.User)
 	Reducer(user model.User, msg clientMessage.ClientMessage) error
@@ -33,21 +32,21 @@ type GameApp struct {
 	problem IProblemApp
 	model.GameState
 
-	LeftParticipants sync.Map
+	LeftParticipants map[model.UserID]model.User
 }
 
-func NewGameApp(users *sync.Map, conf model.GameConfig, output IGameOutput, problemRepository repository.IProblemWithSolutionRepository) (IGameApp, error) {
+func NewGameApp(users map[model.UserID]model.User, conf model.GameConfig, output IGameOutput, problemRepository repository.IProblemWithSolutionRepository) (IGameApp, error) {
 	g := &GameApp{
 		output:            output,
 		problemRepository: problemRepository,
 		GameState:         *model.NewGameState(users, conf),
-		LeftParticipants:  sync.Map{},
+		LeftParticipants:  map[int]model.User{},
 	}
 	return g, g.Init()
 }
 
 func (u *GameApp) Init() error {
-	u.SyncAll()
+	u.output.Broadcast(serverMessage.NewSyncGameMessage(&u.GameState, u.LeftParticipants))
 	err := u.StartProblem()
 	if err != nil {
 		return err
@@ -69,26 +68,22 @@ func (u *GameApp) StartProblem() error {
 	return nil
 }
 func (u *GameApp) SyncAll() error {
-	u.output.Broadcast(serverMessage.NewSyncGameMessage(&u.GameState, &u.LeftParticipants))
-	if !u.GameState.Interval {
-		return u.problem.SyncAll()
-	}
-	return nil
+	u.output.Broadcast(serverMessage.NewSyncGameMessage(&u.GameState, u.LeftParticipants))
+	return u.problem.SyncAll()
 }
 func (u *GameApp) Sync(dest model.UserID) error {
-	u.output.Send(dest, serverMessage.NewSyncGameMessage(&u.GameState, &u.LeftParticipants))
-	if !u.GameState.Interval {
-		return u.problem.Sync(dest)
-	}
-	return nil
+	u.output.Send(dest, serverMessage.NewSyncGameMessage(&u.GameState, u.LeftParticipants))
+	return u.problem.Sync(dest)
 }
 
 func (u *GameApp) Join(user model.User) {
-	u.GameState.Points.LoadOrStore(user.ID, 0)
-	u.LeftParticipants.Delete(user.ID)
+	if _, ok := u.GameState.Points[user.ID]; !ok {
+		u.GameState.Points[user.ID] = 0
+	}
+	delete(u.LeftParticipants, user.ID)
 }
 func (u *GameApp) Leave(user model.User) {
-	u.LeftParticipants.Store(user.ID, user)
+	u.LeftParticipants[user.ID] = user
 }
 
 func (u *GameApp) Finish() error {
@@ -97,11 +92,11 @@ func (u *GameApp) Finish() error {
 }
 
 func (u *GameApp) Reducer(user model.User, msg clientMessage.ClientMessage) error {
-	switch m := msg.(type) {
+	switch msg.(type) {
 	case clientMessage.JoinMessage:
 		u.Join(user)
 	case clientMessage.LeaveMessage:
-		u.Leave(m.GetUser())
+		u.Leave(user)
 	case clientMessage.NextProblemRequestMessage:
 		if u.output.IsRoomAdmin(user) {
 			u.StartProblem()
@@ -124,12 +119,12 @@ func (u *GameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 	u.Interval = true
 	msgs := []serverMessage.SetPointMessage{}
 	for userID, diff := range pointDiff {
-		bef, ok := u.Points.Load(userID)
+		bef, ok := u.Points[userID]
 		nex := diff
 		if ok {
-			nex = bef.(int) + diff
+			nex = bef + diff
 		}
-		u.Points.Store(userID, nex)
+		u.Points[userID] = nex
 		msgs = append(msgs, serverMessage.NewSetPointMessage(userID, nex))
 	}
 	u.output.Broadcast(msgs)
@@ -144,9 +139,8 @@ func (u *GameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 
 func (u *GameApp) isFinish() bool {
 	maxPoint := 0
-	u.Points.Range(func(_, pt interface{}) bool {
-		maxPoint = utils.Max(maxPoint, pt.(int))
-		return true
-	})
+	for _, pt := range u.Points {
+		maxPoint = utils.Max(maxPoint, pt)
+	}
 	return maxPoint > u.GameState.Config.GoalPoint
 }

@@ -40,3 +40,7 @@ func (b Board) Get(pos Pos) Cell {
 func (b Board) Value() (driver.Value, error) {
 	return json.Marshal(b)
 }
+
+func (b Board) Draw(savePath string) {
+
+}

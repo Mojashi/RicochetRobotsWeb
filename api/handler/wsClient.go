@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
+	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
@@ -43,6 +45,8 @@ type WsClient struct {
 	send chan []byte
 
 	user model.User
+
+	sentMsgCnt int32
 }
 
 func (c *WsClient) readPump() {
@@ -111,18 +115,25 @@ func NewClient(conn *websocket.Conn, user model.User) (*WsClient, error) {
 }
 
 func (c *WsClient) Send(msg serverMessage.ServerMessage) error {
-	bytes, err := json.Marshal(msg)
+	msgID := atomic.AddInt32(&c.sentMsgCnt, 1)
+	msgBytes, err := json.Marshal(msg)
 	if err != nil {
 		return err
 	}
-	c.send <- bytes
+
+	buf := bytes.NewBuffer(make([]byte, 0, len(msgBytes)+10))
+	buf.Write([]byte(strconv.Itoa(int(msgID))))
+	buf.Write([]byte(","))
+	buf.Write(msgBytes)
+
+	c.send <- buf.Bytes()
 	return nil
 }
 func (c *WsClient) GetUser() model.User {
 	return c.user
 }
 func (c *WsClient) Delete() error {
-	c.room.Leave(c)
+	c.room.SendLeave(c)
 	c.conn.Close()
 	return nil
 }
@@ -131,6 +142,8 @@ func (c *WsClient) Run(r app.IRoomApp) error {
 	c.room = r
 	go c.writePump()
 	go c.readPump()
+
+	r.SendJoin(c)
 	return nil
 }
 
@@ -140,6 +153,6 @@ func (c *WsClient) Handle(msg []byte) error {
 	if err != nil {
 		return err
 	}
-	c.room.Reducer(c, cmsg)
+	c.room.SendMessage(c, cmsg)
 	return nil
 }

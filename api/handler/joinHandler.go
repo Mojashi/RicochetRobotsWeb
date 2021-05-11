@@ -45,7 +45,8 @@ func (h JoinHandler) Handle(c echo.Context) error {
 		return err
 	}
 	client, _ := NewClient(conn, user)
-	if err := roomApp.Join(client); err != nil {
+
+	if err := client.Run(roomApp); err != nil {
 		return err
 	}
 

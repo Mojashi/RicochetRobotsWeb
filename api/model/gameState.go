@@ -1,23 +1,18 @@
 package model
 
-import (
-	"sync"
-)
-
 type GameState struct {
 	ID     int
 	Config GameConfig
 
-	Points   sync.Map
+	Points   map[UserID]int
 	Interval bool
 }
 
-func NewGameState(users *sync.Map, conf GameConfig) *GameState {
-	points := sync.Map{}
-	users.Range(func(key, value interface{}) bool {
-		points.Store(key, 0)
-		return true
-	})
+func NewGameState(users map[UserID]User, conf GameConfig) *GameState {
+	points := map[UserID]int{}
+	for userID := range users {
+		points[userID] = 0
+	}
 
 	return &GameState{
 		Config:   conf,

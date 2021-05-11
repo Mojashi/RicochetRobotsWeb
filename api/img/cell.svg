@@ -1,0 +1,29 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="64" height="64" fill="white"/>
+<path d="M19 23.5L40.5 45H45V40.5L23.5 19H19V23.5Z" fill="#EBE5DC"/>
+<path d="M30 19L45 34V27L37 19H30Z" fill="#EBE5DC"/>
+<path d="M45 19V21.5L42.5 19H45Z" fill="#EBE5DC"/>
+<path d="M19 45H21.5L19 42.5V45Z" fill="#EBE5DC"/>
+<path d="M19 36.5L27 45H33.5L19 30V36.5Z" fill="#EBE5DC"/>
+<path d="M3 31H5V33H3V31Z" fill="#EBE5DC"/>
+<path d="M3 61V59H5V61H3Z" fill="#EBE5DC"/>
+<path d="M61 61V59H59V61H61Z" fill="#EBE5DC"/>
+<path d="M61 32V33H59V31H61V32Z" fill="#EBE5DC"/>
+<path d="M61 3V5H59V3H61Z" fill="#EBE5DC"/>
+<path d="M32 3H33V5H31V3H32Z" fill="#EBE5DC"/>
+<path d="M3 3V5H5V3H3Z" fill="#EBE5DC"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H64V64H0V0ZM16 48V16H48V48H16ZM33 3H32H31V5H33V3ZM3 5V3H5V5H3ZM61 5V3H59V5H61ZM61 33V32V31H59V33H61ZM61 59V61H59V59H61ZM3 59V61H5V59H3ZM5 31H3V33H5V31Z" fill="#EBE5DC"/>
+<path d="M19 23.5L40.5 45H45V40.5L23.5 19H19V23.5Z" stroke="black" stroke-width="0.5"/>
+<path d="M30 19L45 34V27L37 19H30Z" stroke="black" stroke-width="0.5"/>
+<path d="M45 19V21.5L42.5 19H45Z" stroke="black" stroke-width="0.5"/>
+<path d="M19 45H21.5L19 42.5V45Z" stroke="black" stroke-width="0.5"/>
+<path d="M19 36.5L27 45H33.5L19 30V36.5Z" stroke="black" stroke-width="0.5"/>
+<path d="M3 31H5V33H3V31Z" stroke="black" stroke-width="0.5"/>
+<path d="M3 61V59H5V61H3Z" stroke="black" stroke-width="0.5"/>
+<path d="M61 61V59H59V61H61Z" stroke="black" stroke-width="0.5"/>
+<path d="M61 32V33H59V31H61V32Z" stroke="black" stroke-width="0.5"/>
+<path d="M61 3V5H59V3H61Z" stroke="black" stroke-width="0.5"/>
+<path d="M32 3H33V5H31V3H32Z" stroke="black" stroke-width="0.5"/>
+<path d="M3 3V5H5V3H3Z" stroke="black" stroke-width="0.5"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H64V64H0V0ZM16 48V16H48V48H16ZM33 3H32H31V5H33V3ZM3 5V3H5V5H3ZM61 5V3H59V5H61ZM61 33V32V31H59V33H61ZM61 59V61H59V59H61ZM3 59V61H5V59H3ZM5 31H3V33H5V31Z" stroke="black" stroke-width="0.5"/>
+</svg>

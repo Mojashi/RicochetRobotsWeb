@@ -30,6 +30,12 @@ func (h MakeRoomHandler) Handle(c echo.Context) error {
 	if err := c.Bind(&settings); err != nil {
 		return err
 	}
+	if settings.Name == "" {
+		return echo.NewHTTPError(403, "たくの名前を入力してください")
+	}
+	if settings.Private && settings.Password == "" {
+		return echo.NewHTTPError(403, "パスワードが必要です")
+	}
 
 	roomID, err := h.roomManager.NewRoom(user, settings)
 	if err != nil {

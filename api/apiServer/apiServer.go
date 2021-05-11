@@ -24,6 +24,7 @@ var (
 	singinHandler   handler.Handler
 	joinHandler     handler.Handler
 	makeRoomHandler handler.Handler
+	roomListHandler handler.Handler
 
 	cookieAuthMiddleware middleware.CookieAuthMiddleware
 )
@@ -47,14 +48,17 @@ func init() {
 		"http://"+os.Getenv("DOMAIN")+":"+os.Getenv("FRONT_PORT")+"/api/twitter/callback",
 		"../config.json",
 	)
+
 	callbackHandler = handler.NewOAuthCallbackHandler(userRepo, authSessionRepo, twitterOAuthConf, tokenRepo)
 	singinHandler = handler.NewSigninHandler(authSessionRepo, twitterOAuthConf)
 	cookieAuthMiddleware = middleware.NewCookieAuthMiddleware(userRepo)
 	joinHandler = handler.NewJoinHandler(roomManager)
 	makeRoomHandler = handler.NewMakeRoomHandler(roomManager)
+	roomListHandler = handler.NewRoomListHandler(roomManager)
 }
 
 func Run() {
+
 	e := echo.New()
 	e.Use(echoMid.Logger())
 	e.Use(echoMid.Recover())
@@ -65,15 +69,15 @@ func Run() {
 	e.Use(cookieAuthMiddleware.Handle)
 
 	g := e.Group("/api")
-	g.GET("/me", handler.MeHandler)
-	g.GET("/restricted", handler.RestrictedHandler)
+	g.GET("/users/me", handler.MeHandler)
 
 	g.GET("/signout", handler.SignoutHandler)
 	g.GET("/twitter/signin", singinHandler.Handle)
 	g.GET("/twitter/callback", callbackHandler.Handle)
 
-	g.POST("/makeRoom", makeRoomHandler.Handle)
+	g.POST("/rooms/make", makeRoomHandler.Handle)
 	g.GET("/join/:roomID", joinHandler.Handle)
+	g.GET("/rooms", roomListHandler.Handle)
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
 }

@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/Mojashi/RicochetRobotsWeb/api v0.0.0-20210107191348-36816ce400f2
+	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75 // indirect
 	github.com/garyburd/go-oauth v0.0.0-20180319155456-bca2e7f09a17
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/sessions v1.2.1

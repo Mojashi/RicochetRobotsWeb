@@ -7,3 +7,13 @@ type User struct {
 	Name      string `json:"name" db:"name"`
 	TwitterID string `json:"twitterID" db:"twitterID"`
 }
+
+var SuperUser User
+
+func init() {
+	SuperUser = User{
+		ID:        -12345,
+		Name:      "system",
+		TwitterID: "",
+	}
+}

@@ -5,9 +5,12 @@ type JoinMessage struct {
 	Password string `json:"password"`
 }
 
-// func (m JoinMessage) GetUser() model.User {
-// 	return m.User
-// }
+func NewClientJoinMessage(password string) JoinMessage {
+	return JoinMessage{
+		Type:     Join,
+		Password: password,
+	}
+}
 
 func (m JoinMessage) GetPassword() string {
 	return m.Password

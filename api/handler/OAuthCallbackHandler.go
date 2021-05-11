@@ -1,15 +1,24 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 
 	"github.com/Mojashi/RicochetRobots/api/model"
 	"github.com/Mojashi/RicochetRobots/api/repository"
+	"github.com/garyburd/go-oauth/oauth"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
+
+const PublicImageDirPath = "../front/ricochetrobots-redux/public/userPics/"
 
 type OAuthCallbackHandler struct {
 	userRepository         repository.IUserRepository
@@ -48,6 +57,7 @@ func (h OAuthCallbackHandler) Handle(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Error getting request token, "+err.Error())
 	}
+
 	log.Println(values)
 	twitterID := values["user_id"][0]
 	screenName := values["screen_name"][0]
@@ -57,6 +67,10 @@ func (h OAuthCallbackHandler) Handle(c echo.Context) error {
 		if user, err = h.userRepository.Create(screenName, twitterID); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Error creating user, "+err.Error())
 		}
+	}
+	err = getTwitterPic(h.twitterOAuthConf.oauthClient, tokenCred, user)
+	if err != nil {
+		log.Println(err.Error())
 	}
 	// userInfo := map[string]interface{}{}
 	// if err = apiGet(tokenCred, "https://api.twitter.com/1.1/account/verify_credentials.json", url.Values{}, &userInfo); err != nil {
@@ -81,4 +95,37 @@ func (h OAuthCallbackHandler) Handle(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Error saving session, "+err.Error())
 	}
 	return c.HTML(http.StatusOK, "<html><body onload=\"window.close()\"></body></html>")
+}
+
+func getTwitterPic(c oauth.Client, cred *oauth.Credentials, user model.User) error {
+	res, err := c.Get(nil, cred, `https://api.twitter.com/1.1/users/show.json`, url.Values{"user_id": {user.TwitterID}})
+	if err != nil {
+		return err
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	mp := map[string]interface{}{}
+	json.Unmarshal(body, &mp)
+	imgUrl := mp["profile_image_url_https"].(string)
+	return downloadImage(imgUrl, PublicImageDirPath+fmt.Sprint(user.ID)+".jpg")
+}
+
+func downloadImage(url string, savePath string) error {
+	response, e := http.Get(url)
+	if e != nil {
+		return e
+	}
+	defer response.Body.Close()
+
+	file, err := os.Create(savePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, response.Body)
+	return err
 }
