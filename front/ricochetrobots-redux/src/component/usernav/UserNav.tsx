@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { UserNavPop } from "../../container/UserNavPop";
 import { User } from "../../model/User";
-import { UserIcon } from "../../model/UserIcon"
+import { UserIcon } from "../accessory/UserIcon"
 
 
 type Props = {
     // onClick? : ()=>void,
     className? : string,
     children? : React.ReactNode,
-    img? : string,
+    user? : User
 }
 
 
@@ -33,7 +33,7 @@ function useOutsideClick(ref : React.RefObject<HTMLDivElement>, onClick:()=>void
     }, [ref, onClick]);
 }
 
-export function UserNavView({children, className, img} : Props){
+export function UserNavView({children, className, user} : Props){
     const [pushed, setPushed] = useState(false);
     const [hover, setHover] = useState(false);
     const [openPop, setOpenPop] = useState(false);
@@ -49,7 +49,7 @@ export function UserNavView({children, className, img} : Props){
             onClick={onClick} onMouseDown={()=>setPushed(true)} onMouseUp={()=>setPushed(false)}
             onMouseLeave={()=>{setPushed(false);setHover(false);}}
             onMouseEnter={()=>setHover(true)}>
-            <UserIconStyled src={img}/>
+            <UserIconStyled userID={user?.id}/>
         </Div>
         {openPop && <UserNavPop/>}
         </div>

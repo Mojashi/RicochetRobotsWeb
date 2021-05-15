@@ -19,18 +19,20 @@ import { RoomInfo } from "../../model/RoomInfo"
 import ReactTooltip from "react-tooltip"
 import { AuthDialogView } from "./AuthDialog"
 import { AuthDialog } from "../../container/AuthDialog"
+import { GameResult } from "../../container/GameResult"
+import { Hint } from "../../container/Hint"
 
 interface Props {
     room? : RoomInfo,
     isAdmin : boolean,
     onGame : boolean,
     interval : boolean,
-    readyToNext : boolean,
+    readyNext : boolean,
     onNextClick : ()=>void,
     needToAuth : boolean,
 }
 
-export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyToNext} : Props){
+export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
     const CenterElem = <CenterDiv>
     {onGame || interval ? 
         <Problem/> : 
@@ -38,21 +40,25 @@ export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmi
             <GameSettingPanel/> :
             <Text>開始を待っています...</Text>
     }
-</CenterDiv>
+    </CenterDiv>
+
+    const ResultSideDiv = <>
+        <ResultStyled/>
+            <div data-tip="親の開始を待っています" style={{height:"4em"}}>
+                <WoodButtonStyled pushed={readyNext} onClick={onNextClick}>
+                    <Title style={{border:"none"}}>{onGame ? (readyNext? "WAITING":"NEXT") : "FINISH"}</Title>
+                </WoodButtonStyled> 
+            </div>
+            {(readyNext && onGame && !isAdmin) && <ReactTooltip place="right" type="dark" effect="float"/>}
+        </>
 
     const ContentElem = 
     <Content>
     <SideDiv>
         <SideDivContent>
-        {interval ? <>
-            <ResultStyled/>
-            <div data-tip="親の開始を待っています">
-                <WoodButtonStyled disable={!readyToNext && onGame && !isAdmin} onClick={onNextClick}>
-                    <Title style={{border:"none"}}>{onGame ? "NEXT" : "FINISH"}</Title>
-                </WoodButtonStyled> 
-            </div>
-            {(!readyToNext && onGame && !isAdmin) && <ReactTooltip place="right" type="dark" effect="float"/>}
-        </>:<>
+        {interval ? {ResultSideDiv}:
+        <>
+            <HintStyled/>
             <ShortestStyled/>
             <SubmissionsStyled/>
         </>}
@@ -68,14 +74,23 @@ export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmi
     </Content>
     
 
-    return (
+    return (<>
         <Div>
             <HeaderStyled/>
             {needToAuth ? <Content><AuthDialog/></Content> : ContentElem}       
         </Div>
+        <GameResultStyled/>
+        </>
     )
 }
 
+const GameResultStyled = styled(GameResult) `
+    left:0;
+    top:0;
+    position: absolute;
+    width:100%;
+    height:100%;
+`
 const InputStyled = styled(Input)`
     height:9.3em;
     margin-bottom:1em;
@@ -87,18 +102,22 @@ const ShortestStyled = styled(Shortest) `
     margin-bottom:1.5em;
     flex-shrink:0;
 `
-const WoodButtonStyled = styled(WoodButton)`
-    padding:0.5em 0 0.5em 0;
-`
-const ResultStyled = styled(Result) `
-flex-shrink:1;
-height:100%;
-margin-bottom:1em;
+const HintStyled = styled(Hint) `
+margin-bottom:1.5em;
+flex-shrink:0;
 `
 const SubmissionsStyled = styled(Submissions)`
     flex-shrink:1;
     height:100%;
 `
+const WoodButtonStyled = styled(WoodButton)`
+    padding:0.5em 0 0.5em 0;
+`
+const ResultStyled = styled(Result) `
+height:calc(100% - 5em);
+margin-bottom:1em;
+`
+
 const HeaderStyled = styled(Header)`
     height:3.5em;
 `

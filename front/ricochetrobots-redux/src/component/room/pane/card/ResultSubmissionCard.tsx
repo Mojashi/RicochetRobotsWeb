@@ -2,7 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { PALETTE } from "../../../../app/palette"
 import { ResultSubmission, Submission } from "../../../../model/game/Submission"
-import { UserIcon } from "../../../../model/UserIcon"
+import { UserIcon } from "../../../accessory/UserIcon"
 import { PlayIcon } from "../../../accessory/PlayIcon"
 import { Chip } from "../../../menu/panel/component/Chip"
 import { Card } from "./Card"
@@ -28,7 +28,7 @@ export function ResultSubmissionCard({sub, rank, className, selected, onClick} :
             </UpperDiv>
             <LowerDiv>
                 <AuthorDiv>
-                    <UserIconStyled/>{sub.user.name}
+                    <UserIconStyled userID={sub.user.id}/>{sub.user.name}
                 </AuthorDiv>
                 {sub.addedPoint > 0 && 
                     <ChipStyled fill={PALETTE.paleGold} color={"black"}>
@@ -73,6 +73,7 @@ const CardStyled = styled(Card)`
 `
 
 const MovesDiv = styled("div")`
+    white-space:nowrap;
     font-size:1.5em;
     font-weight:bold;
     padding:0 0.7em 0 0.7em;

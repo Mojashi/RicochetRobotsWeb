@@ -7,10 +7,10 @@ import { BlackRobotColor, BlueRobotColor, GreenRobotColor, RedRobotColor, Yellow
 import { CSSTransition, SwitchTransition } from "react-transition-group"
 import { HowToPanel } from "./panel/HowTo"
 import { MakeTablePanel } from "./panel/MakeTable"
-import { RoomsPanel } from "./panel/rooms/Rooms"
 import { SettingsPanel } from "./panel/Settings"
 import ScrollArea from "react-scrollbar"
 import { FirstToWin } from "../../model/game/Rule"
+import { RoomsPanel } from "../../container/RoomsPanel"
 
 type SECTION = "arena" | "howto" | "maketable" | "findroom" | "settings"
 
@@ -95,14 +95,7 @@ function PanelDivRow({selected, className} : {
                     {selected === "arena" && <ArenaPanel/>}
                     {selected === "howto" && <HowToPanel/>}
                     {selected === "maketable" && <MakeTablePanel/>}
-                    {selected === "findroom" && <RoomsPanel rooms={[
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},
-                        {id:0, name:"テストルーム", users:[], rule:FirstToWin},]}/>}
+                    {selected === "findroom" && <RoomsPanel/> }
                     {selected === "settings" && <SettingsPanel/>}
                 </Slide>
               </CSSTransition>

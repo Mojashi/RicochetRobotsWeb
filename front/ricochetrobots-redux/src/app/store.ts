@@ -3,7 +3,6 @@ import { enableMapSet } from 'immer';
 import { configureStore, ThunkAction, Action, getDefaultMiddleware } from '@reduxjs/toolkit';
 
 import {gameSlice} from "../container/GameSlice"
-import { siteSlice } from '../container/SiteSlice';
 enableMapSet()
 
 

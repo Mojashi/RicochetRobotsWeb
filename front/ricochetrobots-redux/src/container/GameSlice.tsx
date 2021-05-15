@@ -15,6 +15,7 @@ import { BoardViewReducers } from "./reducers/BoardViewReducers"
 import { GameConfig } from "../model/game/GameConfig"
 import { RoomInfo } from "../model/RoomInfo"
 import { RoomInfoReducer } from "./reducers/RoomInfoReducer"
+import { SiteReducers } from "./reducers/SiteReducers"
 
 export type PointsDict = {
     [key:number] : number
@@ -41,14 +42,20 @@ export type ProblemState = {
     readonly shortest? : Submission
     readonly submissions : Submission[]
     readonly mySubmissions : MySubmission[]
+    readonly hint : Hands
 }
-export type ResultState = {
+export type ProblemResultState = {
     readonly problem : Problem
     readonly submissions? : ResultSubmission[]
 
     readonly animFrame? : number
     readonly animSub? : ResultSubmission
     readonly animID : number
+    readonly readyNext : boolean
+}
+
+export type GameResultState = {
+    readonly leaderboard : LeaderBoardUser[]
 }
 
 export type BoardViewState = {
@@ -74,7 +81,8 @@ export type RoomState = {
     readonly problemState? : ProblemState
     readonly boardViewState : BoardViewState
     readonly gameState? : GameState
-    readonly resultState? : ResultState
+    readonly problemResultState? : ProblemResultState
+    readonly gameResultState? : GameResultState
 }
 
 export type State = {
@@ -82,10 +90,10 @@ export type State = {
     readonly roomState : RoomState
 }
 
-const initialSiteState :SiteState = {
+export const initialSiteState :SiteState = {
     user : AnonymousUser,
 }
-var initialRoomState:RoomState = {
+export var initialRoomState:RoomState = {
     needToAuth : false,
     notifications : [],
     participants : {},
@@ -112,6 +120,7 @@ const slice = createSlice({
         ...InputReducers,
         ...ResultReducers,
         ...BoardViewReducers,
+        ...SiteReducers,
     },
 })
 
@@ -119,28 +128,34 @@ export const getRoomState = (state : Draft<State>) => state.roomState
 export const getSiteState = (state : Draft<State>) => state.siteState
 export const getRoomInfo = (state: Draft<State>) => getRoomState(state).roomInfo
 export const getGameState = (state: Draft<State>) => getRoomState(state).gameState
-export const getResultState = (state: Draft<State>) => getRoomState(state).resultState
+export const getProblemResultState = (state: Draft<State>) => getRoomState(state).problemResultState
+export const getGameResultState = (state: Draft<State>) => getRoomState(state).gameResultState
 export const getBoardViewState = (state: Draft<State>) => getRoomState(state).boardViewState
 export const getProblemState = (state: Draft<State>) => getRoomState(state).problemState
 
 
 const selectSelf = (state : RootState) => state.game
+const selectSiteState = (state : RootState) => selectSelf(state).siteState
 const selectRoomState = (state : RootState) => selectSelf(state).roomState
 const selectBoardViewState = (state : RootState) => selectRoomState(state).boardViewState
 const selectProblemState = (state : RootState) => selectRoomState(state).problemState
-const selectResultState = (state : RootState) => selectRoomState(state).resultState
+const selectProblemResultState = (state : RootState) => selectRoomState(state).problemResultState
+const selectGameResultState = (state : RootState) => selectRoomState(state).gameResultState
 const selectGameState = (state : RootState) => selectRoomState(state).gameState
 const selectRoomInfoState = (state : RootState) => selectRoomState(state).roomInfo
 
 export const { addHandFromInput, resetHandFromInput, removeHandFromInput, setProblem,finishResult, selectRobot, setPoint,tellUser, joinToRoom, leaveFromRoom, finishGame,finishProblem,finishProblemFromServer, setTimeleft, startGame,
-     addSubmission, setShortest, setShortestFromServer,addSubmissionFromServer, addHiddenSubmissionFromServer,
-     animNext,animStop,animStart, addMySubmission ,setNeedToAuth, failedToAuth, setRoomInfo, notify, removeNotify} = slice.actions
+     addSubmission,setHint, setShortest, setShortestFromServer,addSubmissionFromServer, addHiddenSubmissionFromServer,
+     animNext,animStop,animStart, addMySubmission,setReadyNext, setUser,quitRoom, setGameResult ,setNeedToAuth, failedToAuth, setRoomInfo, notify, removeNotify} = slice.actions
 
 export const isGoalSelector = createSelector(selectBoardViewState, state=>{
     if(state.problem === undefined || state?.robotPosHistory.length === 0) return false
     const pos = state.robotPosHistory[state.robotPosHistory.length - 1][state.problem.mainRobot]
     return state.problem.board.cells[pos.y][pos.x].goal
 })
+export const loggedInSelector = createSelector(selectSiteState, state=>state.user.id !== AnonymousUser.id)
+export const userSelector = createSelector(selectSiteState, state=>state.user)
+export const isAdminSelector = createSelector(selectSelf, state=>state.siteState.user.id === state.roomState.roomInfo?.admin.id)
 export const needToAuthSelector = createSelector(selectRoomState, state=>state.needToAuth)
 export const notifSelector = createSelector(selectRoomState, state=>state.notifications)
 export const viewHandsSelector = createSelector(selectBoardViewState, state=>state.hands)
@@ -148,20 +163,25 @@ export const viewProblemSelector = createSelector(selectBoardViewState, state=>s
 export const submissionsSelector = createSelector(selectProblemState, state=>state?.submissions)
 export const selectedRobotSelector = createSelector(selectBoardViewState, state=>state?.selectedRobot)
 export const shortestSelector = createSelector(selectProblemState, state=>state?.shortest)
-export const resultSubsSelector = createSelector(selectResultState, state=>state?.submissions)
-export const resultProblemSelector = createSelector(selectResultState, state=>state?.problem)
-export const resultAnimSubSelector = createSelector(selectResultState, state=>state?.animSub)
-export const resultAnimIDSelector = createSelector(selectResultState, state=>state?.animID)
+export const gameResultSelector = createSelector(selectGameResultState, state=>state?.leaderboard)
+export const showGameResultSelector = createSelector(selectRoomState, state=>state.gameResultState !== undefined && state.problemResultState === undefined)
+export const resultSubsSelector = createSelector(selectProblemResultState, state=>state?.submissions)
+export const resultProblemSelector = createSelector(selectProblemResultState, state=>state?.problem)
+export const resultAnimSubSelector = createSelector(selectProblemResultState, state=>state?.animSub)
+export const resultAnimIDSelector = createSelector(selectProblemResultState, state=>state?.animID)
 export const roomInfoSelector = createSelector(selectRoomInfoState, state=>state)
+export const readyNextSelector = createSelector(selectProblemResultState, state=>state?.readyNext)
 export const onGameSelector = createSelector(selectGameState, state=>state !== undefined)
+export const hintSelector = createSelector(selectProblemState, state=>state?.hint)
+export const gameConfigSelector = createSelector(selectRoomInfoState, state=>state?.gameConfig)
 export const problemExistsSelector = createSelector(selectProblemState, state => state !== undefined)
-export const intervalSelector = createSelector(selectResultState, state=>state !== undefined)
+export const intervalSelector = createSelector(selectProblemResultState, state=>state !== undefined)
 export const lastMySubTimeSelector = createSelector(selectProblemState, state=>{
     const len = state?.mySubmissions.length
     if(state && len !== undefined && len > 0) return state.mySubmissions[len - 1].timeStamp
     else return 0 
 })
-export const inputAcceptableSelector = createSelector(selectRoomState, state=>state.resultState === undefined && state.problemState !== undefined )
+export const inputAcceptableSelector = createSelector(selectRoomState, state=>state.problemResultState === undefined && state.problemState !== undefined )
 // export const webSocketSelector = createSelector(selectSelf, state=>state.webSocket)
 export const possSelector = createSelector(selectBoardViewState, state=>{
     if(state.robotPosHistory.length > 0) return state.robotPosHistory[state.robotPosHistory.length-1]

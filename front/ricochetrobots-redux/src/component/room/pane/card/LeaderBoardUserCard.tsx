@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { UserIcon } from "../../../../model/UserIcon"
+import { UserIcon } from "../../../accessory/UserIcon"
 import { LeaderBoardUser } from "../LeaderBoard"
 import { Card } from "./Card"
 import ScrollArea from "react-scrollbar"
@@ -23,7 +23,7 @@ export function LeaderBoardUserCard({rank, user, className} : Props) {
                     horizontalContainerStyle={{height:"5px"}}
                 >
                     <UserContentDiv>
-                        <UserIconStyled/>
+                        <UserIconStyled userID={user.user.id}/>
                         <UserNameDiv>{user.user.name}</UserNameDiv>
                     </UserContentDiv>
                 </ScrollArea>

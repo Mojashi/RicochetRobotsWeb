@@ -2,13 +2,12 @@ import React, { useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { ShortestView } from "../component/room/pane/Shortest"
 import { UserNavView } from "../component/usernav/UserNav"
-import { shortestSelector } from "./GameSlice"
-import { loggedInSelector, setUser, userSelector } from "./SiteSlice"
+import { loggedInSelector, shortestSelector, setUser } from "./GameSlice"
 import Icon from "../img/usericon.jpg"
 import AnonIcon from "../img/anonymous.png"
 import { UserNavPopView } from "../component/usernav/UserNavPop"
 import { API_SERVER } from "../api/api"
-import { fetchMeApi } from "../api/fetchMe"
+import { getMeApi } from "../api/getMe"
 import { logoutApi } from "../api/logout"
 import { AnonymousUser } from "../model/User"
 
@@ -31,7 +30,7 @@ export function UserNavPop({className} : Props){
                     var timer = setInterval(function() { 
                         if(w.closed) {
                             clearInterval(timer);
-                            fetchMeApi((user)=>{dispatch(setUser(user))})
+                            getMeApi((user)=>{dispatch(setUser(user))})
                         }
                     }, 1000);
                 }

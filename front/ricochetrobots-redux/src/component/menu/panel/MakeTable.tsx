@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from "styled-components"
 import { PALETTE } from "../../../app/palette"
 import { LockIcon } from "../../accessory/LockIcon"
@@ -18,8 +18,9 @@ import { useImmer } from "use-immer"
 import { RoomInfo, RoomSettings } from "../../../model/RoomInfo"
 
 export function MakeTablePanel({className} : {className? : string}){
-    const [reflect, toggleReflect, ] = useToggle(false);
-    const [torus, toggleTorus, ] = useToggle(false);
+    const [reflect, toggleReflect, ] = useToggle(false)
+    const [torus, toggleTorus, ] = useToggle(false)
+    const [err, setErr] = useState<string>("")
     const history = useHistory()
     const [roomSettings, updRoomSettings] = useImmer<RoomSettings>({
         name : "",
@@ -44,14 +45,18 @@ export function MakeTablePanel({className} : {className? : string}){
                             onChange={(password)=>updRoomSettings(draft=>{draft.password=password as string})}/>
                     </RowDiv>
                 </LinedDiv>
+                    <ErrText>{err}</ErrText>
                 <ButtonDiv color={PALETTE.paleGreen} fill={PALETTE.white} text="つくる" fontSize="2em"
-                    onClick={()=>makeTableApi(roomSettings,(roomID)=>history.push(`/room/${roomID}`))}/>
+                    onClick={()=>makeTableApi(roomSettings,(roomID)=>history.push(`/room/${roomID}`), setErr)}/>
                 </ScrollArea>
             </Div>
         </Panel>
     )
 }
-
+const ErrText = styled("div")`
+    font-weight:bold;
+    color : red;
+`
 const Div = styled("div")`
     display:flex;
     flex-direction:row;

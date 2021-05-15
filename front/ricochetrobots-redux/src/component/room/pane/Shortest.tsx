@@ -16,7 +16,7 @@ export function ShortestView({sub, className} : Props) {
             <Title>SHORTEST</Title>
             {sub ? 
                 <SubmissionCard sub={sub} rank={1}/> : 
-                <Card>There is no submission</Card>
+                ""
             }
         </Div>
     )

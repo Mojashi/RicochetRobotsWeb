@@ -14,9 +14,11 @@ import { FinishGameMessage } from "./serverMessage/finishGameMessage";
 import { FinishProblemMessage } from "./serverMessage/finishProblemMessage";
 import { StartGameMessage } from "./serverMessage/startGameMessage";
 import { SyncRoomMessage } from "./serverMessage/setRoomInfoMessage";
-import { notify } from "../GameSlice";
+import { NotifyMessage} from "./serverMessage/notifyMessage";
+import { notify,quitRoom } from "../GameSlice";
 import { TellUserMessage } from "./serverMessage/tellUserMessage";
 import { UnauthErrorMessage } from "./serverMessage/unauthErrorMessage";
+import { SetHintMessage } from "./serverMessage/setHintMessage";
 
 export type MessageType = number
 
@@ -25,6 +27,9 @@ export const CLeave: MessageType = 1
 export const CSubmit: MessageType = 2
 export const CStart: MessageType = 3
 export const CNextProblem : MessageType = 4
+export const CDeleteRoom: MessageType = 5
+export const CSetGameSettings: MessageType = 6
+export const CRequestHint: MessageType = 7
 
 export const SAddHiddenSubmission: MessageType = 0
 export const SSetShortest: MessageType = 1
@@ -41,6 +46,8 @@ export const SStartGame : MessageType = 11
 export const SSetRoomInfo : MessageType = 12
 export const STellUser : MessageType = 13
 export const SUnauth : MessageType = 14
+export const SNotify : MessageType = 15
+export const SHint : MessageType = 16
 
 export interface Message {
     type: MessageType,
@@ -73,9 +80,20 @@ function serverEventHander(msg: any, dispatch: Dispatch<any>) {
         case SSetRoomInfo : smsg = new SyncRoomMessage(msg); break;
         case STellUser : smsg = new TellUserMessage(msg); break;
         case SUnauth : smsg = new UnauthErrorMessage(msg); break;
+        case SNotify : smsg = new NotifyMessage(msg); break;
+        case SHint : smsg = new SetHintMessage(msg); break;
         default: console.error("unknown message type" + msg.type); return;
     }
     smsg.handle(dispatch)
+}
+
+function getMsgID(e:any) : [number,string] {
+    const s =(e as string) 
+    const pos = s.indexOf(",")
+    if(pos === -1) {
+        throw "invalid message format"
+    }
+    return [parseInt(s.slice(0, pos)), s.slice(pos + 1, s.length)]
 }
 
 export function useServer(url: string) : WsDispatch{
@@ -83,12 +101,18 @@ export function useServer(url: string) : WsDispatch{
     const dispatch = useDispatch()
 
     useEffect(() => {
+        var latestAcceptedMsgID = 0
+        const unAcceptedMsgSet = new Map<number, any>()
+
         ws.current = new WebSocket(url)
         ws.current.onerror = (ev) => {
             console.log(ev)
             dispatch(notify("connection error"))
         }
-        ws.current.onopen = () => console.log("ws opened")
+        ws.current.onopen = () =>{
+            console.log("ws opened")
+            dispatch(quitRoom())
+        }
         ws.current.onclose = () => {
             console.log("ws closed");
             dispatch(notify("room not found"))
@@ -96,7 +120,16 @@ export function useServer(url: string) : WsDispatch{
         ws.current.onmessage = e => {
             try {
                 console.log("received:" + e.data)
-                serverEventHander(JSON.parse(e.data), dispatch)
+                const [msgID,evstr] = getMsgID(e.data)
+                const ev = JSON.parse(evstr)
+
+                unAcceptedMsgSet.set(msgID, ev)
+                while (unAcceptedMsgSet.has(latestAcceptedMsgID + 1)) {
+                    var nex = latestAcceptedMsgID + 1
+                    serverEventHander(unAcceptedMsgSet.get(nex), dispatch)
+                    unAcceptedMsgSet.delete(nex)
+                    latestAcceptedMsgID++
+                }
             } catch (err) {
                 console.error(err)
                 dispatch(notify("failed to parse"))

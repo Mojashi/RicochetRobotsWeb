@@ -17,7 +17,7 @@ export function Card({children, index, indexColor, color, selected, className, o
         <div style={{position:"relative"}} onClick={onClick}>
         {selected && <Stroke/>}
         <Div color={color} className={className}>
-            <ChipDiv color={indexColor}>{index}</ChipDiv>
+            {index!==undefined && <ChipDiv color={indexColor}>{index}</ChipDiv>}
             {children}
         </Div>
         </div>

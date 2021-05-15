@@ -2,7 +2,7 @@ import { Action, PayloadAction } from "@reduxjs/toolkit"
 import { Hand } from "../../model/game/Hand"
 import {produce} from "immer"
 import { moveRobot } from "../../model/game/board/Board"
-import {RoomState} from "../GameSlice"
+import {getRoomState, RoomState, State} from "../GameSlice"
 import { WritableDraft } from "immer/dist/internal"
 import { Robot } from "../../model/game/Robot"
 import { Problem } from "../../model/game/Problem"
@@ -59,16 +59,16 @@ export function initBoardView(draft :WritableDraft<RoomState>, problem? : Proble
 }
 
 export const BoardViewReducers = {
-    addHand: (state:RoomState, action : PayloadAction<Hand>) => (
-        produce(state, draft=>addHandFunc(draft, action.payload))
+    addHand: (state:State, action : PayloadAction<Hand>) => (
+        produce(state, draft=>addHandFunc(getRoomState(draft), action.payload))
     ),
-    removeHand: (state:RoomState, action : Action) => (
-        produce(state, draft=>removeHandFunc(draft))
+    removeHand: (state:State, action : Action) => (
+        produce(state, draft=>removeHandFunc(getRoomState(draft)))
     ),
-    resetHand: (state:RoomState, action : Action) =>  (
-        produce(state, draft=>resetHandFunc(draft))
+    resetHand: (state:State, action : Action) =>  (
+        produce(state, draft=>resetHandFunc(getRoomState(draft)))
     ),
-    selectRobot: (state:RoomState, action:PayloadAction<{robot : Robot, selected:boolean}>) => (
-        produce(state, draft => selectRobotFunc(draft, action.payload.robot, action.payload.selected))
+    selectRobot: (state:State, action:PayloadAction<{robot : Robot, selected:boolean}>) => (
+        produce(state, draft => selectRobotFunc(getRoomState(draft), action.payload.robot, action.payload.selected))
     ),
 }

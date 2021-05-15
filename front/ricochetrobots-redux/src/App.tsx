@@ -2,14 +2,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
-import { fetchMeApi } from './api/fetchMe';
+import { getMeApi } from './api/getMe';
 import './App.css';
 import MenuView from './component/menu/Menu';
+import { setUser } from './container/GameSlice';
 import { Room } from './container/Room';
-import { setUser } from './container/SiteSlice';
 function App() {
   const dispatch  = useDispatch()
-  useEffect(()=>{fetchMeApi((user)=>{dispatch(setUser(user))})},[])
+  useEffect(()=>{getMeApi((user)=>{dispatch(setUser(user))})},[])
 
   return (
     <Router>

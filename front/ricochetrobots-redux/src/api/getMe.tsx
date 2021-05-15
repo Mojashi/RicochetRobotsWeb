@@ -1,8 +1,8 @@
 import { AnonymousUser, User } from "../model/User";
 import { API_SERVER } from "./api";
 
-export function fetchMeApi(callBack : (user : User)=>void){
-    fetch(API_SERVER + "/me")
+export function getMeApi(callBack : (user : User)=>void){
+    fetch(API_SERVER + "/users/me")
     .then((res) => {
 		if(!res.ok){
 		  throw new Error(res.statusText);

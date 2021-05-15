@@ -4,17 +4,18 @@ import styled from "styled-components"
 type Props = {
     disable : boolean,
     onClick? : ()=>void,
+    pushed? : boolean,
     className? : string,
     children? : React.ReactNode,
 }
 
-export function WoodButton({disable, onClick , children, className} : Props){
-    const [pushed, setPushed] = useState(false);
+export function WoodButton({disable, onClick , children, pushed, className} : Props){
+    const [pushedState, setPushedState] = useState(false);
 
     return (
-        <Div className={className + (disable ? " disable":"") + (pushed ? " pushed":"")} 
-            onClick={onClick} onMouseDown={()=>setPushed(true)} onMouseUp={()=>setPushed(false)}
-            onMouseLeave={()=>setPushed(false)}
+        <Div className={className + (disable ? " disable":"") + (pushed||pushedState ? " pushed":"")} 
+            onClick={onClick} onMouseDown={()=>setPushedState(true)} onMouseUp={()=>setPushedState(false)}
+            onMouseLeave={()=>setPushedState(false)}
         >
             {children}
         </Div>

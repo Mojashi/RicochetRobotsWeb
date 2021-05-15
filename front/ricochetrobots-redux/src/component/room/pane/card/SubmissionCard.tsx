@@ -2,7 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { PALETTE } from "../../../../app/palette"
 import { Submission } from "../../../../model/game/Submission"
-import { UserIcon } from "../../../../model/UserIcon"
+import { UserIcon } from "../../../accessory/UserIcon"
 import { Card } from "./Card"
 
 type Props = {
@@ -18,7 +18,7 @@ export function SubmissionCard({sub, rank, className} : Props) {
         >
             <MovesDiv>{sub.length} moves</MovesDiv>
             <AuthorDiv>
-                <UserIconStyled/>{sub.user.name}
+                <UserIconStyled userID={sub.user.id}/>{sub.user.name}
             </AuthorDiv>
         </CardStyled>
     )

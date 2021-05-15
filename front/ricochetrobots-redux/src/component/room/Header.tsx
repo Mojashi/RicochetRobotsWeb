@@ -3,6 +3,7 @@ import { useHistory } from "react-router"
 import { CSSTransition, TransitionGroup } from "react-transition-group"
 import styled from "styled-components"
 import { PALETTE } from "../../app/palette"
+import { GameConfig } from "../../container/GameConfigDisp"
 import { Notification } from "../../container/GameSlice"
 import { UserNav } from "../../container/UserNav"
 import { UserNavView } from "../usernav/UserNav"
@@ -22,10 +23,11 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
         <Div className={className}>
             <BackButtonStyled onClick={()=>history.push("/")}/>
             <CenterText>{roomName}</CenterText>
+            <GameConfig/>
             <UserNavStyled/>
             <TransitionGroupStyled>
             {msgs.map(msg => 
-                <CSSTransition key={msg.id} timeout={200} in={true} onEntered={()=>onMsgEntered(msg.id)}>
+                <CSSTransition key={msg.id} timeout={200} in={true} onEntering={()=>onMsgEntered(msg.id)}>
                     <MessageBox>{msg.msg}</MessageBox>
                 </CSSTransition>
             )}

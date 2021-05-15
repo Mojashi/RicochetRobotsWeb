@@ -1,3 +1,4 @@
+import { ParticipantsDict } from "../container/GameSlice";
 import { GameConfig } from "./game/GameConfig";
 import { User } from "./User";
 
@@ -14,3 +15,12 @@ export type RoomInfo = {
     admin : User
     onGame : boolean
 }
+export type RoomAbstract = {
+    participants : ParticipantsDict
+    id : number,
+    name : string
+    gameConfig : GameConfig
+    admin : User
+    onGame : boolean,
+    private : boolean,
+} 

@@ -1,98 +1,115 @@
 import { Action, createDraftSafeSelector, PayloadAction } from "@reduxjs/toolkit"
 import { Hand } from "../../model/game/Hand"
-import {produce} from "immer"
+import {Draft, produce} from "immer"
 import { moveRobot } from "../../model/game/board/Board"
-import {animStart, animStop, RoomState} from "../GameSlice"
+import {animNext, animStart, animStop, getProblemResultState, getRoomState, RoomState, State} from "../GameSlice"
 import { ResultSubmission } from "../../model/game/Submission"
-import { WritableDraft } from "immer/dist/internal"
 import { addHandFunc, initBoardView, resetHandFunc } from "./BoardViewReducers"
 import { Problem } from "../../model/game/Problem"
-import { startProblemFunc } from "./GameReducers"
+import { finishProblemFunc, startProblemFunc } from "./GameReducers"
 
-export function initResultState(draft : WritableDraft<RoomState>, problem : Problem, subs : ResultSubmission[]) {
-    draft.resultState = {
+export function initResultState(draft : Draft<RoomState>, problem : Problem, subs : ResultSubmission[]) {
+    draft.problemResultState = {
         submissions : subs,
         problem : problem,
         animID : 0,
+        readyNext: false,
     }
     if(draft.boardViewState.robotPosHistory.length > 1)
         resetRobots(draft)
     initBoardView(draft, problem)
 }
 
-export function animStopFunc(draft : WritableDraft<RoomState>) {
-    if(draft.resultState) {
+export function animStopFunc(draft : Draft<RoomState>) {
+    if(draft.problemResultState) {
         resetHandFunc(draft)
-        draft.resultState.animFrame = undefined
-        draft.resultState.animSub = undefined
+        draft.problemResultState.animFrame = undefined
+        draft.problemResultState.animSub = undefined
     }
 }
-export function resetRobots(draft : WritableDraft<RoomState>){
-    if(draft.resultState) {
-        draft.resultState.animFrame = -1
+export function resetRobots(draft : Draft<RoomState>){
+    if(draft.problemResultState) {
+        draft.problemResultState.animFrame = -1
         resetHandFunc(draft)
     }
 }
-function hasResetRobot(draft : WritableDraft<RoomState>) : boolean {
-    if(draft.resultState){
-        return draft.resultState.animFrame === -1
+function hasResetRobot(draft : Draft<RoomState>) : boolean {
+    if(draft.problemResultState){
+        return draft.problemResultState.animFrame === -1
     }
     return false
 }
 
-export function animStartFunc(draft : WritableDraft<RoomState>, sub : ResultSubmission) {
-    if(draft.resultState) {
-        draft.resultState.animID += 1
-        draft.resultState.animSub = sub
+export function animStartFunc(draft : Draft<RoomState>, sub : ResultSubmission) {
+    if(draft.problemResultState) {
+        draft.problemResultState.animID += 1
+        draft.problemResultState.animSub = sub
 
         if(draft.boardViewState.robotPosHistory.length > 1) { //最初にリセットが必要
             resetRobots(draft);
         } else if(!hasResetRobot(draft)){ //リセット中ならそのまま
-            draft.resultState.animFrame = 0
+            draft.problemResultState.animFrame = 0
             addHandFunc(draft, sub.hands[0])
         }
         
     }
 }
 
-export const ResultReducers = {
-    finishResult: (state:RoomState, action : Action) => (
-        produce(state,draft => {
-            if(draft.gameState){ //まだゲーム続いてる
-                draft.resultState = undefined
-                if(draft.problemState) {
-                    startProblemFunc(draft);
-                }
-            } else { //もうゲームおわり
-                draft.resultState = undefined
-                initBoardView(draft, undefined)
-            }
-        })
-    ),
-    animNext: (state:RoomState, action : PayloadAction<number>) => (
-        produce(state, draft=>{
-            const sub = draft.resultState?.animSub
-            if(sub !== undefined && 
-                draft.resultState?.animFrame !== undefined && 
-                action.payload === draft.resultState.animID){
-                if(hasResetRobot(draft)){
-                    draft.resultState.animID += 1
-                } 
+export function finishResultFunc(draft : Draft<RoomState>) {
+    if(draft.gameState){ //まだゲーム続いてる
+        draft.problemResultState = undefined
+        if(draft.problemState) {
+            startProblemFunc(draft);
+        }
+    } else { //もうゲームおわり
+        draft.problemResultState = undefined
+        initBoardView(draft, undefined)
+    }
+}
 
-                draft.resultState.animFrame += 1
-                const frame = draft.resultState.animFrame
-                if(frame >= sub.hands.length) {
-                    resetRobots(draft);
-                } else {
-                    addHandFunc(draft, sub.hands[frame])
-                }
-            }
-        })
+export function animNextFunc(draft : Draft<RoomState>, animID : number) {
+    const sub = draft.problemResultState?.animSub
+    if(sub !== undefined && 
+        draft.problemResultState?.animFrame !== undefined && 
+        animID === draft.problemResultState.animID){
+        if(hasResetRobot(draft)){
+            draft.problemResultState.animID += 1
+        } 
+
+        draft.problemResultState.animFrame += 1
+        const frame = draft.problemResultState.animFrame
+        if(frame >= sub.hands.length) {
+            resetRobots(draft);
+        } else {
+            addHandFunc(draft, sub.hands[frame])
+        }
+    }
+}
+
+export function readyNextFunc(draft : Draft<RoomState>, ready : boolean) {
+    const result = draft.problemResultState
+    if(result){
+        result.readyNext = ready
+        if(ready && draft.problemState !== undefined){
+            finishResultFunc(draft)
+        }
+    }
+}
+
+export const ResultReducers = {
+    finishResult: (state:State, action : Action) => (
+        produce(state,draft => finishResultFunc(getRoomState(draft)))
     ),
-    animStart: (state: RoomState, action : PayloadAction<ResultSubmission>) => (
-        produce(state,draft=> animStartFunc(draft, action.payload))
+    animNext: (state:State, action : PayloadAction<number>) => (
+        produce(state, draft=>animNextFunc(getRoomState(draft), action.payload))
     ),
-    animStop: (state: RoomState, action : Action) => (
-        produce(state,draft=> animStopFunc(draft))
+    animStart: (state: State, action : PayloadAction<ResultSubmission>) => (
+        produce(state,draft=> animStartFunc(getRoomState(draft), action.payload))
     ),
+    animStop: (state: State, action : Action) => (
+        produce(state,draft=> animStopFunc(getRoomState(draft)))
+    ),
+    setReadyNext : (state : State, action : PayloadAction<boolean>) => (
+        produce(state, draft=> readyNextFunc(getRoomState(draft), action.payload))
+    )
 }

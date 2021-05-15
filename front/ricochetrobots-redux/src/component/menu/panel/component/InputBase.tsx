@@ -33,7 +33,7 @@ export function InputBase({title, placeHolder, disabled, defaultValue,tail, onCh
             <Box>
                 {children}
                 <InputStyled className="input" type={type} placeholder={placeHolder} onChange={validateChange} 
-                     defaultValue={defaultValue} disabled={disabled} value={value}/>
+                     disabled={disabled} value={value}/>
                 <span className="tail">{tail}</span>
             </Box>
             <div className="title">{title}</div>

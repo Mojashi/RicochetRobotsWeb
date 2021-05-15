@@ -2,8 +2,8 @@ import { RoomInfo, RoomSettings } from "../model/RoomInfo";
 import { AnonymousUser, User } from "../model/User";
 import { API_SERVER } from "./api";
 
-export function makeTableApi(roomSettings : RoomSettings, callBack : (roomID : number)=>void){
-    fetch(API_SERVER + "/makeRoom", {
+export function makeTableApi(roomSettings : RoomSettings, callBack : (roomID : number)=>void, onError : (err : string)=>void){
+    fetch(API_SERVER + "/rooms/make", {
         method:"POST",
         headers: {
           'Accept': 'application/json',
@@ -13,7 +13,8 @@ export function makeTableApi(roomSettings : RoomSettings, callBack : (roomID : n
     })
     .then((res) => {
 		if(!res.ok){
-		    throw new Error(res.statusText);
+		    res.json().then((err)=>onError(err["message"]))
+            throw new Error(res.statusText)
 		}
 		return res.json()
 	})

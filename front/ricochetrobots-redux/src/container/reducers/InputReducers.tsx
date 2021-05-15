@@ -2,38 +2,38 @@ import { Action, bindActionCreators, PayloadAction } from "@reduxjs/toolkit"
 import { Hand } from "../../model/game/Hand"
 import {produce} from "immer"
 import { moveRobot } from "../../model/game/board/Board"
-import {RoomState, selectRobot} from "../GameSlice"
+import {getRoomState, RoomState, selectRobot, State} from "../GameSlice"
 import { WritableDraft } from "immer/dist/internal"
 import { addHandFunc, removeHandFunc, resetHandFunc, selectRobotFunc } from "./BoardViewReducers"
 import { Robot } from "../../model/game/Robot"
 
 function inputAcceptable(draft : WritableDraft<RoomState>) {
-    return draft.resultState === undefined && draft.problemState !== undefined
+    return draft.problemResultState === undefined && draft.problemState !== undefined
 }
 
 export const InputReducers = {
-    addHandFromInput: (state:RoomState, action : PayloadAction<Hand>) => (
+    addHandFromInput: (state:State, action : PayloadAction<Hand>) => (
         produce(state, draft=>{
-            if(inputAcceptable(draft)) 
-                addHandFunc(draft, action.payload)
+            if(inputAcceptable(getRoomState(draft))) 
+                addHandFunc(getRoomState(draft), action.payload)
         })
     ),
-    removeHandFromInput: (state:RoomState, action : Action) => (
+    removeHandFromInput: (state:State, action : Action) => (
         produce(state, draft=>{
-            if(inputAcceptable(draft)) 
-                removeHandFunc(draft)
+            if(inputAcceptable(getRoomState(draft))) 
+                removeHandFunc(getRoomState(draft))
         })
     ),
-    resetHandFromInput: (state:RoomState, action : Action) =>  (
+    resetHandFromInput: (state:State, action : Action) =>  (
         produce(state, draft=>{
-            if(inputAcceptable(draft)) 
-                resetHandFunc(draft)
+            if(inputAcceptable(getRoomState(draft))) 
+                resetHandFunc(getRoomState(draft))
         })
     ),
-    selectRobotFromInput: (state:RoomState, action:PayloadAction<{robot:Robot, selected:boolean}>) => (
+    selectRobotFromInput: (state:State, action:PayloadAction<{robot:Robot, selected:boolean}>) => (
         produce(state, draft => {
-            if(inputAcceptable(draft))
-                selectRobotFunc(draft, action.payload.robot, action.payload.selected)
+            if(inputAcceptable(getRoomState(draft)))
+                selectRobotFunc(getRoomState(draft), action.payload.robot, action.payload.selected)
         })
     )
 }

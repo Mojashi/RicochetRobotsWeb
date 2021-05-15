@@ -4,7 +4,7 @@ import { WritableDraft } from "immer/dist/internal";
 import { Writable } from "node:stream";
 import { RoomInfo } from "../../model/RoomInfo";
 import { User, UserID } from "../../model/User";
-import { RoomState, setNeedToAuth } from "../GameSlice";
+import { getRoomInfo, getRoomState, getSiteState, RoomState, setNeedToAuth, State, initialRoomState } from "../GameSlice";
 import { joinToGameFunc } from "./GameReducers";
 
 export function notifyFunc(draft : WritableDraft<RoomState> , msg : string){
@@ -22,44 +22,58 @@ export function leaveFromRoomFunc (draft : Draft<RoomState>, userID : UserID) {
 export function setNeedToAuthFunc(draft : Draft<RoomState>, need : boolean) {
     draft.needToAuth = need
 }
+export function setRoomInfoFunc(draft : Draft<State>, roomInfo : RoomInfo){
+    const oldRoomInfo = getRoomInfo(draft) 
+    const room = getRoomState(draft)
+    const userID = getSiteState(draft).user.id
+    setNeedToAuthFunc(room, false)
+    if (oldRoomInfo && oldRoomInfo.admin.id !== userID && userID === roomInfo.admin.id) {
+        notifyFunc(room, "このルームの親はあなたです")
+    }
+    room.roomInfo = roomInfo
+}
+export function removeNotifyFunc(draft : Draft<RoomState>, id : number) {
+    draft.notifications = draft.notifications.filter(notif => notif.id !== id)
+}
+export function failedToAuthFunc(draft : Draft<RoomState>) {
+    if (draft.needToAuth) { //まちがえた
+        notifyFunc(draft, "あいことばがちがいます")
+    } 
+    setNeedToAuthFunc(draft, true)
+}
+export function tellUserFunc(draft : Draft<RoomState>, user : User) {
+    draft.participants[user.id] = user
+}
+export function quitRoomFunc(draft : Draft<State>) {
+    draft.roomState = initialRoomState
+}
 
 export const RoomInfoReducer = {
-    joinToRoom: (state:RoomState, action : PayloadAction<User>) => (
-        produce(state, draft => joinToRoomFunc(draft, action.payload))
+    quitRoom : (state:State,action :Action) => (
+        produce(state,draft => quitRoomFunc(draft))
     ),
-    leaveFromRoom: (state:RoomState, action : PayloadAction<UserID>) => (
-        produce(state, draft => leaveFromRoomFunc(draft, action.payload))
+    joinToRoom: (state:State, action : PayloadAction<User>) => (
+        produce(state, draft => joinToRoomFunc(getRoomState(draft), action.payload))
     ),
-    setRoomInfo: (state:RoomState, action : PayloadAction<RoomInfo>) => (
-        produce(state, draft => {
-            setNeedToAuthFunc(draft, false)
-            if (draft.roomInfo && draft.roomInfo.admin === ) {
-            }
-            draft.roomInfo = action.payload
-        })
+    leaveFromRoom: (state:State, action : PayloadAction<UserID>) => (
+        produce(state, draft => leaveFromRoomFunc(getRoomState(draft), action.payload))
     ),
-    notify:(state : RoomState, action : PayloadAction<string>) => (
-        produce(state, draft => notifyFunc(draft, action.payload))
+    setRoomInfo: (state:State, action : PayloadAction<RoomInfo>) => (
+        produce(state, draft => setRoomInfoFunc(draft, action.payload))
     ),
-    removeNotify:(state:RoomState, action : Action) => (
-        produce(state, draft => {
-            draft.notifications.shift()
-        })
+    notify:(state : State, action : PayloadAction<string>) => (
+        produce(state, draft => notifyFunc(getRoomState(draft), action.payload))
     ),
-    tellUser:(state:RoomState, action : PayloadAction<User>) => (
-        produce(state,draft => {
-            draft.participants[action.payload.id] = action.payload
-        })
+    removeNotify:(state:State, action : PayloadAction<number>) => (
+        produce(state, draft => removeNotifyFunc(getRoomState(draft), action.payload))
     ),
-    setNeedToAuth:(state:RoomState, action : PayloadAction<boolean>) => (
-        produce(state,draft => setNeedToAuthFunc(draft, action.payload))
+    tellUser:(state:State, action : PayloadAction<User>) => (
+        produce(state,draft => tellUserFunc(getRoomState(draft), action.payload))
     ),
-    failedToAuth:(state:RoomState, action : Action) => (
-        produce(state,draft => {
-            if (draft.needToAuth) { //まちがえた
-                notifyFunc(draft, "あいことばがちがいます")
-            } 
-            setNeedToAuthFunc(draft, true)
-        })
+    setNeedToAuth:(state:State, action : PayloadAction<boolean>) => (
+        produce(state,draft => setNeedToAuthFunc(getRoomState(draft), action.payload))
+    ),
+    failedToAuth:(state:State, action : Action) => (
+        produce(state,draft => failedToAuthFunc(getRoomState(draft)))
     )
 }

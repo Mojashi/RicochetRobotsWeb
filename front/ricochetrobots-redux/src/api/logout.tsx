@@ -1,4 +1,4 @@
-import { setUser } from "../container/SiteSlice";
+import { setUser } from "../container/GameSlice";
 import { API_SERVER } from "./api";
 
 export function logoutApi(setUserToNull : ()=>void) {
