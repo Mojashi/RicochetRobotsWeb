@@ -3,6 +3,8 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
+
+	svg "github.com/ajstarks/svgo"
 )
 
 type Board struct {
@@ -41,6 +43,19 @@ func (b Board) Value() (driver.Value, error) {
 	return json.Marshal(b)
 }
 
-func (b Board) Draw(savePath string) {
-
+func (b Board) Draw(canvas *svg.SVG, cellSize int) error {
+	for i := 0; b.Height > i; i++ {
+		for j := 0; b.Width > j; j++ {
+			canvas.Image(j*cellSize, i*cellSize, cellSize, cellSize, "./img/cell.svg")
+			if b.Cells[i][j].Goal {
+				canvas.Image(j*cellSize, i*cellSize, cellSize, cellSize, "./img/goal.svg")
+			}
+			for k := 0; 4 > k; k++ {
+				if b.Cells[i][j].Walls[k] {
+					canvas.Image(j*cellSize, i*cellSize, cellSize, cellSize, "./img/wall.svg")
+				}
+			}
+		}
+	}
+	return nil
 }

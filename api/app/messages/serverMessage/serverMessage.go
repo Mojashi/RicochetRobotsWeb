@@ -22,4 +22,6 @@ const (
 	SetRoomInfo         Type = 12
 	TellUser            Type = 13
 	UnauthError         Type = 14
+	Notify              Type = 15
+	Hint                Type = 16
 )

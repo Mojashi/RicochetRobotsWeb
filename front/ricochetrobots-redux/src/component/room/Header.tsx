@@ -24,7 +24,6 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
             <BackButtonStyled onClick={()=>history.push("/")}/>
             <CenterText>{roomName}</CenterText>
             <GameConfig/>
-            <UserNavStyled/>
             <TransitionGroupStyled>
             {msgs.map(msg => 
                 <CSSTransition key={msg.id} timeout={200} in={true} onEntering={()=>onMsgEntered(msg.id)}>

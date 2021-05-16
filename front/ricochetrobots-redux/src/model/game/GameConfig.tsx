@@ -6,4 +6,6 @@ export type GameConfig = {
     goalPoint : number,
     pointForFirst : number,
     pointForOther : number,
+    solLenMin : number,
+    solLenMax : number,
 }

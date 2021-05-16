@@ -7,25 +7,35 @@ import { PlayIcon } from "../../../accessory/PlayIcon"
 import { Chip } from "../../../menu/panel/component/Chip"
 import { Card } from "./Card"
 import { Hands } from "../../../../model/game/Hands"
+import { WoodButton } from "../Input/WoodButton"
 
 type Props = {
     className? : string,
     hint : Hands,
     selected : boolean,
-    onClick? : ()=>void,
+    showHintButton : boolean,
+    onClickPlay : ()=>void,
+    onClickGetHint : ()=>void
 }
 
-export function HintCard({hint, className, selected, onClick} : Props) {
+export function HintCard({hint, className, selected, showHintButton, onClickPlay, onClickGetHint} : Props) {
     return (
         <CardStyled className={className}
             color={PALETTE.paper}
-            onClick={onClick}
+            onClick={onClickPlay}
             selected={selected}
         >
             <Div>
-                <MovesDiv>{hint.length} moves</MovesDiv>
-                <PlayIcon/>
+            {hint.length > 0 &&
+                <> 
+                    <MovesDiv>{hint.length} moves</MovesDiv>
+                    <PlayIcon/>
+                </>
+            }
             </Div> 
+            {showHintButton &&
+                <WoodButtonStyled onClick={()=>{onClickGetHint()}}><BText>ヒントをもらう</BText></WoodButtonStyled>
+            }
         </CardStyled>
     )
 }
@@ -33,6 +43,18 @@ HintCard.defaultProps = {
     selected : false,
 }
 
+
+const BText = styled("div")`
+    color : black;
+    font-weight:bold;
+`
+const WoodButtonStyled = styled(WoodButton)`
+    border-color:${PALETTE.gold};
+    background-color:${PALETTE.gold};
+    width: fit-content;
+    margin-right: auto;
+    margin-left: auto;
+`
 const Div = styled("div")`
     display:flex;
 `

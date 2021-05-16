@@ -15,6 +15,15 @@ type SubmitMessage struct {
 	Sub  SubmitMsgDto `json:"sub"`
 }
 
+func NewSubmitMessage(hands model.Hands) SubmitMessage {
+	return SubmitMessage{
+		Type: Submit,
+		Sub: SubmitMsgDto{
+			Hands: hands,
+		},
+	}
+}
+
 func (m SubmitMessage) GetSubmission(user model.User, optLen int) model.Submission {
 	return model.Submission{
 		ID:        -1,

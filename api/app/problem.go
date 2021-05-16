@@ -16,12 +16,15 @@ type IProblemApp interface {
 	Reducer(user model.User, msg clientMessage.ClientMessage) error
 	Sync(dest model.UserID) error
 	SyncAll() error
+	GetProblem() model.ProblemWithSolution
+	SuggestHint() error
 }
 
 type IProblemOutput interface {
 	Broadcast(msg serverMessage.ServerMessage)
 	Send(dest model.UserID, msg serverMessage.ServerMessage) error
 	OnFinishProblem(pointDiff map[model.UserID]int)
+	IsRoomAdmin(user model.User) bool
 }
 
 type ProblemApp struct {
@@ -38,6 +41,10 @@ func NewProblemApp(problem model.ProblemWithSolution, gameConfig model.GameConfi
 		gameConfig:   gameConfig,
 		ProblemState: model.NewProblemState(problem),
 	}
+}
+
+func (a *ProblemApp) GetProblem() model.ProblemWithSolution {
+	return a.Problem
 }
 
 func (a *ProblemApp) SyncAll() error {
@@ -131,10 +138,22 @@ func (a *ProblemApp) CalcPointDiff(ranking []model.Submission) map[model.UserID]
 	}
 	return diff
 }
+func (a *ProblemApp) SuggestHint() error {
+	if a.HintCount == len(a.Problem.Solution) {
+		return errors.New("all hints are suggested")
+	}
+	a.HintCount++
+	a.output.Broadcast(serverMessage.NewSetHintMessage(a.Problem.Solution[0:a.HintCount]))
+	return nil
+}
 func (a *ProblemApp) Reducer(user model.User, msg clientMessage.ClientMessage) error {
 	switch m := msg.(type) {
 	case clientMessage.SubmitMessage:
 		a.Submit(m.GetSubmission(user, len(a.Problem.Solution)))
+	case clientMessage.RequestHintMessage:
+		if a.output.IsRoomAdmin(user) {
+			a.SuggestHint()
+		}
 	default:
 		return errors.New("unknown messageType")
 	}

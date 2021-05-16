@@ -54,6 +54,10 @@ func ToClientMessage(msg []byte) (ClientMessage, error) {
 		var smsg SetGameSettingsMessage
 		err = json.Unmarshal(msg, &smsg)
 		m = smsg
+	case RequestHint:
+		var smsg RequestHintMessage
+		err = json.Unmarshal(msg, &smsg)
+		m = smsg
 	default:
 		err = errors.New("unknown message")
 	}
@@ -73,4 +77,5 @@ const (
 	NextProblem     Type = 4
 	DeleteRoom      Type = 5
 	SetGameSettings Type = 6
+	RequestHint     Type = 7
 )

@@ -9,6 +9,7 @@ import (
 
 type IProblemWithSolutionRepository interface {
 	GetUnused() (model.ProblemWithSolution, error)
+	GetUnusedWithRange(solLenMin int, solLenMax int) (model.ProblemWithSolution, error)
 	SetUsed(id int) error
 	Get(id int) (model.ProblemWithSolution, error)
 	Create(p model.ProblemWithSolution) error
@@ -43,6 +44,23 @@ func (r ProblemWithSolutionRepository) GetUnused() (model.ProblemWithSolution, e
 	var p model.ProblemWithSolution
 	rows := r.db.QueryRowx(
 		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems where used=false LIMIT 1",
+	)
+
+	err := rows.StructScan(&p)
+	if err != nil {
+		log.Print(err.Error())
+		return p, err
+	}
+	return p, nil
+}
+
+func (r ProblemWithSolutionRepository) GetUnusedWithRange(solLenMin int, solLenMax int) (model.ProblemWithSolution, error) {
+
+	var p model.ProblemWithSolution
+	rows := r.db.QueryRowx(
+		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems "+
+			"where used=false and json_length(solution) between ? and ? LIMIT 1",
+		solLenMin, solLenMax,
 	)
 
 	err := rows.StructScan(&p)

@@ -13,11 +13,11 @@ type Client interface {
 }
 
 type DummyClient struct {
-	user model.User
+	User model.User
 }
 
 func (c DummyClient) GetUser() model.User {
-	return c.user
+	return c.User
 }
 func (c DummyClient) Send(msg serverMessage.ServerMessage) error {
 	return nil

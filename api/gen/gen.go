@@ -16,7 +16,7 @@ var (
 	problemRepository repository.IProblemWithSolutionRepository
 )
 
-func init() {
+func build() {
 
 	err := godotenv.Load("../.env")
 	if err != nil {
@@ -28,11 +28,15 @@ func init() {
 }
 
 func Gen() {
-	rand.Seed(time.Now().UnixNano())
-	problem := rngProblemWithSolution()
+	build()
 
-	err := problemRepository.Create(problem)
-	if err != nil {
-		log.Fatal(err)
+	for {
+		rand.Seed(time.Now().UnixNano())
+		problem := rngProblemWithSolution(30)
+
+		err := problemRepository.Create(problem)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }

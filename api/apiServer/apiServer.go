@@ -4,11 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/Mojashi/RicochetRobots/api/app"
+	"github.com/Mojashi/RicochetRobots/api/app/roomManager"
 	"github.com/Mojashi/RicochetRobots/api/db"
 	"github.com/Mojashi/RicochetRobots/api/handler"
 	"github.com/Mojashi/RicochetRobots/api/middleware"
 	"github.com/Mojashi/RicochetRobots/api/repository"
+	"github.com/Mojashi/RicochetRobots/api/twitter"
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
@@ -20,34 +21,32 @@ import (
 )
 
 var (
-	callbackHandler handler.Handler
-	singinHandler   handler.Handler
-	joinHandler     handler.Handler
-	makeRoomHandler handler.Handler
-	roomListHandler handler.Handler
-
+	callbackHandler      handler.Handler
+	singinHandler        handler.Handler
+	joinHandler          handler.Handler
+	makeRoomHandler      handler.Handler
+	roomListHandler      handler.Handler
+	twitterWebhookGroup  *handler.TwWebHookGroup
 	cookieAuthMiddleware middleware.CookieAuthMiddleware
 )
 
-func init() {
+func build() {
 	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal(".env doesnt exist")
 	}
 
 	db := db.NewDB(os.Getenv("DB"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
+	twApi := twitter.NewTwitterAPI()
 
 	authSessionRepo := repository.NewAuthSessionRepository()
 	problemRepo := repository.NewProblemWithSolutionRepository(db)
 	tokenRepo := repository.NewTokenDataSource()
 	userRepo := repository.NewUserRepository(db)
 
-	roomManager := app.NewRoomManager(problemRepo)
+	roomManager := roomManager.NewRoomManager(problemRepo, twApi)
 
-	twitterOAuthConf := handler.NewTwitterOAuthConf(
-		"http://"+os.Getenv("DOMAIN")+":"+os.Getenv("FRONT_PORT")+"/api/twitter/callback",
-		"../config.json",
-	)
+	twitterOAuthConf := handler.NewTwitterOAuthConf()
 
 	callbackHandler = handler.NewOAuthCallbackHandler(userRepo, authSessionRepo, twitterOAuthConf, tokenRepo)
 	singinHandler = handler.NewSigninHandler(authSessionRepo, twitterOAuthConf)
@@ -55,9 +54,14 @@ func init() {
 	joinHandler = handler.NewJoinHandler(roomManager)
 	makeRoomHandler = handler.NewMakeRoomHandler(roomManager)
 	roomListHandler = handler.NewRoomListHandler(roomManager)
+
+	roomManager.NewArena()
+	arena, _ := roomManager.Get(0)
+	twitterWebhookGroup = handler.NewTwWebHookGroup(arena, twApi)
 }
 
 func Run() {
+	build()
 
 	e := echo.New()
 	e.Use(echoMid.Logger())
@@ -79,5 +83,7 @@ func Run() {
 	g.GET("/join/:roomID", joinHandler.Handle)
 	g.GET("/rooms", roomListHandler.Handle)
 
-	e.Logger.Fatal(e.Start(":" + os.Getenv("PORT")))
+	twitterWebhookGroup.Make(g.Group("/twitter"))
+
+	e.Logger.Fatal(e.Start(":" + os.Getenv("API_PORT")))
 }

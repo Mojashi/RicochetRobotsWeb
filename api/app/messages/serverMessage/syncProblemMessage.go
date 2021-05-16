@@ -17,5 +17,7 @@ func NewSyncProblemMessage(p *model.ProblemState) SyncProblemMessage {
 	for _, sub := range p.Submissions[utils.Max(0, len(p.Submissions)-3):len(p.Submissions)] {
 		msgs = append(msgs, NewAddHiddenSubmissionMessage(sub))
 	}
+
+	msgs = append(msgs, NewSetHintMessage(p.Problem.Solution[0:p.HintCount]))
 	return msgs
 }

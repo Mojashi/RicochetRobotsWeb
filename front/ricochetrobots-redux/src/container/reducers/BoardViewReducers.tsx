@@ -2,16 +2,19 @@ import { Action, PayloadAction } from "@reduxjs/toolkit"
 import { Hand } from "../../model/game/Hand"
 import {produce} from "immer"
 import { moveRobot } from "../../model/game/board/Board"
-import {getRoomState, RoomState, State} from "../GameSlice"
-import { WritableDraft } from "immer/dist/internal"
+import {getRoomState, initAnimState, RoomState, State} from "../GameSlice"
+import { Draft, WritableDraft } from "immer/dist/internal"
 import { Robot } from "../../model/game/Robot"
 import { Problem } from "../../model/game/Problem"
+import { Hands } from "../../model/game/Hands"
+import { resetRobotsFunc } from "./AnimReducers"
 
 export function addHandFunc(draft : WritableDraft<RoomState>, hand : Hand) {
     const {boardViewState} = draft
     var problem = draft.boardViewState?.problem
 
     if(problem){
+
         const poss = boardViewState.robotPosHistory[boardViewState.robotPosHistory.length - 1].slice()
         const changed = 
             moveRobot(problem.board, poss, hand.robot, hand.dir)
@@ -42,20 +45,28 @@ export function selectRobotFunc(draft : WritableDraft<RoomState>, robot:Robot, s
 
 export function initBoardView(draft :WritableDraft<RoomState>, problem? : Problem) {
     if(problem) {
+        resetRobotsFunc(draft)
         draft.boardViewState = {
             problem : problem,
             hands : [],
             robotPosHistory : [problem.robotPoss],
             selectedRobot : Array.from({length:problem.numRobot},()=>false),
+            animState:draft.boardViewState.animState,
         }
     } else {
+        resetRobotsFunc(draft)
         draft.boardViewState = {
             problem : undefined,
             hands : [],
             robotPosHistory : [],
             selectedRobot : [],
+            animState:draft.boardViewState.animState,
         }
     }
+}
+
+export function getViewControllFunc(draft : Draft<RoomState>){
+    
 }
 
 export const BoardViewReducers = {

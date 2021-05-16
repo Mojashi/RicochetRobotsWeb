@@ -1,12 +1,48 @@
 package model
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strings"
 )
 
 type Hands []Hand
+
+var nums = []byte{'1', '2', '3', '4', '5', '6', '7', '8'}
+var dirs = []byte{'u', 'r', 'd', 'l'}
+
+func (b Hands) Value() (driver.Value, error) {
+	return json.Marshal(b)
+}
+
+func find(ch byte, ar []byte) int {
+	for i := 0; len(ar) > i; i++ {
+		if ar[i] == ch {
+			return i
+		}
+	}
+	return -1
+}
+
+func StrToHands(str string) (Hands, error) {
+	str = strings.TrimSpace(str)
+	if len(str)%2 == 1 {
+		return Hands{}, nil
+	}
+	hs := Hands{}
+	for i := 0; len(str) > i; i += 2 {
+		num := find(str[i], nums)
+		dir := find(str[i+1], dirs)
+		if num == -1 || dir == -1 {
+			return Hands{}, nil
+		}
+
+		hs = append(hs, Hand{Dir: dir, Robot: num})
+	}
+	return hs, nil
+}
 
 func (pc *Hands) Scan(val interface{}) error {
 	switch v := val.(type) {

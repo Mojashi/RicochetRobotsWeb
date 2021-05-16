@@ -39,3 +39,10 @@ func (pc *Board) Scan(val interface{}) error {
 		return fmt.Errorf("unsupported type: %T", v)
 	}
 }
+
+func (p *Problem) Draw(path string) error {
+	// cellSize := 64
+	// width := p.Width * cellSize
+	// height := b.Height * cellSize
+	return nil
+}

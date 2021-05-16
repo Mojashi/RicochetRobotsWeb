@@ -174,7 +174,7 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 	return hands, nil
 }
 
-func rngProblemWithSolution() model.ProblemWithSolution {
+func rngProblemWithSolution(timeout int) model.ProblemWithSolution {
 	for {
 		p := rngProblem()
 
@@ -201,7 +201,7 @@ func rngProblemWithSolution() model.ProblemWithSolution {
 			}
 			log.Fatalf(err.Error())
 
-		case <-time.After(30 * time.Second):
+		case <-time.After(time.Duration(timeout) * time.Second):
 			cmd.Process.Kill()
 		}
 	}

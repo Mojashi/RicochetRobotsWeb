@@ -3,10 +3,8 @@ package handler
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
-	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 
 	"github.com/Mojashi/RicochetRobots/api/repository"
 	"github.com/garyburd/go-oauth/oauth"
@@ -18,32 +16,26 @@ type TwitterOAuthConf struct {
 	callback          string
 	oauthClient       oauth.Client
 	signinOAuthClient oauth.Client
-	credPath          string
 	authKey           string
 	tokenCredKey      string
 }
 
-func NewTwitterOAuthConf(callback string, credPath string) TwitterOAuthConf {
+func NewTwitterOAuthConf() TwitterOAuthConf {
 	oauthClient := oauth.Client{
 		TemporaryCredentialRequestURI: "https://api.twitter.com/oauth/request_token",
 		ResourceOwnerAuthorizationURI: "https://api.twitter.com/oauth/authorize",
 		TokenRequestURI:               "https://api.twitter.com/oauth/access_token",
 	}
-	b, err := ioutil.ReadFile(credPath)
-	if err != nil {
-		log.Fatal("not found config.json")
-	}
-	if json.Unmarshal(b, &oauthClient.Credentials) != nil {
-		log.Fatal("couldn't load credential informations.")
-	}
+	oauthClient.Credentials.Secret = os.Getenv("CONSUMER_SECRET")
+	oauthClient.Credentials.Token = os.Getenv("CONSUMER_KEY")
+
 	signinOAuthClient := oauthClient
 	signinOAuthClient.ResourceOwnerAuthorizationURI = "https://api.twitter.com/oauth/authenticate"
 
 	return TwitterOAuthConf{
-		callback,
+		"https://" + os.Getenv("PUBLIC_DOMAIN") + "/api/twitter/callback",
 		oauthClient,
 		signinOAuthClient,
-		credPath,
 		"authSessId",
 		"tokenCred",
 	}

@@ -14,7 +14,7 @@ export function WoodButton({disable, onClick , children, pushed, className} : Pr
 
     return (
         <Div className={className + (disable ? " disable":"") + (pushed||pushedState ? " pushed":"")} 
-            onClick={onClick} onMouseDown={()=>setPushedState(true)} onMouseUp={()=>setPushedState(false)}
+            onClick={(ev)=>{ev.stopPropagation();onClick&&onClick()}} onMouseDown={()=>setPushedState(true)} onMouseUp={()=>setPushedState(false)}
             onMouseLeave={()=>setPushedState(false)}
         >
             {children}

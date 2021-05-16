@@ -56,7 +56,7 @@ export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmi
     <Content>
     <SideDiv>
         <SideDivContent>
-        {interval ? {ResultSideDiv}:
+        {interval ? ResultSideDiv:
         <>
             <HintStyled/>
             <ShortestStyled/>

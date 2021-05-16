@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 )
@@ -11,6 +12,10 @@ type Pos struct {
 }
 
 type Poss []Pos
+
+func (b Poss) Value() (driver.Value, error) {
+	return json.Marshal(b)
+}
 
 func (pc *Poss) Scan(val interface{}) error {
 	switch v := val.(type) {

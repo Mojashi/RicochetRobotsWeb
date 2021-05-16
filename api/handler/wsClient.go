@@ -133,7 +133,7 @@ func (c *WsClient) GetUser() model.User {
 	return c.user
 }
 func (c *WsClient) Delete() error {
-	c.room.SendLeave(c)
+	app.SendLeave(c.room, c)
 	c.conn.Close()
 	return nil
 }
@@ -143,7 +143,7 @@ func (c *WsClient) Run(r app.IRoomApp) error {
 	go c.writePump()
 	go c.readPump()
 
-	r.SendJoin(c)
+	app.SendJoin(r, c)
 	return nil
 }
 

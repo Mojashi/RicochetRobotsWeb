@@ -8,11 +8,12 @@ import { OptSubSample, ResultSubmission, Submission, SubSample } from "../../mod
 import Game from "../../model/game/Game"
 import { UnknownUser, User, UserExample, UserID } from "../../model/User"
 import { initBoardView } from "./BoardViewReducers"
-import { animStartFunc, finishResultFunc, initResultState, resetRobots } from "./ResultReducers"
+import { finishResultFunc, initResultState } from "./ResultReducers"
 import { WritableDraft } from "immer/dist/internal"
 import { Room } from "../../model/Room"
 import { Hands } from "../../model/game/Hands"
 import { LeaderBoardUser } from "../../component/room/pane/LeaderBoard"
+import { animStartFunc, animStopFunc, getBoardViewControll, releaseBoardViewControll } from "./AnimReducers"
 
 export const setProblemFunc = (draft : Draft<RoomState>, problem : Problem)=> {
     if(draft.gameState) {
@@ -21,6 +22,7 @@ export const setProblemFunc = (draft : Draft<RoomState>, problem : Problem)=> {
             submissions : [],
             mySubmissions : [],
             hint : [],
+            hintPlaying:false
         }
         if(draft.problemResultState && draft.problemResultState.readyNext){
             finishResultFunc(draft)
@@ -49,7 +51,6 @@ export const setPointFunc = (draft : Draft<RoomState>, userID : UserID, point : 
 export function finishProblemFunc(draft : Draft<RoomState>, subs : ResultSubmission[]) {
     if(draft.problemState){
         initResultState(draft, draft.problemState.problem, subs)
-        animStartFunc(draft, subs[0])
         draft.problemState = undefined
     }
 }
@@ -75,6 +76,26 @@ export function setGameResultFunc(draft : WritableDraft<RoomState>, leaderboard:
 export function setHintFunc(draft : WritableDraft<RoomState>, hint : Hands) {
     if(draft.problemState) {
         draft.problemState.hint = hint
+
+        if(draft.problemState.hintPlaying) {
+            stopHintFunc(draft)
+        }
+    }
+}
+
+export function playHintFunc(draft : WritableDraft<RoomState>) {
+    if(draft.problemState?.hint && draft.problemState.hint.length > 0) {
+        getBoardViewControll(draft, "hint")
+        animStartFunc(draft, draft.problemState.hint)
+        draft.problemState.hintPlaying = true
+    }
+}
+export function stopHintFunc(draft : WritableDraft<RoomState>) {
+    if(draft.problemState?.hint) {
+        if(releaseBoardViewControll(draft, "hint")){
+            animStopFunc(draft)
+        }
+        draft.problemState.hintPlaying = false
     }
 }
 
@@ -142,5 +163,11 @@ export const GameReducers = {
     ),
     setHint : (state : State, action : PayloadAction<Hands>) => (
         produce(state, draft => setHintFunc(getRoomState(draft), action.payload))
-    )
+    ),
+    playHint : (state : State, action : Action) => (
+        produce(state, draft => playHintFunc(getRoomState(draft)))
+    ),
+    stopHint : (state : State, action : Action) => (
+        produce(state, draft => stopHintFunc(getRoomState(draft)))
+    ),
 }
