@@ -24,12 +24,12 @@ type Props = {
 
 const defaultGameConfig : GameConfig = {
     rule : FirstToWin,
-    timeLimit : 10,
+    timeLimit : 30,
     goalPoint : 20,
     pointForFirst : 5,
     pointForOther : 2,
     solLenMin:1,
-    solLenMax:999,
+    solLenMax:99,
 }
 export function GameSettingPanelView({className,onClickStart} : Props) {
     const [reflect, toggleReflect, ] = useToggle(false)
@@ -58,7 +58,7 @@ export function GameSettingPanelView({className,onClickStart} : Props) {
             <NumInput title="最短手数の下限" defaultValue={defaultGameConfig.solLenMin} tail={"手"}
                 isValid={(v)=>(v>=1&& v<=gameConfig.solLenMax)} 
                 onChange={(v)=>updGameConfig(draft=>{draft.solLenMin = v as number})}/>
-            <NumInput title="最短手数の上限" defaultValue={defaultGameConfig.solLenMin} tail={"手"} 
+            <NumInput title="最短手数の上限" defaultValue={defaultGameConfig.solLenMax} tail={"手"} 
                 isValid={(v)=>(v<=99&& v>=gameConfig.solLenMin)} 
                 onChange={(v)=>updGameConfig(draft=>{draft.solLenMax = v as number})}/>
         </RowDiv>

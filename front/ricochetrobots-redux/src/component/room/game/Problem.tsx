@@ -29,10 +29,10 @@ export function ProblemView({problem, robotPoss, selectedRobot, className, onTra
                  onTransitionEnd={onTransitionEnd}/>
             )}
             <RobotIconStyled rid={problem.mainRobot} 
-                 width={10} 
-                 height={10} 
-                 x={7.5*10} 
-                 y={7.5*10}/>
+                 width={18} 
+                 height={18} 
+                 x={7.5*10 - 4} 
+                 y={7.5*10 - 4}/>
         </Div>
     )
 }

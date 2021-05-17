@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/Mojashi/RicochetRobots/api/model"
 	"github.com/jmoiron/sqlx"
 )
@@ -11,6 +13,8 @@ type IUserRepository interface {
 	Get(userID model.UserID) (model.User, error)
 	GetByTwID(twitterID string) (model.User, error)
 	Update(user model.User) error
+	AddArenaWinCount(user model.UserID) error
+	GetRanking(count int) []model.User
 }
 
 type UserRepository struct {
@@ -43,7 +47,7 @@ func (r UserRepository) Create(screenName, twitterID string) (model.User, error)
 func (r UserRepository) Get(userID model.UserID) (model.User, error) {
 	u := model.User{}
 	row := r.db.QueryRowx(
-		"SELECT id, name, twitterID from users where id=?",
+		"SELECT id, name, twitterID, arenaWinCount from users where id=?",
 		userID,
 	)
 
@@ -53,7 +57,7 @@ func (r UserRepository) Get(userID model.UserID) (model.User, error) {
 func (r UserRepository) GetByTwID(twitterID string) (model.User, error) {
 	u := model.User{}
 	row := r.db.QueryRowx(
-		"SELECT id, name, twitterID from users where twitterID=?",
+		"SELECT id, name, twitterID, arenaWinCount from users where twitterID=?",
 		twitterID,
 	)
 
@@ -67,4 +71,29 @@ func (r UserRepository) Delete(userID model.UserID) error {
 
 func (r UserRepository) Update(user model.User) error {
 	return nil
+}
+
+func (r UserRepository) AddArenaWinCount(userID model.UserID) error {
+	_, err := r.db.Exec(
+		"UPDATE users SET arenaWinCount=arenaWinCount+1 where id=?",
+		userID,
+	)
+	return err
+}
+
+func (r UserRepository) GetRanking(count int) []model.User {
+	rows, _ := r.db.Queryx(
+		"SELECT id, name, twitterID, arenaWinCount from users order by arenaWinCount DESC limit ?",
+		count,
+	)
+	ranking := []model.User{}
+	for rows.Next() {
+		u := model.User{}
+		err := rows.StructScan(&u)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ranking = append(ranking, u)
+	}
+	return ranking
 }

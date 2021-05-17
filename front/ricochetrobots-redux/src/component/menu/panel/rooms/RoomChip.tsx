@@ -91,6 +91,7 @@ const UserIconStyled = styled(UserIcon)`
     height:50%;
     width:50%;
     border:solid 1px black;
+    box-sizing:border-box;
 `
 
 const Div2 = styled("div")`

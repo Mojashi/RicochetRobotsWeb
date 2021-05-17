@@ -194,16 +194,21 @@ func (r *UserMadeRoomApp) Leave(c app.Client) {
 
 	delete(r.participants, user.ID)
 	if r.roomInfo.Admin.ID == user.ID {
-		// if len(r.participants) == 0 {
-		// 	r.self.Delete()
-		// 	return
-		// }
-
+		setted := false
 		for _, nextAdmin := range r.participants {
-			r.self.SetAdmin(nextAdmin.GetUser())
-			break
+			if !model.IsGuestUser(nextAdmin.GetUser()) {
+				r.self.SetAdmin(nextAdmin.GetUser())
+				setted = true
+				break
+			}
 		}
-		r.self.Broadcast(serverMessage.NewSetRoomInfoMessage(r.roomInfo))
+		if !setted {
+			if len(r.participants) > 0 {
+				r.self.Broadcast(serverMessage.NewNotifyMessage("ゲストのみになったため解散しました"))
+			}
+			r.self.Delete()
+			return
+		}
 	}
 	if r.roomInfo.OnGame {
 		r.gameApp.Leave(user)
@@ -257,6 +262,7 @@ func (r *UserMadeRoomApp) getParticipantsMap() map[model.UserID]model.User {
 
 func (r *UserMadeRoomApp) SetGameConfig(conf model.GameConfig) {
 	r.roomInfo.GameConfig = conf
+	r.self.Broadcast(serverMessage.NewSetRoomInfoMessage(r.roomInfo))
 	r.roomManager.ChangeRoomInfo(r.roomInfo)
 }
 func (r *UserMadeRoomApp) SetOnGame(onGame bool) {
@@ -265,5 +271,6 @@ func (r *UserMadeRoomApp) SetOnGame(onGame bool) {
 }
 func (r *UserMadeRoomApp) SetAdmin(admin model.User) {
 	r.roomInfo.Admin = admin
+	r.self.Broadcast(serverMessage.NewSetRoomInfoMessage(r.roomInfo))
 	r.roomManager.ChangeRoomInfo(r.roomInfo)
 }

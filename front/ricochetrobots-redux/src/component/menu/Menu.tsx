@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import { PALETTE } from "../../app/palette"
 import Button from "./Button"
-import { ArenaPanel } from "./panel/Arena"
 import { BlackRobotColor, BlueRobotColor, GreenRobotColor, RedRobotColor, YellowRobotColor } from "../accessory/solidRobots/SolidRobotIcon"
 import { CSSTransition, SwitchTransition } from "react-transition-group"
 import { HowToPanel } from "./panel/HowTo"
@@ -11,6 +10,8 @@ import { SettingsPanel } from "./panel/Settings"
 import ScrollArea from "react-scrollbar"
 import { FirstToWin } from "../../model/game/Rule"
 import { RoomsPanel } from "../../container/RoomsPanel"
+import { ArenaPanel } from "../../container/ArenaPanel"
+import Helmet from "react-helmet"
 
 type SECTION = "arena" | "howto" | "maketable" | "findroom" | "settings"
 
@@ -19,11 +20,12 @@ type Props = {}
 export default function MenuView(props : Props){
     const [selected, setSelected] = useState<SECTION>("findroom");
 
-    return (
+    return (<>
         <Div>
             <PanelDiv selected={selected}/>
             <ButtonDiv selected={selected} setSelected={setSelected}/>
         </Div>
+        </>
     )
 }
 

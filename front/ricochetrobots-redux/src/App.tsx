@@ -9,6 +9,8 @@ import MenuView from './component/menu/Menu';
 import { setUser } from './container/GameSlice';
 import { Room } from './container/Room';
 import { UserNav } from './container/UserNav';
+import Helmet from "react-helmet"
+import ogpImg from "../public/ogp.png"
 function App() {
   const dispatch  = useDispatch()
   useEffect(()=>{getMeApi((user)=>{dispatch(setUser(user))})},[])

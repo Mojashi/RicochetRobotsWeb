@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"time"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
@@ -16,6 +17,8 @@ type TwitterClient struct {
 
 	twApi twitter.TwitterAPI
 	room  app.IRoomApp
+
+	alive bool
 }
 
 func NewTwitterClient(u model.User, twApi twitter.TwitterAPI, room app.IRoomApp) *TwitterClient {
@@ -24,11 +27,16 @@ func NewTwitterClient(u model.User, twApi twitter.TwitterAPI, room app.IRoomApp)
 		createdTime: time.Now(),
 		twApi:       twApi,
 		room:        room,
+		alive:       true,
 	}
+	c.room.SendMessage(c, clientMessage.NewClientJoinMessage(""))
 	return c
 }
 
 func (c *TwitterClient) Submit(tweet twitter.TweetCreateEvent) error {
+	if !c.alive {
+		return errors.New("not alive")
+	}
 	hands, err := model.StrToHands(tweet.Text)
 	if err != nil {
 		return err
@@ -42,12 +50,17 @@ func (c *TwitterClient) GetUser() model.User {
 }
 
 func (c *TwitterClient) Send(msg serverMessage.ServerMessage) error {
+	if !c.alive {
+		return errors.New("not alive")
+	}
 	if _, ok := msg.(serverMessage.FinishGameMessage); ok {
+		c.room.SendMessage(c, clientMessage.NewClientLeaveMessage())
 		c.Delete()
 	}
 	return nil
 }
 
 func (c *TwitterClient) Delete() error {
+	c.alive = false
 	return nil
 }

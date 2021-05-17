@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"math/rand"
 	"net/http"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
@@ -23,7 +22,7 @@ func (h MakeRoomHandler) Handle(c echo.Context) error {
 	if c.Get("authorized").(bool) {
 		user = c.Get("user").(model.User)
 	} else {
-		user = model.User{ID: model.UserID(rand.Intn(1000000)), Name: "guest", TwitterID: ""}
+		return echo.NewHTTPError(403, "You must login")
 	}
 
 	settings := model.RoomSettings{}

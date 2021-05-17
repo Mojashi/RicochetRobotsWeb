@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -29,14 +30,14 @@ func find(ch byte, ar []byte) int {
 func StrToHands(str string) (Hands, error) {
 	str = strings.TrimSpace(str)
 	if len(str)%2 == 1 {
-		return Hands{}, nil
+		return Hands{}, errors.New("invalid format")
 	}
 	hs := Hands{}
 	for i := 0; len(str) > i; i += 2 {
 		num := find(str[i], nums)
 		dir := find(str[i+1], dirs)
 		if num == -1 || dir == -1 {
-			return Hands{}, nil
+			return Hands{}, errors.New("invalid format")
 		}
 
 		hs = append(hs, Hand{Dir: dir, Robot: num})

@@ -5,6 +5,8 @@ import { KeyboardIcon } from "../accessory/KeyboardIcon"
 import { LogoutIcon } from "../accessory/LogoutIcon"
 import { LoginIcon } from "../accessory/LoginIcon"
 
+import ReactTooltip from "react-tooltip"
+
 type Props = {
     className? : string,
     loggedIn : boolean,
@@ -17,12 +19,14 @@ export function UserNavPopView({className, onClickLogIn, onClickLogOut, onClickS
 
     return (
         <Div className={className}>
-            <Button onClick={onClickSetting}><KeyboardIconStyled/>操作の設定</Button>
+            <Button data-tip="工事中です！" onClick={onClickSetting}><KeyboardIconStyled/>操作の設定</Button>
             <Divider/>
             {loggedIn ? 
                 <Button onClick={onClickLogOut}><LogoutIconStyled/>ログアウト</Button>:
                 <Button onClick={onClickLogIn}><LoginIconStyled/>ログイン</Button>
             }
+
+            <ReactTooltip place="right" type="dark" effect="float"/>
         </Div>
     )
 }

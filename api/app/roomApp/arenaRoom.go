@@ -18,31 +18,35 @@ type IArenaRoomApp interface {
 
 type ArenaRoomApp struct {
 	*UserMadeRoomApp
-	self       IArenaRoomApp
-	arenaCount int
-	twApi      twitter.TwitterAPI
+	self               IArenaRoomApp
+	userRepository     repository.IUserRepository
+	arenaLogRepository repository.IArenaLogRepository
+	twApi              twitter.TwitterAPI
 }
 
 var arenaConf = model.GameConfig{
 	Rule:          model.FirstToWin,
-	Timelimit:     10,
-	GoalPoint:     10,
-	PointForFirst: 10,
-	PointForOther: 5,
-	SolLenMin:     4,
-	SolLenMax:     999,
+	Timelimit:     20,
+	GoalPoint:     30,
+	PointForFirst: 5,
+	PointForOther: 3,
+	SolLenMin:     6,
+	SolLenMax:     99,
 }
 
 func NewArenaRoomApp(
 	room model.RoomInfo,
 	roomManager app.IRoomObserver,
+	userRepository repository.IUserRepository,
 	problemRepository repository.IProblemWithSolutionRepository,
+	arenaLogRepository repository.IArenaLogRepository,
 	twApi twitter.TwitterAPI,
 	self IArenaRoomApp,
 ) *ArenaRoomApp {
 	roomApp := &ArenaRoomApp{
-		arenaCount: 0,
-		twApi:      twApi,
+		twApi:              twApi,
+		userRepository:     userRepository,
+		arenaLogRepository: arenaLogRepository,
 	}
 	if self == nil {
 		self = roomApp
@@ -62,14 +66,14 @@ func (r *ArenaRoomApp) Run() error {
 }
 
 func (r *ArenaRoomApp) StartGame() error {
-	r.arenaCount++
-	r.self.Broadcast(serverMessage.NewNotifyMessage("ラウンド" + strconv.Itoa(r.arenaCount)))
-
+	r.self.Broadcast(serverMessage.NewNotifyMessage("ラウンド" + strconv.Itoa(r.arenaLogRepository.GetLatestGameID()+1)))
 	r.self.SetOnGame(true)
 
 	var err error
 	r.gameApp = gameApp.NewArenaGameApp(
 		r.twApi,
+		r.userRepository,
+		r.arenaLogRepository,
 		r.self.getParticipantsMap(),
 		r.roomInfo.GameConfig,
 		r.self,
@@ -83,8 +87,10 @@ func (r *ArenaRoomApp) StartGame() error {
 func (r *ArenaRoomApp) OnFinishGame() {
 	r.UserMadeRoomApp.OnFinishGame()
 
-	r.self.Broadcast(serverMessage.NewNotifyMessage("10秒後に次ラウンドです"))
 	time.AfterFunc(time.Second*10, func() {
+		r.self.Broadcast(serverMessage.NewNotifyMessage("5分後に次ラウンドです"))
+	})
+	time.AfterFunc(time.Second*300, func() {
 		app.SendStartRequest(r.self, arenaConf)
 	})
 }

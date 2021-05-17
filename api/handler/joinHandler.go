@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"math/rand"
 	"strconv"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
+	"github.com/Mojashi/RicochetRobots/api/app/client"
 	"github.com/Mojashi/RicochetRobots/api/model"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -28,7 +28,7 @@ func (h JoinHandler) Handle(c echo.Context) error {
 	if c.Get("authorized").(bool) {
 		user = c.Get("user").(model.User)
 	} else {
-		user = model.User{ID: model.UserID(rand.Intn(1000000)), Name: "guest", TwitterID: ""}
+		user = model.GetGurstUser()
 	}
 
 	roomID, err := strconv.Atoi(c.Param("roomID"))
@@ -44,7 +44,7 @@ func (h JoinHandler) Handle(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	client, _ := NewClient(conn, user)
+	client, _ := client.NewWsClient(conn, user)
 
 	if err := client.Run(roomApp); err != nil {
 		return err

@@ -14,7 +14,7 @@ export function SubmissionsView({subs, className} : Props) {
         <Div className={className}>
             <Title>SUBMISSIONS</Title>
             {subs.slice(Math.max(subs.length - 5, 0), subs.length).reverse().map((sub,idx) => 
-                <SubmissionCard sub={sub} key={""+idx+sub.id} rank={subs.length - idx}/>
+                <SubmissionCard sub={sub} key={sub.id} rank={subs.length - idx}/>
             )}
         </Div>
     )

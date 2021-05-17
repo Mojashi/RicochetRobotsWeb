@@ -22,7 +22,7 @@ export function LeaderBoardView({ranking, className} : Props) {
             <Title>LEADERBOARD</Title>
             <LaneStyled>
                 {ranking.map((user,idx) => 
-                    <LeaderBoardUserCard rank={idx + 1} user={user} key={idx}/>
+                    <LeaderBoardUserCard rank={idx + 1} user={user} key={user.user.id}/>
                 )}
             </LaneStyled>
         </Div>

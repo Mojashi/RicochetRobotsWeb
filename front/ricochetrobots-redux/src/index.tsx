@@ -7,13 +7,14 @@ import App from './App';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
-enableMapSet()
+import Helmet from "react-helmet"
 
 ReactDOM.render(
   <React.StrictMode>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
     </style>
+  
     <Provider store={store}>
       <App />
     </Provider>

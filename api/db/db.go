@@ -23,7 +23,15 @@ CREATE TABLE IF NOT EXISTS users (
 	id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	name char(20) not null,
 	password char(20),
-	twitterID char(30) default null unique
+	twitterID char(30) default null unique,
+	arenaWinCount int not null default 0
+);
+`
+const ArenaLogSchema = `
+CREATE TABLE IF NOT EXISTS arenaLog (
+	gameID int NOT NULL PRIMARY KEY,
+	userID int NOT NULL,
+	createdAt datetime NOT NULL
 );
 `
 
@@ -35,5 +43,6 @@ func NewDB(DBName, DBUser, DBPass string) *sqlx.DB {
 
 	DBCon.MustExec(ProblemWithSolutionSchema)
 	DBCon.MustExec(UserSchema)
+	DBCon.MustExec(ArenaLogSchema)
 	return DBCon
 }

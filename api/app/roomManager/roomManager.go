@@ -23,20 +23,29 @@ type RoomManager struct {
 	roomApps  map[int]app.IRoomApp
 	roomInfos map[int]*RoomAbstractMtx
 
-	roomCount         int32
-	problemRepository repository.IProblemWithSolutionRepository
+	roomCount          int32
+	problemRepository  repository.IProblemWithSolutionRepository
+	arenaLogRepository repository.IArenaLogRepository
+	userRepository     repository.IUserRepository
 
 	twApi twitter.TwitterAPI
 }
 
-func NewRoomManager(problemRepository repository.IProblemWithSolutionRepository, twApi twitter.TwitterAPI) app.IRoomManager {
+func NewRoomManager(
+	problemRepository repository.IProblemWithSolutionRepository,
+	arenaLogRepository repository.IArenaLogRepository,
+	userRepository repository.IUserRepository,
+	twApi twitter.TwitterAPI,
+) app.IRoomManager {
 	ret := &RoomManager{
-		roomMtx:           &sync.RWMutex{},
-		roomApps:          map[int]app.IRoomApp{},
-		roomInfos:         map[int]*RoomAbstractMtx{},
-		roomCount:         0,
-		problemRepository: problemRepository,
-		twApi:             twApi,
+		roomMtx:            &sync.RWMutex{},
+		roomApps:           map[int]app.IRoomApp{},
+		roomInfos:          map[int]*RoomAbstractMtx{},
+		roomCount:          0,
+		problemRepository:  problemRepository,
+		arenaLogRepository: arenaLogRepository,
+		userRepository:     userRepository,
+		twApi:              twApi,
 	}
 	return ret
 }
@@ -92,7 +101,14 @@ func (m *RoomManager) NewArena() (int, error) {
 	}
 	atomic.AddInt32(&m.roomCount, 1)
 
-	room := roomApp.NewArenaRoomApp(roomInfo, m, m.problemRepository, m.twApi, nil)
+	room := roomApp.NewArenaRoomApp(
+		roomInfo,
+		m,
+		m.userRepository,
+		m.problemRepository,
+		m.arenaLogRepository,
+		m.twApi,
+		nil)
 
 	m.roomMtx.Lock()
 	m.roomApps[roomInfo.ID] = room

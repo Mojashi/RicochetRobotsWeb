@@ -23,17 +23,31 @@ type ArenaGameApp struct {
 	*BaseGameApp
 	self IArenaGameApp
 
-	twitterApi   twitter.TwitterAPI
-	problemTweet *anaconda.Tweet
-	solAnimMedia *anaconda.VideoMedia
-	nextProblem  chan *model.ProblemWithSolution
+	arenaLogRepository repository.IArenaLogRepository
+	userRepository     repository.IUserRepository
+	twitterApi         twitter.TwitterAPI
+	problemTweet       *anaconda.Tweet
+	solAnimMedia       *anaconda.VideoMedia
+	nextProblem        chan *model.ProblemWithSolution
+	currentRound       int
 }
 
-func NewArenaGameApp(twApi twitter.TwitterAPI, users map[model.UserID]model.User, conf model.GameConfig, output app.IGameOutput, problemRepository repository.IProblemWithSolutionRepository, self IArenaGameApp) *ArenaGameApp {
+func NewArenaGameApp(
+	twApi twitter.TwitterAPI,
+	userRepository repository.IUserRepository,
+	arenaLogRepository repository.IArenaLogRepository,
+	users map[model.UserID]model.User,
+	conf model.GameConfig,
+	output app.IGameOutput,
+	problemRepository repository.IProblemWithSolutionRepository,
+	self IArenaGameApp,
+) *ArenaGameApp {
 	g := &ArenaGameApp{
-		twitterApi:  twApi,
-		self:        self,
-		nextProblem: make(chan *model.ProblemWithSolution, 10),
+		twitterApi:         twApi,
+		self:               self,
+		userRepository:     userRepository,
+		nextProblem:        make(chan *model.ProblemWithSolution, 10),
+		arenaLogRepository: arenaLogRepository,
 	}
 	if self == nil {
 		g.self = g
@@ -47,13 +61,17 @@ func (a *ArenaGameApp) StartProblem() error {
 	if !a.GameState.Interval {
 		return errors.New("another problem has already been started")
 	}
+	a.currentRound = a.arenaLogRepository.GetLatestGameID() + 1
 
 	problem := <-a.nextProblem
 	imgPath := "./boardImg.png"
 	utils.DrawProblem(imgPath, problem.Problem)
 	media, err := a.twitterApi.UploadImage(imgPath)
 	if err == nil {
-		buf, err := a.twitterApi.PostTweet("test", url.Values{"media_ids": []string{media.MediaIDString}})
+		buf, err := a.twitterApi.PostTweet(
+			"ラウンド "+strconv.Itoa(a.currentRound),
+			url.Values{"media_ids": []string{media.MediaIDString}},
+		)
 		if err == nil {
 			a.problemTweet = &buf
 		} else {
@@ -67,12 +85,32 @@ func (a *ArenaGameApp) StartProblem() error {
 	return nil
 }
 
+func getWinner(pointDiff map[model.UserID]int) model.UserID {
+	maxPt := -1
+	var ret model.UserID
+	for userID, pt := range pointDiff {
+		if maxPt < pt {
+			ret = userID
+		}
+	}
+	return ret
+}
+
 func (a *ArenaGameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 	a.BaseGameApp.OnFinishProblem(pointDiff)
+	var winner model.User
+	winner, ok := a.Participants[getWinner(pointDiff)]
+	if ok {
+		a.arenaLogRepository.Create(a.currentRound, winner.ID)
+		//トランザクションなんかいらねえ！！（まあここはいらないよ、別に）
+		a.userRepository.AddArenaWinCount(winner.ID)
+	}
 
 	if a.problemTweet != nil {
 		a.twitterApi.PostTweet(
-			"@"+a.problemTweet.User.ScreenName+"\nsolution \nOPT:"+strconv.Itoa(len(a.problem.GetProblem().Solution))+"moves",
+			"@"+a.problemTweet.User.ScreenName+"\n"+
+				"winner @."+winner.Name+"\n"+
+				"OPT:"+strconv.Itoa(len(a.problem.GetProblem().Solution))+"moves",
 			url.Values{
 				"media_ids":             []string{a.solAnimMedia.MediaIDString},
 				"in_reply_to_status_id": []string{a.problemTweet.IdStr},
@@ -98,7 +136,7 @@ func (a *ArenaGameApp) addNextProblem() {
 	}
 	a.problemRepository.SetUsed(problem.ID)
 
-	solAnimPath := "./solgif/" + strconv.Itoa(problem.ID) + ".gif"
+	solAnimPath := "./solution.gif"
 	utils.DrawSolution(solAnimPath, problem.Problem, problem.Solution)
 	a.solAnimMedia, _ = a.twitterApi.UploadGif(solAnimPath)
 	a.nextProblem <- &problem

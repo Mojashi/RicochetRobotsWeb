@@ -8,19 +8,24 @@ import (
 	"net/http"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
+	"github.com/Mojashi/RicochetRobots/api/app/client"
+	"github.com/Mojashi/RicochetRobots/api/model"
+	"github.com/Mojashi/RicochetRobots/api/repository"
 	"github.com/Mojashi/RicochetRobots/api/twitter"
 	"github.com/labstack/echo/v4"
 )
 
 type TwWebHookGroup struct {
-	twApi twitter.TwitterAPI
-	room  app.IRoomApp
+	twApi          twitter.TwitterAPI
+	userRepository repository.IUserRepository
+	room           app.IRoomApp
 }
 
-func NewTwWebHookGroup(room app.IRoomApp, twApi twitter.TwitterAPI) *TwWebHookGroup {
+func NewTwWebHookGroup(room app.IRoomApp, userRepository repository.IUserRepository, twApi twitter.TwitterAPI) *TwWebHookGroup {
 	tw := &TwWebHookGroup{
-		room:  room,
-		twApi: twApi,
+		room:           room,
+		twApi:          twApi,
+		userRepository: userRepository,
 	}
 	return tw
 }
@@ -44,9 +49,22 @@ func (h *TwWebHookGroup) HandleActivity(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 	for _, ev := range req.TweetCreateEvents {
-		log.Println(ev.Text)
-
-		// h.room.SendMessage(, msg clientMessage.ClientMessage)
+		twitterID := ev.User.IDStr
+		user, err := h.userRepository.GetByTwID(twitterID)
+		if err != nil {
+			user, err = h.userRepository.Create(ev.User.ScreenName, ev.User.IDStr)
+			if err != nil {
+				log.Println(err.Error())
+				continue
+			}
+		}
+		_, err = model.StrToHands(ev.Text)
+		if err == nil {
+			log.Println(ev.Text)
+			c := client.NewTwitterClient(user, h.twApi, h.room)
+			c.Submit(ev)
+			// h.room.SendMessage(, msg clientMessage.ClientMessage)
+		}
 	}
 	return c.NoContent(http.StatusOK)
 }

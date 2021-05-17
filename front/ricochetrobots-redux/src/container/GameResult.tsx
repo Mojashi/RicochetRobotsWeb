@@ -9,7 +9,7 @@ export function GameResult({className} : {className? : string}) {
     const showGameResult = useSelector(showGameResultSelector)
 
     return  <GameResultView 
-        onEntered={()=>{setTimeout(()=>dispatch(setGameResult([])), 5000)}}
+        onEntered={()=>{setTimeout(()=>dispatch(setGameResult([])), 2000)}}
         winner={ showGameResult && leaderboard && leaderboard.length > 0?leaderboard[0]:undefined}
         className={className}/>
 }

@@ -88,6 +88,7 @@ func (u *BaseGameApp) Join(user model.User) {
 	if _, ok := u.GameState.Points[user.ID]; !ok {
 		u.GameState.Points[user.ID] = 0
 	}
+	u.Participants[user.ID] = user
 	delete(u.LeftParticipants, user.ID)
 }
 func (u *BaseGameApp) Leave(user model.User) {

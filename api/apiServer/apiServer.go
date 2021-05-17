@@ -25,6 +25,7 @@ var (
 	singinHandler        handler.Handler
 	joinHandler          handler.Handler
 	makeRoomHandler      handler.Handler
+	getRankingHandler    handler.Handler
 	roomListHandler      handler.Handler
 	twitterWebhookGroup  *handler.TwWebHookGroup
 	cookieAuthMiddleware middleware.CookieAuthMiddleware
@@ -43,8 +44,9 @@ func build() {
 	problemRepo := repository.NewProblemWithSolutionRepository(db)
 	tokenRepo := repository.NewTokenDataSource()
 	userRepo := repository.NewUserRepository(db)
+	arenaLogRepo := repository.NewAreanLogRepository(db)
 
-	roomManager := roomManager.NewRoomManager(problemRepo, twApi)
+	roomManager := roomManager.NewRoomManager(problemRepo, arenaLogRepo, userRepo, twApi)
 
 	twitterOAuthConf := handler.NewTwitterOAuthConf()
 
@@ -54,10 +56,11 @@ func build() {
 	joinHandler = handler.NewJoinHandler(roomManager)
 	makeRoomHandler = handler.NewMakeRoomHandler(roomManager)
 	roomListHandler = handler.NewRoomListHandler(roomManager)
+	getRankingHandler = handler.NewGetRankingHandler(userRepo)
 
 	roomManager.NewArena()
 	arena, _ := roomManager.Get(0)
-	twitterWebhookGroup = handler.NewTwWebHookGroup(arena, twApi)
+	twitterWebhookGroup = handler.NewTwWebHookGroup(arena, userRepo, twApi)
 }
 
 func Run() {
@@ -74,6 +77,7 @@ func Run() {
 
 	g := e.Group("/api")
 	g.GET("/users/me", handler.MeHandler)
+	g.GET("/users/ranking", getRankingHandler.Handle)
 
 	g.GET("/signout", handler.SignoutHandler)
 	g.GET("/twitter/signin", singinHandler.Handle)

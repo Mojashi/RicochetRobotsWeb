@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useHistory } from "react-router"
 import { CSSTransition, TransitionGroup } from "react-transition-group"
 import styled from "styled-components"
@@ -8,6 +8,7 @@ import { Notification } from "../../container/GameSlice"
 import { UserNav } from "../../container/UserNav"
 import { UserNavView } from "../usernav/UserNav"
 import { BackButton } from "./BackButton"
+import { TweetButton } from "./tweetButton"
 
 interface Props {
     className? : string,
@@ -22,6 +23,7 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
     return (
         <Div className={className}>
             <BackButtonStyled onClick={()=>history.push("/")}/>
+            <TweetButtonStyled text={"ハイパーロボットで遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>
             <CenterText>{roomName}</CenterText>
             <GameConfig/>
             <TransitionGroupStyled>
@@ -34,6 +36,9 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
         </Div>
     )
 }
+const TweetButtonStyled = styled(TweetButton)`
+    margin:0.5em;
+`
 const UserNavStyled = styled(UserNav)`
     z-index: 1000;
     position : absolute;
