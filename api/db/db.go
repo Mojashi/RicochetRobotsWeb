@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS arenaLog (
 );
 `
 
-func NewDB(DBName, DBUser, DBPass string) *sqlx.DB {
-	DBCon, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s", DBUser, DBPass, DBName))
+func NewDB(DBHost, DBName, DBUser, DBPass string) *sqlx.DB {
+	DBCon, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", DBHost, DBUser, DBPass, DBName))
 	if err != nil {
 		log.Fatalln(err)
 	}

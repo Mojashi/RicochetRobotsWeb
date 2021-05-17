@@ -23,7 +23,7 @@ func build() {
 		log.Fatal(".env doesnt exist")
 	}
 
-	db := db.NewDB(os.Getenv("DB"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
+	db := db.NewDB(os.Getenv("DB_HOST"), os.Getenv("DB"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
 	problemRepository = repository.NewProblemWithSolutionRepository(db)
 }
 
