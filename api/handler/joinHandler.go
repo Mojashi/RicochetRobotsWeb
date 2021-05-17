@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"log"
+	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
@@ -13,6 +16,11 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+
+	CheckOrigin: func(r *http.Request) bool {
+		log.Println(r.Host)
+		return r.Host == os.Getenv("PUBLIC_DOMAIN")
+	},
 }
 
 type JoinHandler struct {
