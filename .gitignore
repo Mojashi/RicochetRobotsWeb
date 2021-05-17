@@ -4,4 +4,6 @@ config.json
 gen/solver
 gen/gen
 front/ricochetrobots/node_modules/
+front/ricochetrobots-redux/node_modules/
+front-ricochetrobots-redux/public/userPics/
 api/solgif/
