@@ -18,8 +18,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const PublicImageDirPath = "../front/ricochetrobots-redux/public/userPics/"
-
 type OAuthCallbackHandler struct {
 	userRepository         repository.IUserRepository
 	authSessionsRepository repository.IAuthSessionDataSource
@@ -110,7 +108,7 @@ func getTwitterPic(c oauth.Client, cred *oauth.Credentials, user model.User) err
 	mp := map[string]interface{}{}
 	json.Unmarshal(body, &mp)
 	imgUrl := mp["profile_image_url_https"].(string)
-	return downloadImage(imgUrl, PublicImageDirPath+fmt.Sprint(user.ID)+".jpg")
+	return downloadImage(imgUrl, os.Getenv("PUBLIC_DIR")+fmt.Sprint(user.ID)+".jpg")
 }
 
 func downloadImage(url string, savePath string) error {
