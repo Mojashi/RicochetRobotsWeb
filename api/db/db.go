@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS arenaLog (
 `
 
 func NewDB(DBHost, DBName, DBUser, DBPass string) *sqlx.DB {
-	DBCon, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", DBHost, DBUser, DBPass, DBName))
+	DBCon, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", DBUser, DBPass, DBHost, DBName))
 	if err != nil {
 		log.Fatalln(err)
 	}
