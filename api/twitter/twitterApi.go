@@ -26,8 +26,8 @@ func NewTwitterAPI() TwitterAPI {
 		ConsumerSecret: os.Getenv("CONSUMER_SECRET"),
 
 		TwitterApi: anaconda.NewTwitterApiWithCredentials(
-			os.Getenv("DEV_TWACCESS_TOKEN"),
-			os.Getenv("DEV_TWACCESS_SECRET"),
+			os.Getenv("TWACCESS_TOKEN"),
+			os.Getenv("TWACCESS_SECRET"),
 			os.Getenv("CONSUMER_KEY"),
 			os.Getenv("CONSUMER_SECRET"),
 		),
