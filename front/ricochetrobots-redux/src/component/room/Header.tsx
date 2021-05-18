@@ -23,7 +23,7 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
     return (
         <Div className={className}>
             <BackButtonStyled onClick={()=>history.push("/")}/>
-            <TweetButtonStyled text={"ハイパーロボットで遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>
+            <TweetButtonStyled text={roomName+"で遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>
             <CenterText>{roomName}</CenterText>
             <GameConfig/>
             <TransitionGroupStyled>
