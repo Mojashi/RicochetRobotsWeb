@@ -23,6 +23,7 @@ export function HowToPanel({className} : {className? : string}){
                     数字キーを押し続けながら、矢印キーを押すと該当するロボットがその方向に動きます。<br/>
                     R：リセット<br/>
                     BackSpace：１手もどす<br/>
+                    Enter: 提出<br/>
                 </Text>
                 </ScrollArea>
             </Div>

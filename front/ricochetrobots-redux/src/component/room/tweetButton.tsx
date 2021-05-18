@@ -14,7 +14,7 @@ export function TweetButton({text, hashTags , className} : Props){
         //@ts-ignore
         twttr.widgets.load(ref.current.tweetButton);
         }
-    },[])
+    },[ref.current])
     return <div className={className}>
     <a ref={ref}
         href="https://twitter.com/share?ref_src=twsrc%5Etfw" 
