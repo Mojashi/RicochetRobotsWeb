@@ -10,6 +10,7 @@ import (
 type IUserRepository interface {
 	Create(screenName string, twitterID string) (model.User, error)
 	Delete(userID model.UserID) error
+	GetAll() []model.User
 	Get(userID model.UserID) (model.User, error)
 	GetByTwID(twitterID string) (model.User, error)
 	Update(user model.User) error
@@ -42,6 +43,25 @@ func (r UserRepository) Create(screenName, twitterID string) (model.User, error)
 		Name:      screenName,
 		TwitterID: twitterID,
 	}, err
+}
+
+func (r UserRepository) GetAll() []model.User {
+	rows, err := r.db.Queryx(
+		"SELECT id, name, twitterID, arenaWinCount from users",
+	)
+	if err != nil {
+		return []model.User{}
+	}
+
+	users := []model.User{}
+	for rows.Next() {
+		u := model.User{}
+		err := rows.StructScan(&u)
+		if err == nil {
+			users = append(users, u)
+		}
+	}
+	return users
 }
 
 func (r UserRepository) Get(userID model.UserID) (model.User, error) {

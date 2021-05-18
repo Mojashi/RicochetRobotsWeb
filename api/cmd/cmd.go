@@ -18,5 +18,6 @@ func init() {
 	cobra.OnInitialize()
 	RootCmd.AddCommand(
 		genCmd(),
+		getTwitterPicCmd(),
 	)
 }

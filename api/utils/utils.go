@@ -2,6 +2,8 @@ package utils
 
 import (
 	"encoding/base64"
+	"io"
+	"net/http"
 	"os"
 	"sync"
 )
@@ -43,4 +45,21 @@ func EncodeBase64(path string) string {
 	file.Read(data)
 
 	return base64.StdEncoding.EncodeToString(data)
+}
+
+func DownloadImage(url string, savePath string) error {
+	response, e := http.Get(url)
+	if e != nil {
+		return e
+	}
+	defer response.Body.Close()
+
+	file, err := os.Create(savePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, response.Body)
+	return err
 }

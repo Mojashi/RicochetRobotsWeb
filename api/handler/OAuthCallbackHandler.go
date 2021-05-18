@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/Mojashi/RicochetRobots/api/model"
 	"github.com/Mojashi/RicochetRobots/api/repository"
+	"github.com/Mojashi/RicochetRobots/api/utils"
 	"github.com/garyburd/go-oauth/oauth"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
@@ -108,22 +108,5 @@ func getTwitterPic(c oauth.Client, cred *oauth.Credentials, user model.User) err
 	mp := map[string]interface{}{}
 	json.Unmarshal(body, &mp)
 	imgUrl := mp["profile_image_url_https"].(string)
-	return downloadImage(imgUrl, os.Getenv("PUBLIC_DIR")+"/"+fmt.Sprint(user.ID)+".jpg")
-}
-
-func downloadImage(url string, savePath string) error {
-	response, e := http.Get(url)
-	if e != nil {
-		return e
-	}
-	defer response.Body.Close()
-
-	file, err := os.Create(savePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, response.Body)
-	return err
+	return utils.DownloadImage(imgUrl, os.Getenv("PUBLIC_DIR")+"/"+fmt.Sprint(user.ID)+".jpg")
 }
