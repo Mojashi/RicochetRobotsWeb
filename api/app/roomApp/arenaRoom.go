@@ -32,7 +32,7 @@ var arenaConf = model.GameConfig{
 	GoalPoint:     30,
 	PointForFirst: 5,
 	PointForOther: 3,
-	SolLenMin:     5,
+	SolLenMin:     6,
 	SolLenMax:     99,
 }
 
