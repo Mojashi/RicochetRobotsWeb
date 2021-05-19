@@ -7,8 +7,10 @@ import { User, UserID } from "../../model/User";
 import { getRoomInfo, getRoomState, getSiteState, RoomState, setNeedToAuth, State, initialRoomState } from "../GameSlice";
 import { joinToGameFunc } from "./GameReducers";
 
-export function notifyFunc(draft : WritableDraft<RoomState> , msg : string){
-    draft.notifications.push({id:Math.random(), msg:msg})
+export function notifyFunc(draft : WritableDraft<RoomState> , msg : string, duration? : number){
+    if(duration === undefined || duration < 0) duration = 1
+
+    draft.notifications.push({id:Math.random(), msg:msg, duration : duration})
 }
 
 export function joinToRoomFunc (draft : Draft<RoomState>, user : User) {
@@ -61,8 +63,8 @@ export const RoomInfoReducer = {
     setRoomInfo: (state:State, action : PayloadAction<RoomInfo>) => (
         produce(state, draft => setRoomInfoFunc(draft, action.payload))
     ),
-    notify:(state : State, action : PayloadAction<string>) => (
-        produce(state, draft => notifyFunc(getRoomState(draft), action.payload))
+    notify:(state : State, action : PayloadAction<{msg:string, duration?:number}>) => (
+        produce(state, draft => notifyFunc(getRoomState(draft), action.payload.msg, action.payload.duration))
     ),
     removeNotify:(state:State, action : PayloadAction<number>) => (
         produce(state, draft => removeNotifyFunc(getRoomState(draft), action.payload))

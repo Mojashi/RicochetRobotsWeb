@@ -15,10 +15,10 @@ export function initResultState(draft : Draft<RoomState>, problem : Problem, sub
         problem : problem,
         readyNext: false,
     }
+    initBoardView(draft, problem)
     if (subs.length > 0){
         playResultSubFunc(draft, subs[0])
     }
-    initBoardView(draft, problem)
 }
 
 export function finishResultFunc(draft : Draft<RoomState>) {

@@ -11,9 +11,9 @@ export class StartTimelimitMessage {
     handle(dispatch : Dispatch<any>){
         const f = (nex : Function, left:number) => {
             if(left > 0)
-                dispatch(notify(`${left}`))
+                dispatch(notify({msg:`${left}`}))
             else
-                dispatch(notify("FINISH"))
+                dispatch(notify({msg:"FINISH"}))
             if(left > 0)
                 setTimeout(nex, 1000, nex, left - 1)
         }

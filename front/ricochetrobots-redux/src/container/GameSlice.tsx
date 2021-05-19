@@ -84,6 +84,7 @@ export type BoardViewState = {
 
 export type Notification = {
     id : number
+    duration : number
     msg : string
 }
 

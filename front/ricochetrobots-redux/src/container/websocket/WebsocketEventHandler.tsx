@@ -107,7 +107,7 @@ export function useServer(url: string) : WsDispatch{
         ws.current = new WebSocket(url)
         ws.current.onerror = (ev) => {
             console.log(ev)
-            dispatch(notify("connection error"))
+            dispatch(notify({msg:"connection error"}))
         }
         ws.current.onopen = () =>{
             console.log("ws opened")
@@ -115,7 +115,7 @@ export function useServer(url: string) : WsDispatch{
         }
         ws.current.onclose = () => {
             console.log("ws closed");
-            dispatch(notify("room not found"))
+            dispatch(notify({msg:"room not found"}))
         }
         ws.current.onmessage = e => {
             try {
@@ -132,7 +132,7 @@ export function useServer(url: string) : WsDispatch{
                 }
             } catch (err) {
                 console.error(err)
-                dispatch(notify("failed to parse"))
+                dispatch(notify({msg:"failed to parse"}))
             }
         };
         return () => {

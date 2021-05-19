@@ -13,11 +13,11 @@ import { TweetButton } from "./tweetButton"
 interface Props {
     className? : string,
     roomName : string,
-    msgs : Notification[],
-    onMsgEntered : (id : number)=>void,
+    notifs : Notification[],
+    onMsgEntered : (notif : Notification)=>void,
 }
 
-export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
+export function HeaderView({className,roomName, notifs, onMsgEntered} : Props){
     const history = useHistory();
 
     return (
@@ -27,9 +27,9 @@ export function HeaderView({className,roomName, msgs, onMsgEntered} : Props){
             <CenterText>{roomName}</CenterText>
             <GameConfig/>
             <TransitionGroupStyled>
-            {msgs.map(msg => 
-                <CSSTransition key={msg.id} timeout={200} in={true} onEntering={()=>onMsgEntered(msg.id)}>
-                    <MessageBox>{msg.msg}</MessageBox>
+            {notifs.map(notif => 
+                <CSSTransition key={notif.id} timeout={200} in={true} onEntering={()=>onMsgEntered(notif)}>
+                    <MessageBox>{notif.msg}</MessageBox>
                 </CSSTransition>
             )}
             </TransitionGroupStyled>
