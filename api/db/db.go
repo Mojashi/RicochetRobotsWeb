@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS problems (
 	robotPoss json NOT NULL,
 	solution json NOT NULL,
 	numRobot int NOT NULL,
+	torus boolean NOT NULL default false,
+	mirror boolean NOT NULL default false,
 	used	boolean DEFAULT false
 );
 `

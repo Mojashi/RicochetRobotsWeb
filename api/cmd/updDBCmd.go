@@ -17,8 +17,11 @@ func updDBCmd() *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			build()
-			if args[0] == "1" {
+			switch args[0] {
+			case "1":
 				UPDV1()
+			case "2":
+				UPDV2()
 			}
 			return nil
 		},
@@ -44,6 +47,17 @@ func UPDV1() {
 		panic(err)
 	}
 	_, err = d.Exec("UPDATE problems SET randomValue=RAND()")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func UPDV2() {
+	_, err := d.Exec("ALTER TABLE problems ADD torus boolean not null default false")
+	if err != nil {
+		panic(err)
+	}
+	_, err = d.Exec("ALTER TABLE problems ADD mirror boolean not null default false")
 	if err != nil {
 		panic(err)
 	}
