@@ -85,11 +85,13 @@ func (a *ArenaGameApp) StartProblem() error {
 	return nil
 }
 
+//ポイントの情報からWinnerを推察してるんだけど、あんまよくないね
 func getWinner(pointDiff map[model.UserID]int) model.UserID {
 	maxPt := -1
 	var ret model.UserID
 	for userID, pt := range pointDiff {
 		if maxPt < pt {
+			maxPt = pt
 			ret = userID
 		}
 	}
