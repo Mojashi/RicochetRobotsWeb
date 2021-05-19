@@ -1,6 +1,7 @@
 package roomApp
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -22,6 +23,7 @@ type ArenaRoomApp struct {
 	userRepository     repository.IUserRepository
 	arenaLogRepository repository.IArenaLogRepository
 	twApi              twitter.TwitterAPI
+	nextStartTime      time.Time
 }
 
 var arenaConf = model.GameConfig{
@@ -30,7 +32,7 @@ var arenaConf = model.GameConfig{
 	GoalPoint:     30,
 	PointForFirst: 5,
 	PointForOther: 3,
-	SolLenMin:     6,
+	SolLenMin:     5,
 	SolLenMax:     99,
 }
 
@@ -66,7 +68,7 @@ func (r *ArenaRoomApp) Run() error {
 }
 
 func (r *ArenaRoomApp) StartGame() error {
-	r.self.Broadcast(serverMessage.NewNotifyMessage("ラウンド" + strconv.Itoa(r.arenaLogRepository.GetLatestGameID()+1)))
+	r.self.Broadcast(serverMessage.NewNotifyMessage("ラウンド"+strconv.Itoa(r.arenaLogRepository.GetLatestGameID()+1), -1))
 	r.self.SetOnGame(true)
 
 	var err error
@@ -84,13 +86,30 @@ func (r *ArenaRoomApp) StartGame() error {
 	return err
 }
 
+func (r *ArenaRoomApp) GetSyncRoomMessage() serverMessage.ServerMessage {
+	ret := r.UserMadeRoomApp.GetSyncRoomMessage()
+	if !r.roomInfo.OnGame {
+		if ar, ok := ret.(serverMessage.SyncRoomMessage); ok {
+			ar = append(ar, serverMessage.NewNotifyMessage(
+				fmt.Sprint(int(-time.Since(r.nextStartTime).Seconds()))+"秒後に次ラウンドです", 10),
+			)
+			return ar
+		}
+	}
+	return ret
+}
+
 func (r *ArenaRoomApp) OnFinishGame() {
 	r.UserMadeRoomApp.OnFinishGame()
 
 	time.AfterFunc(time.Second*10, func() {
-		r.self.Broadcast(serverMessage.NewNotifyMessage("5分後に次ラウンドです"))
+		r.self.Broadcast(serverMessage.NewNotifyMessage("5分後に次ラウンドです", 20))
 	})
-	time.AfterFunc(time.Second*300, func() {
+
+	intervalLen := time.Second * time.Duration(300)
+
+	r.nextStartTime = time.Now().Add(intervalLen)
+	time.AfterFunc(intervalLen, func() {
 		app.SendStartRequest(r.self, arenaConf)
 	})
 }

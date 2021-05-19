@@ -25,8 +25,9 @@ type IUserMadeRoomApp interface {
 	Leave(c app.Client)
 	StartGame() error
 	OnFinishGame()
-	SyncAll() error
+	SyncAll()
 	Sync(dest model.UserID) error
+	GetSyncRoomMessage() serverMessage.ServerMessage
 	getParticipantsMap() map[model.UserID]model.User
 	SetGameConfig(conf model.GameConfig)
 	SetOnGame(onGame bool)
@@ -204,7 +205,7 @@ func (r *UserMadeRoomApp) Leave(c app.Client) {
 		}
 		if !setted {
 			if len(r.participants) > 0 {
-				r.self.Broadcast(serverMessage.NewNotifyMessage("ゲストのみになったため解散しました"))
+				r.self.Broadcast(serverMessage.NewNotifyMessage("ゲストのみになったため解散しました", 30))
 			}
 			r.self.Delete()
 			return
@@ -237,19 +238,22 @@ func (r *UserMadeRoomApp) OnFinishGame() {
 	r.self.SetOnGame(false)
 }
 
-func (r *UserMadeRoomApp) SyncAll() error {
-	r.self.Broadcast(serverMessage.NewSyncRoomMessage(r.roomInfo, r.self.getParticipantsMap()))
+func (r *UserMadeRoomApp) SyncAll() {
+	r.self.Broadcast(r.self.GetSyncRoomMessage())
 	if r.roomInfo.OnGame && r.gameApp != nil {
 		r.gameApp.SyncAll()
 	}
-	return nil
 }
 func (r *UserMadeRoomApp) Sync(dest model.UserID) error {
-	r.self.Send(dest, serverMessage.NewSyncRoomMessage(r.roomInfo, r.self.getParticipantsMap()))
+	r.self.Send(dest, r.self.GetSyncRoomMessage())
 	if r.roomInfo.OnGame && r.gameApp != nil {
 		return r.gameApp.Sync(dest)
 	}
 	return nil
+}
+
+func (r *UserMadeRoomApp) GetSyncRoomMessage() serverMessage.ServerMessage {
+	return serverMessage.NewSyncRoomMessage(r.roomInfo, r.self.getParticipantsMap())
 }
 
 func (r *UserMadeRoomApp) getParticipantsMap() map[model.UserID]model.User {
