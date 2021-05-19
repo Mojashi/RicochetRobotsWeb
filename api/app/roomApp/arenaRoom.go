@@ -26,12 +26,12 @@ type ArenaRoomApp struct {
 
 var arenaConf = model.GameConfig{
 	Rule:          model.FirstToWin,
-	Timelimit:     5,
+	Timelimit:     20,
 	GoalPoint:     30,
 	PointForFirst: 5,
 	PointForOther: 3,
-	SolLenMin:     1,
-	SolLenMax:     4,
+	SolLenMin:     6,
+	SolLenMax:     99,
 }
 
 func NewArenaRoomApp(
