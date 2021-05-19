@@ -10,6 +10,7 @@ import (
 const ProblemWithSolutionSchema = `
 CREATE TABLE IF NOT EXISTS problems (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    randomValue float NOT NULL,
 	board  json NOT NULL,
 	mainRobot int NOT NULL,
 	robotPoss json NOT NULL,

@@ -26,6 +26,15 @@ type ArenaRoomApp struct {
 	nextStartTime      time.Time
 }
 
+var arenaConfForDEV = model.GameConfig{
+	Rule:          model.FirstToWin,
+	Timelimit:     5,
+	GoalPoint:     30,
+	PointForFirst: 5,
+	PointForOther: 3,
+	SolLenMin:     1,
+	SolLenMax:     4,
+}
 var arenaConf = model.GameConfig{
 	Rule:          model.FirstToWin,
 	Timelimit:     20,

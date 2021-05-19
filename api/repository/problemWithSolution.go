@@ -43,7 +43,7 @@ func (r ProblemWithSolutionRepository) GetUnused() (model.ProblemWithSolution, e
 
 	var p model.ProblemWithSolution
 	rows := r.db.QueryRowx(
-		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems where used=false LIMIT 1",
+		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems where used=false ORDER BY randomValue LIMIT 1",
 	)
 
 	err := rows.StructScan(&p)
@@ -59,7 +59,7 @@ func (r ProblemWithSolutionRepository) GetUnusedWithRange(solLenMin int, solLenM
 	var p model.ProblemWithSolution
 	rows := r.db.QueryRowx(
 		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems "+
-			"where used=false and json_length(solution) between ? and ? LIMIT 1",
+			"where used=false and json_length(solution) between ? and ? ORDER BY randomValue LIMIT 1",
 		solLenMin, solLenMax,
 	)
 
@@ -81,7 +81,7 @@ func (r ProblemWithSolutionRepository) SetUsed(id int) error {
 
 func (r ProblemWithSolutionRepository) Create(p model.ProblemWithSolution) error {
 	_, err := r.db.Exec(
-		"INSERT INTO problems(board, mainRobot, robotPoss, solution, numRobot) VALUES(?,?,?,?,?)",
+		"INSERT INTO problems(board, mainRobot, robotPoss, solution, numRobot, randomValue) VALUES(?,?,?,?,?,RAND())",
 		p.Board,
 		p.MainRobot,
 		p.RobotPoss,

@@ -19,5 +19,6 @@ func init() {
 	RootCmd.AddCommand(
 		genCmd(),
 		getTwitterPicCmd(),
+		updDBCmd(),
 	)
 }

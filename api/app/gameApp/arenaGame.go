@@ -69,7 +69,7 @@ func (a *ArenaGameApp) StartProblem() error {
 	media, err := a.twitterApi.UploadImage(imgPath)
 	if err == nil {
 		buf, err := a.twitterApi.PostTweet(
-			"ラウンド "+strconv.Itoa(a.currentRound)+"\n"+"https://ricochetrobots.mojashidev.xyz",
+			"ラウンド "+strconv.Itoa(a.currentRound)+"\n"+"https://ricochetrobots.mojashidev.xyz/room/0",
 			url.Values{"media_ids": []string{media.MediaIDString}},
 		)
 		if err == nil {
