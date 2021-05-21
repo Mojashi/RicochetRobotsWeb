@@ -11,6 +11,8 @@ type Problem struct {
 	MainRobot Robot `json:"mainRobot" db:"mainRobot"`
 	RobotPoss Poss  `json:"robotPoss" db:"robotPoss"`
 	NumRobot  int   `json:"numRobot" db:"numRobot"`
+	Torus     bool  `json:"torus" db:"torus"`
+	Mirror    bool  `json:"mirror" db:"mirror"`
 }
 
 func (p Problem) IsValid(hands Hands) bool {

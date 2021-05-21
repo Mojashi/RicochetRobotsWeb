@@ -27,12 +27,12 @@ func build() {
 	problemRepository = repository.NewProblemWithSolutionRepository(db)
 }
 
-func Gen() {
+func Gen(torus, mirror bool) {
 	build()
 
 	for {
 		rand.Seed(time.Now().UnixNano())
-		problem := rngProblemWithSolution(30)
+		problem := rngProblemWithSolution(torus, mirror, 10)
 
 		err := problemRepository.Create(problem)
 		if err != nil {

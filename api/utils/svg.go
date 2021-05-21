@@ -16,6 +16,7 @@ import (
 	"github.com/srwiley/rasterx"
 )
 
+var mirrorImgs [][]*image.Paletted
 var robotImgs []*image.Paletted
 var wallImgs []*image.Paletted
 var cellImg *image.Paletted
@@ -29,7 +30,10 @@ const cellSize = 64
 func init() {
 	palette = []color.Color{}
 	paletteMap = map[uint32]int{}
-	makePalette([]string{"./img/cell", "./img/center", "./img/wall", "./img/robot1", "./img/robot2", "./img/robot3", "./img/robot4", "./img/robot5", "./img/goal"})
+	makePalette([]string{"./img/cell", "./img/center", "./img/wall",
+		"./img/robot1", "./img/robot2", "./img/robot3", "./img/robot4", "./img/robot5",
+		"./img/mirror1", "./img/mirror2", "./img/mirror3", "./img/mirror4", "./img/mirror5",
+		"./img/goal"})
 	robotImgs = []*image.Paletted{
 		ReadSVG("./img/robot1", 0.8),
 		ReadSVG("./img/robot2", 0.8),
@@ -37,6 +41,20 @@ func init() {
 		ReadSVG("./img/robot4", 0.8),
 		ReadSVG("./img/robot5", 0.8),
 	}
+	mirrorImgs = [][]*image.Paletted{{
+		ReadSVG("./img/mirror1", 1),
+		ReadSVG("./img/mirror2", 1),
+		ReadSVG("./img/mirror3", 1),
+		ReadSVG("./img/mirror4", 1),
+		ReadSVG("./img/mirror5", 1),
+	}}
+	mirrorImgs = append(mirrorImgs, []*image.Paletted{
+		Affine(mirrorImgs[0][0], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
+		Affine(mirrorImgs[0][1], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
+		Affine(mirrorImgs[0][2], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
+		Affine(mirrorImgs[0][3], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
+		Affine(mirrorImgs[0][4], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
+	})
 	centerImg = ReadSVG("./img/center", 1)
 	cellImg = ReadSVG("./img/cell", 1)
 	bwallImg := ReadSVG("./img/wall", 1)
@@ -137,6 +155,9 @@ func ReadSVG(pathWithoutExt string, scale float64) *image.Paletted {
 }
 
 func DrawCell(dst draw.Image, b model.Board, x, y int) {
+	if x < 0 || y < 0 || x >= b.Width || y >= b.Height {
+		return
+	}
 	rect := image.Rect(x*cellSize, y*cellSize, (x+1)*cellSize, (y+1)*cellSize)
 
 	if (y == b.Height/2 || y == b.Height/2-1) && (x == b.Width/2 || x == b.Width/2-1) {
@@ -151,6 +172,10 @@ func DrawCell(dst draw.Image, b model.Board, x, y int) {
 		}
 		if b.Cells[y][x].Goal {
 			draw.Draw(dst, rect, goalImg, image.Point{Y: 0, X: 0}, draw.Over)
+		}
+		if b.Cells[y][x].Mirror != nil {
+			m := b.Cells[y][x].Mirror
+			draw.Draw(dst, rect, mirrorImgs[m.Side][m.Trans], image.Point{Y: 0, X: 0}, draw.Over)
 		}
 	}
 }
@@ -188,6 +213,9 @@ func DrawProblem(path string, p model.Problem) {
 }
 
 func DrawSolution(path string, p model.Problem, hands model.Hands) {
+	if !p.IsValid(hands) {
+		return
+	}
 	boardImg := DrawBoard(p.Board)
 	DrawRobot(p.MainRobot, float64(p.Board.Height)/2-0.5, float64(p.Board.Width)/2-0.5, boardImg)
 
@@ -202,9 +230,18 @@ func DrawSolution(path string, p model.Problem, hands model.Hands) {
 
 	for _, hand := range hands {
 		bef := poss[hand.Robot]
-		for p.Board.Move(poss, hand) {
-			images = linearInterpolate(images, p.Board, boardImg.Rect, bef, poss[hand.Robot], hand.Robot, 2)
+		bh := hand
+		for p.Board.Move(poss, &hand) {
+			if Abs(bef.X-poss[hand.Robot].X)+Abs(bef.Y-poss[hand.Robot].Y) > 1 {
+				mid := model.AddVec(hand.Dir, bef)
+				images = linearInterpolate(images, p.Board, boardImg.Rect, bef, mid, bh.Robot, 2)
+				mid = model.AddVec(model.InvDir(bh.Dir), poss[hand.Robot])
+				images = linearInterpolate(images, p.Board, boardImg.Rect, mid, poss[hand.Robot], hand.Robot, 2)
+			} else {
+				images = linearInterpolate(images, p.Board, boardImg.Rect, bef, poss[hand.Robot], hand.Robot, 2)
+			}
 			bef = poss[hand.Robot]
+			bh = hand
 		}
 	}
 	f, _ := os.Create(path)

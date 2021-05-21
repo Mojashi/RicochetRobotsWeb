@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Mojashi/RicochetRobots/api/model"
+	"github.com/Mojashi/RicochetRobots/api/utils"
 )
 
 func NewBoard(height, width int) model.Board {
@@ -29,21 +31,27 @@ func NewBoard(height, width int) model.Board {
 func SetWall(b model.Board, y, x int, d model.Dir) {
 	b.Cells[y][x].Walls[d] = true
 	nex := model.AddVec(d, model.Pos{X: x, Y: y})
+	nex.Y = (nex.Y + b.Height) % b.Height
+	nex.X = (nex.X + b.Width) % b.Width
 
-	if nex.X < b.Width && nex.X >= 0 && nex.Y < b.Height && nex.Y >= 0 {
-		b.Cells[nex.Y][nex.X].Walls[model.InvDir(d)] = true
-	}
+	b.Cells[nex.Y][nex.X].Walls[model.InvDir(d)] = true
 }
 
-func rngBoard() model.Board {
+func SetMirror(b model.Board, y, x int, mirror model.Mirror) {
+	b.Cells[y][x].Mirror = &mirror
+}
+
+func rngBoard(torus, mirror bool) model.Board {
 	mp := NewBoard(16, 16)
 	// mp := [[[0 for k in range(4)] for i in range(16)] for j in range(16)]
 
-	for i := 0; 16 > i; i++ {
-		SetWall(mp, 0, i, model.UP)
-		SetWall(mp, 15, i, model.DN)
-		SetWall(mp, i, 0, model.LT)
-		SetWall(mp, i, 15, model.RT)
+	if !torus {
+		for i := 0; 16 > i; i++ {
+			SetWall(mp, 0, i, model.UP)
+			SetWall(mp, 15, i, model.DN)
+			SetWall(mp, i, 0, model.LT)
+			SetWall(mp, i, 15, model.RT)
+		}
 	}
 
 	SetWall(mp, 7, 7, model.UP)
@@ -56,7 +64,7 @@ func rngBoard() model.Board {
 	SetWall(mp, 7, 8, model.RT)
 
 	elcount := rand.Intn(10) + 24
-
+	// elcount := rand.Intn(5)
 	for i := 0; elcount > i; i++ {
 		x := rand.Intn(16)
 		y := rand.Intn(16)
@@ -65,11 +73,26 @@ func rngBoard() model.Board {
 		SetWall(mp, y, x, (d+1)%4)
 	}
 
+	if mirror {
+		mrcount := rand.Intn(7) + 4
+		for i := 0; mrcount > i; i++ {
+			t := rand.Intn(5)
+			x := rand.Intn(16)
+			y := rand.Intn(16)
+			side := rand.Intn(2)
+			mirror := model.Mirror{
+				Trans: t,
+				Side:  side,
+			}
+			SetMirror(mp, y, x, mirror)
+		}
+	}
+
 	return mp
 }
 
-func rngProblem() model.Problem {
-	board := rngBoard()
+func rngProblem(torus, mirror bool) model.Problem {
+	board := rngBoard(torus, mirror)
 
 	candnum := []int{}
 	for i := 0; 16*16 > i; i++ {
@@ -100,25 +123,27 @@ func stringify(p model.Problem) string {
 	instr := ""
 	var goalpos model.Pos
 	b := p.Board
+	mirrorstr := ""
 
 	for i := 0; 16 > i; i++ {
 		for j := 0; 16 > j; j++ {
 			cell := b.Get(model.Pos{Y: i, X: j})
-			if cell.Walls[1] {
-				instr += fmt.Sprintf("%d %d 1\n", i, j)
-			}
-			if cell.Walls[2] {
-				instr += fmt.Sprintf("%d %d 2\n", i, j)
+			for k := 0; 4 > k; k++ {
+				if cell.Walls[k] {
+					instr += fmt.Sprintf("%d %d %d\n", i, j, k)
+				}
 			}
 			if cell.Goal {
 				goalpos = model.Pos{Y: i, X: j}
 			}
+			if cell.Mirror != nil {
+				m := cell.Mirror
+				mirrorstr += fmt.Sprintf("%d %d %d %d\n", i, j, m.Trans, m.Side)
+			}
 		}
 	}
-
-	log.Println(instr)
-
 	instr += "-1 -1 -1\n"
+	instr += mirrorstr + "-1 -1 -1 -1 \n"
 
 	for i := 0; 5 > i; i++ {
 		instr += fmt.Sprintf("%d %d\n", p.RobotPoss[i].Y, p.RobotPoss[i].X)
@@ -137,6 +162,7 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 	strs := strings.Split(str, "\n")
 	hands := model.Hands{}
 
+	utils.DrawProblem("./p.png", p)
 	for _, hs := range strs[1:] {
 		as := strings.Split(hs, " ")
 		if len(as) != 3 {
@@ -146,17 +172,19 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 		y, _ := strconv.Atoi(as[1])
 		x, _ := strconv.Atoi(as[2])
 		nex := model.Pos{Y: y, X: x}
-		var dir model.Dir
-
-		if y > poss[robot].Y {
-			dir = model.DN
-		} else if y < poss[robot].Y {
-			dir = model.UP
-		} else if x > poss[robot].X {
-			dir = model.RT
-		} else if x < poss[robot].X {
-			dir = model.LT
-		} else {
+		var dir model.Dir = -1
+		for i := 0; 4 > i; i++ {
+			bufposs := make([]model.Pos, len(p.RobotPoss))
+			copy(bufposs, poss)
+			if p.Board.Slide(bufposs, model.Hand{Robot: robot, Dir: i}) {
+				continue
+			}
+			if bufposs[robot].X == x && bufposs[robot].Y == y {
+				dir = i
+				break
+			}
+		}
+		if dir == -1 {
 			return model.Hands{}, fmt.Errorf("couldnt parse direction")
 		}
 		hands = append(hands, model.Hand{Robot: robot, Dir: dir})
@@ -168,17 +196,21 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 		return []model.Hand{}, errors.New("invalid solution(couldnt reach goal)")
 	}
 
+	utils.DrawSolution("./b.gif", p, hands)
 	if !p.IsValid(hands) {
 		return nil, errors.New("solver has some bugs")
 	}
 	return hands, nil
 }
 
-func rngProblemWithSolution(timeout int) model.ProblemWithSolution {
+func rngProblemWithSolution(torus bool, mirror bool, timeout int) model.ProblemWithSolution {
 	for {
-		p := rngProblem()
-
-		cmd := exec.Command("./gen/solver")
+		p := rngProblem(torus, mirror)
+		solverName := os.Getenv("SOLVER_DIR") + "solver_classic"
+		if torus || mirror {
+			solverName = os.Getenv("SOLVER_DIR") + "solver_g"
+		}
+		cmd := exec.Command(solverName)
 		in, _ := cmd.StdinPipe()
 
 		in.Write([]byte(stringify(p)))
@@ -193,6 +225,7 @@ func rngProblemWithSolution(timeout int) model.ProblemWithSolution {
 		select {
 		case <-fin:
 			hands, err := parseHands(p, string(out))
+
 			if err == nil {
 				return model.ProblemWithSolution{
 					Solution: hands,

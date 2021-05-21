@@ -8,7 +8,6 @@ import (
 	"github.com/Mojashi/RicochetRobots/api/app/messages/serverMessage"
 	"github.com/Mojashi/RicochetRobots/api/model"
 	"github.com/Mojashi/RicochetRobots/api/repository"
-	"github.com/Mojashi/RicochetRobots/api/utils"
 )
 
 type IBaseGameApp interface {
@@ -19,6 +18,7 @@ type IBaseGameApp interface {
 	Send(dest model.UserID, msg serverMessage.ServerMessage) error
 	OnFinishProblem(pointDiff map[model.UserID]int)
 	isFinish() bool
+	getGameWinner() (model.User, bool)
 	Join(user model.User)
 	Leave(user model.User)
 	Finish() error
@@ -97,7 +97,8 @@ func (u *BaseGameApp) Leave(user model.User) {
 
 func (u *BaseGameApp) Finish() error {
 	u.output.Broadcast(serverMessage.NewFinishGameMessage(&u.GameState))
-	u.output.OnFinishGame()
+	winner, _ := u.self.getGameWinner()
+	u.output.OnFinishGame(winner)
 	return nil
 }
 
@@ -129,6 +130,7 @@ func (u *BaseGameApp) Broadcast(msg serverMessage.ServerMessage) {
 func (u *BaseGameApp) Send(dest model.UserID, msg serverMessage.ServerMessage) error {
 	return u.output.Send(dest, msg)
 }
+
 func (u *BaseGameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 	u.Interval = true
 	msgs := []serverMessage.SetPointMessage{}
@@ -149,9 +151,18 @@ func (u *BaseGameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 }
 
 func (u *BaseGameApp) isFinish() bool {
+	_, ret := u.self.getGameWinner()
+	return ret
+}
+
+func (u *BaseGameApp) getGameWinner() (model.User, bool) {
 	maxPoint := 0
-	for _, pt := range u.Points {
-		maxPoint = utils.Max(maxPoint, pt)
+	var maxPUser model.UserID
+	for userID, pt := range u.Points {
+		if maxPoint < pt {
+			maxPoint = pt
+			maxPUser = userID
+		}
 	}
-	return maxPoint >= u.GameState.Config.GoalPoint
+	return u.Participants[maxPUser], maxPoint >= u.GameState.Config.GoalPoint
 }

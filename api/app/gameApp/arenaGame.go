@@ -104,8 +104,6 @@ func (a *ArenaGameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 	winner, ok := a.Participants[getWinner(pointDiff)]
 	if ok {
 		a.arenaLogRepository.Create(a.currentRound, winner.ID)
-		//トランザクションなんかいらねえ！！（まあここはいらないよ、別に）
-		a.userRepository.AddArenaWinCount(winner.ID)
 	}
 
 	if a.problemTweet != nil {

@@ -7,10 +7,11 @@ import (
 
 func genCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "gen",
+		Use:   "gen 0 0",
 		Short: "gen problem",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			gen.Gen()
+			gen.Gen(args[0] == "1", args[1] == "1")
 			return nil
 		},
 	}

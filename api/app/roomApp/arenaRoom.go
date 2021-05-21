@@ -108,8 +108,9 @@ func (r *ArenaRoomApp) GetSyncRoomMessage() serverMessage.ServerMessage {
 	return ret
 }
 
-func (r *ArenaRoomApp) OnFinishGame() {
-	r.UserMadeRoomApp.OnFinishGame()
+func (r *ArenaRoomApp) OnFinishGame(user model.User) {
+	r.UserMadeRoomApp.OnFinishGame(user)
+	r.userRepository.AddArenaWinCount(user.ID)
 
 	time.AfterFunc(time.Second*10, func() {
 		r.self.Broadcast(serverMessage.NewNotifyMessage("5分後に次ラウンドです", 20))

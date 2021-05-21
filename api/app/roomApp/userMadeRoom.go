@@ -24,7 +24,7 @@ type IUserMadeRoomApp interface {
 	Participate(c app.Client, password string) error
 	Leave(c app.Client)
 	StartGame() error
-	OnFinishGame()
+	OnFinishGame(user model.User)
 	SyncAll()
 	Sync(dest model.UserID) error
 	GetSyncRoomMessage() serverMessage.ServerMessage
@@ -234,7 +234,7 @@ func (r *UserMadeRoomApp) StartGame() error {
 	return err
 }
 
-func (r *UserMadeRoomApp) OnFinishGame() {
+func (r *UserMadeRoomApp) OnFinishGame(user model.User) {
 	r.self.SetOnGame(false)
 }
 

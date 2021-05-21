@@ -87,7 +87,8 @@ func (hs Hands) Hash(p Problem) SolutionHash {
 
 	for _, hand := range hs {
 		bef := poss[hand.Robot]
-		for p.Board.Move(poss, hand) {
+		if p.Board.Slide(poss, hand) {
+			return 0
 		}
 		nex := poss[hand.Robot]
 		hash ^= zobTable[bef.Y][bef.X][nex.X][nex.Y][hand.Robot]

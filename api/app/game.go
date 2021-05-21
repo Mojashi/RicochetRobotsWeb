@@ -18,6 +18,6 @@ type IGameApp interface { //かならず１スレッドからしか触られな�
 type IGameOutput interface {
 	Broadcast(msg serverMessage.ServerMessage)
 	Send(dest model.UserID, msg serverMessage.ServerMessage) error
-	OnFinishGame()
+	OnFinishGame(winner model.User)
 	IsRoomAdmin(user model.User) bool
 }
