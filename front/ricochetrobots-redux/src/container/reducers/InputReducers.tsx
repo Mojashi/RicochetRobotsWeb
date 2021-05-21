@@ -9,11 +9,14 @@ import { Robot } from "../../model/game/Robot"
 import { animStopFunc, getBoardViewControll } from "./AnimReducers"
 
 function inputAcceptable(draft : WritableDraft<RoomState>) {
-    if(draft.boardViewState.animState.hands){
-        getBoardViewControll(draft, "input")
-        animStopFunc(draft)
+    if(draft.problemResultState === undefined && draft.problemState !== undefined){
+        if(draft.boardViewState.animState.hands){
+            getBoardViewControll(draft, "input")
+            animStopFunc(draft)
+        }
+        return true
     }
-    return draft.problemResultState === undefined && draft.problemState !== undefined
+    return false
 }
 
 export const InputReducers = {

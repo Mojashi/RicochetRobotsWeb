@@ -1,4 +1,6 @@
 api/api
+api/boardImg.png
+api/solution.gif
 .env
 config.json
 gen/solver

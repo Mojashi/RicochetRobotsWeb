@@ -164,7 +164,7 @@ const selectGameResultState = (state : RootState) => selectRoomState(state).game
 const selectGameState = (state : RootState) => selectRoomState(state).gameState
 const selectRoomInfoState = (state : RootState) => selectRoomState(state).roomInfo
 
-export const { addHandFromInput, resetHandFromInput, removeHandFromInput, setProblem,finishResult, selectRobot, setPoint,tellUser, joinToRoom, leaveFromRoom, finishGame,finishProblem,finishProblemFromServer, setTimeleft, startGame,
+export const { addHandFromInput, resetHandFromInput, removeHandFromInput, setProblem,finishResult, selectRobot,selectRobotFromInput, setPoint,tellUser, joinToRoom, leaveFromRoom, finishGame,finishProblem,finishProblemFromServer, setTimeleft, startGame,
      addSubmission,setHint, setShortest, setShortestFromServer,addSubmissionFromServer, addHiddenSubmissionFromServer,
      animNext,animStop,animStart,playHint,stopHint, playResultSub,stopResultSub, addMySubmission,setReadyNext, setUser,quitRoom, setGameResult ,setNeedToAuth, failedToAuth, setRoomInfo, notify, removeNotify} = slice.actions
 

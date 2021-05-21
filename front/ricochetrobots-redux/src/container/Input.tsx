@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useRef } from "reac
 import { useDispatch, useSelector } from "react-redux"
 import { InputView } from "../component/room/pane/Input/Input"
 import { Dir, DN, LT, RT, UP } from "../model/game/Dir"
-import { addHandFromInput, addMySubmission, viewHandsSelector, removeHandFromInput, resetHandFromInput, selectRobot, inputAcceptableSelector, lastMySubTimeSelector, possSelector, isGoalSelector} from "./GameSlice"
+import { addHandFromInput, addMySubmission, viewHandsSelector, removeHandFromInput, resetHandFromInput, selectRobotFromInput, inputAcceptableSelector, lastMySubTimeSelector, possSelector, isGoalSelector} from "./GameSlice"
 import { Problem } from "./Problem"
 import { WsDispatchContext } from "./Room"
 import { SubmitMessage } from "./websocket/clientMessage/submitMessage"
@@ -49,7 +49,7 @@ export function Input({disable, className} : Props){
         const pushNum = (id : number, selected : boolean)=>{
             if(pushed.current[id] !== selected){
                 pushed.current[id] = selected
-                dispatch(selectRobot({robot:id, selected:selected}))
+                dispatch(selectRobotFromInput({robot:id, selected:selected}))
             }
         }
         const handleKeyDown = (e: KeyboardEvent) => {
