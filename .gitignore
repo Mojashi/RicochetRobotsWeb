@@ -4,6 +4,8 @@ api/solution.gif
 .env
 config.json
 gen/solver
+solve/solver_classic
+solve/solver_g
 gen/gen
 front/ricochetrobots/node_modules/
 front/ricochetrobots-redux/node_modules/
