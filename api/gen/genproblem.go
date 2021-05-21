@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Mojashi/RicochetRobots/api/model"
-	"github.com/Mojashi/RicochetRobots/api/utils"
 )
 
 func NewBoard(height, width int) model.Board {
@@ -162,7 +161,7 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 	strs := strings.Split(str, "\n")
 	hands := model.Hands{}
 
-	utils.DrawProblem("./p.png", p)
+	// utils.DrawProblem("./p.png", p)
 	for _, hs := range strs[1:] {
 		as := strings.Split(hs, " ")
 		if len(as) != 3 {
@@ -196,7 +195,7 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 		return []model.Hand{}, errors.New("invalid solution(couldnt reach goal)")
 	}
 
-	utils.DrawSolution("./b.gif", p, hands)
+	// utils.DrawSolution("./b.gif", p, hands)
 	if !p.IsValid(hands) {
 		return nil, errors.New("solver has some bugs")
 	}
