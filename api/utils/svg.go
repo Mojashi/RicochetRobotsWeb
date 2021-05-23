@@ -24,29 +24,31 @@ var goalImg *image.Paletted
 var centerImg *image.Paletted
 var paletteMap map[uint32]int
 var palette []color.Color
+var built = false
 
 const cellSize = 64
 
-func init() {
+func Build() {
+	imgPath := os.Getenv("API_DIR") + "/img"
 	palette = []color.Color{}
 	paletteMap = map[uint32]int{}
-	makePalette([]string{"./img/cell", "./img/center", "./img/wall",
-		"./img/robot1", "./img/robot2", "./img/robot3", "./img/robot4", "./img/robot5",
-		"./img/mirror1", "./img/mirror2", "./img/mirror3", "./img/mirror4", "./img/mirror5",
-		"./img/goal"})
+	makePalette([]string{imgPath + "/cell", imgPath + "/center", imgPath + "/wall",
+		imgPath + "/robot1", imgPath + "/robot2", imgPath + "/robot3", imgPath + "/robot4", imgPath + "/robot5",
+		imgPath + "/mirror1", imgPath + "/mirror2", imgPath + "/mirror3", imgPath + "/mirror4", imgPath + "/mirror5",
+		imgPath + "/goal"})
 	robotImgs = []*image.Paletted{
-		ReadSVG("./img/robot1", 0.8),
-		ReadSVG("./img/robot2", 0.8),
-		ReadSVG("./img/robot3", 0.8),
-		ReadSVG("./img/robot4", 0.8),
-		ReadSVG("./img/robot5", 0.8),
+		ReadSVG(imgPath+"/robot1", 0.8),
+		ReadSVG(imgPath+"/robot2", 0.8),
+		ReadSVG(imgPath+"/robot3", 0.8),
+		ReadSVG(imgPath+"/robot4", 0.8),
+		ReadSVG(imgPath+"/robot5", 0.8),
 	}
 	mirrorImgs = [][]*image.Paletted{{
-		ReadSVG("./img/mirror1", 1),
-		ReadSVG("./img/mirror2", 1),
-		ReadSVG("./img/mirror3", 1),
-		ReadSVG("./img/mirror4", 1),
-		ReadSVG("./img/mirror5", 1),
+		ReadSVG(imgPath+"/mirror1", 1),
+		ReadSVG(imgPath+"/mirror2", 1),
+		ReadSVG(imgPath+"/mirror3", 1),
+		ReadSVG(imgPath+"/mirror4", 1),
+		ReadSVG(imgPath+"/mirror5", 1),
 	}}
 	mirrorImgs = append(mirrorImgs, []*image.Paletted{
 		Affine(mirrorImgs[0][0], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
@@ -55,10 +57,10 @@ func init() {
 		Affine(mirrorImgs[0][3], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
 		Affine(mirrorImgs[0][4], 90, mirrorImgs[0][0].Bounds().Max.X-1, 0, 1),
 	})
-	centerImg = ReadSVG("./img/center", 1)
-	cellImg = ReadSVG("./img/cell", 1)
-	bwallImg := ReadSVG("./img/wall", 1)
-	goalImg = ReadSVG("./img/goal", 1)
+	centerImg = ReadSVG(imgPath+"/center", 1)
+	cellImg = ReadSVG(imgPath+"/cell", 1)
+	bwallImg := ReadSVG(imgPath+"/wall", 1)
+	goalImg = ReadSVG(imgPath+"/goal", 1)
 	wallImgs = []*image.Paletted{
 		bwallImg,
 		Affine(bwallImg, 90, bwallImg.Bounds().Max.X-1, 0, 1),

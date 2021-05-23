@@ -207,9 +207,9 @@ func parseHands(p model.Problem, str string) (model.Hands, error) {
 func rngProblemWithSolution(torus bool, mirror bool, timeout int) model.ProblemWithSolution {
 	for {
 		p := rngProblem(torus, mirror)
-		solverName := os.Getenv("SOLVER_DIR") + "solver_classic"
+		solverName := os.Getenv("SOLVER_DIR") + "/solver_classic"
 		if torus || mirror {
-			solverName = os.Getenv("SOLVER_DIR") + "solver_g"
+			solverName = os.Getenv("SOLVER_DIR") + "/solver_g"
 		}
 		cmd := exec.Command(solverName)
 		in, _ := cmd.StdinPipe()

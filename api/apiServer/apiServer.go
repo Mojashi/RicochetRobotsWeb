@@ -1,7 +1,6 @@
 package apiServer
 
 import (
-	"log"
 	"os"
 	"strings"
 
@@ -11,8 +10,8 @@ import (
 	"github.com/Mojashi/RicochetRobots/api/middleware"
 	"github.com/Mojashi/RicochetRobots/api/repository"
 	"github.com/Mojashi/RicochetRobots/api/twitter"
+	"github.com/Mojashi/RicochetRobots/api/utils"
 	"github.com/gorilla/sessions"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo-contrib/session"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -33,12 +32,8 @@ var (
 )
 
 func build() {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal(".env doesnt exist")
-	}
-	log.Println(os.Getenv("HOME"))
-	log.Println(os.Getenv("DB_HOST"))
+	utils.Build()
+
 	db := db.NewDB(os.Getenv("DB_HOST"), os.Getenv("DB"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
 	twApi := twitter.NewTwitterAPI()
 
