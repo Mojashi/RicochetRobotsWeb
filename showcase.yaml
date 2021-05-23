@@ -10,7 +10,7 @@ startup: |
   npm run build
   cd ../../api
   go build
-  cd ../solver
+  cd ../solve
   make all
   
 # use external databases (default: false)
