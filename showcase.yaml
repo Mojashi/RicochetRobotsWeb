@@ -4,7 +4,7 @@ type: runtime
 
 # script executed on startup (default: null)
 startup: |
-  mkdir ../userPics
+  mkdir ./userPics
   cd front/ricochetrobots-redux
   npm install
   npm run build
@@ -35,7 +35,7 @@ expose: []
 envs: 
   SOLVER_DIR: ./solve,
   PUBLIC_DIR: ./front/ricochetrobots-redux/build,
-  USERPIC_DIR: ../userPics,
+  USERPIC_DIR: ./userPics,
   PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz,
   REACT_APP_PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz,
   PUBLIC_URL: https://ricochetrobots.mojashidev.xyz,
