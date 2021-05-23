@@ -48,7 +48,7 @@ envs:
 # <<< static or http-proxied-runtime only setting >>>
 
 # additional server name <array or string> (default: [])
-cname: typingwar.trap.games
+cname: ricochetrobots.trap.games
 
 # parse user token, restrict access from non-traP user <"off", "soft", "hard"> (default: "off")
 internal: "off"
