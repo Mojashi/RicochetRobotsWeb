@@ -32,8 +32,12 @@ var arenaConfForDEV = model.GameConfig{
 	GoalPoint:     30,
 	PointForFirst: 5,
 	PointForOther: 3,
-	SolLenMin:     1,
-	SolLenMax:     4,
+	ProblemConfig: model.ProblemConfig{
+		SolLenMin: 1,
+		SolLenMax: 4,
+		Torus:     model.Required,
+		Mirror:    model.Required,
+	},
 }
 var arenaConf = model.GameConfig{
 	Rule:          model.FirstToWin,
@@ -41,8 +45,12 @@ var arenaConf = model.GameConfig{
 	GoalPoint:     30,
 	PointForFirst: 5,
 	PointForOther: 3,
-	SolLenMin:     6,
-	SolLenMax:     99,
+	ProblemConfig: model.ProblemConfig{
+		SolLenMin: 1,
+		SolLenMax: 4,
+		Torus:     model.Optional,
+		Mirror:    model.Optional,
+	},
 }
 
 func NewArenaRoomApp(

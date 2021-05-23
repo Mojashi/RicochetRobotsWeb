@@ -108,5 +108,5 @@ func getTwitterPic(c oauth.Client, cred *oauth.Credentials, user model.User) err
 	mp := map[string]interface{}{}
 	json.Unmarshal(body, &mp)
 	imgUrl := mp["profile_image_url_https"].(string)
-	return utils.DownloadImage(imgUrl, os.Getenv("PUBLIC_DIR")+"/"+fmt.Sprint(user.ID)+".jpg")
+	return utils.DownloadImage(imgUrl, os.Getenv("USERPIC_DIR")+"/"+fmt.Sprint(user.ID)+".jpg")
 }

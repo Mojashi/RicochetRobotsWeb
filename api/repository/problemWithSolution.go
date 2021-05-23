@@ -2,6 +2,7 @@ package repository
 
 import (
 	"log"
+	"strings"
 
 	"github.com/Mojashi/RicochetRobots/api/model"
 	"github.com/jmoiron/sqlx"
@@ -9,7 +10,7 @@ import (
 
 type IProblemWithSolutionRepository interface {
 	GetUnused() (model.ProblemWithSolution, error)
-	GetUnusedWithRange(solLenMin int, solLenMax int) (model.ProblemWithSolution, error)
+	GetUnusedWithConfig(conf model.ProblemConfig, allowUsed bool) (model.ProblemWithSolution, error)
 	SetUsed(id int) error
 	Get(id int) (model.ProblemWithSolution, error)
 	Create(p model.ProblemWithSolution) error
@@ -28,7 +29,7 @@ func NewProblemWithSolutionRepository(db *sqlx.DB) IProblemWithSolutionRepositor
 func (r ProblemWithSolutionRepository) Get(id int) (model.ProblemWithSolution, error) {
 	p := model.ProblemWithSolution{}
 	row := r.db.QueryRowx(
-		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems where id=?",
+		"SELECT id, board, mainRobot, robotPoss, solution, numRobot, torus, mirror from problems where id=?",
 		id,
 	)
 
@@ -43,7 +44,7 @@ func (r ProblemWithSolutionRepository) GetUnused() (model.ProblemWithSolution, e
 
 	var p model.ProblemWithSolution
 	rows := r.db.QueryRowx(
-		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems where used=false ORDER BY randomValue LIMIT 1",
+		"SELECT id, board, mainRobot, robotPoss, solution, numRobot, torus, mirror from problems where used=false ORDER BY randomValue LIMIT 1",
 	)
 
 	err := rows.StructScan(&p)
@@ -54,13 +55,32 @@ func (r ProblemWithSolutionRepository) GetUnused() (model.ProblemWithSolution, e
 	return p, nil
 }
 
-func (r ProblemWithSolutionRepository) GetUnusedWithRange(solLenMin int, solLenMax int) (model.ProblemWithSolution, error) {
-
+func (r ProblemWithSolutionRepository) GetUnusedWithConfig(conf model.ProblemConfig, allowUsed bool) (model.ProblemWithSolution, error) {
 	var p model.ProblemWithSolution
+
+	whereArgs := []interface{}{}
+	wheres := []string{"true"}
+
+	if !allowUsed {
+		wheres = append(wheres, "used=false")
+	}
+
+	wheres = append(wheres, "json_length(solution) between ? and ?")
+	whereArgs = append(whereArgs, conf.SolLenMin, conf.SolLenMax)
+
+	if conf.Torus != model.Optional {
+		wheres = append(wheres, "torus=?")
+		whereArgs = append(whereArgs, conf.Torus == model.Required)
+	}
+	if conf.Mirror != model.Optional {
+		wheres = append(wheres, "mirror=?")
+		whereArgs = append(whereArgs, conf.Mirror == model.Required)
+	}
+
 	rows := r.db.QueryRowx(
-		"SELECT id, board, mainRobot, robotPoss, solution, numRobot from problems "+
-			"where used=false and json_length(solution) between ? and ? ORDER BY randomValue LIMIT 1",
-		solLenMin, solLenMax,
+		"SELECT id, board, mainRobot, robotPoss, solution, numRobot, torus, mirror from problems where "+
+			strings.Join(wheres, " and ")+" ORDER BY randomValue LIMIT 1",
+		whereArgs...,
 	)
 
 	err := rows.StructScan(&p)
@@ -81,12 +101,14 @@ func (r ProblemWithSolutionRepository) SetUsed(id int) error {
 
 func (r ProblemWithSolutionRepository) Create(p model.ProblemWithSolution) error {
 	_, err := r.db.Exec(
-		"INSERT INTO problems(board, mainRobot, robotPoss, solution, numRobot, randomValue) VALUES(?,?,?,?,?,RAND())",
+		"INSERT INTO problems(board, mainRobot, robotPoss, solution, numRobot, torus, mirror, randomValue) VALUES(?,?,?,?,?,?,?,RAND())",
 		p.Board,
 		p.MainRobot,
 		p.RobotPoss,
 		p.Solution,
 		p.NumRobot,
+		p.Torus,
+		p.Mirror,
 	)
 	return err
 }

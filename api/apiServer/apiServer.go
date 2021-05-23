@@ -3,6 +3,7 @@ package apiServer
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Mojashi/RicochetRobots/api/app/roomManager"
 	"github.com/Mojashi/RicochetRobots/api/db"
@@ -88,6 +89,21 @@ func Run() {
 	g.GET("/rooms", roomListHandler.Handle)
 
 	twitterWebhookGroup.Make(g.Group("/twitter"))
+
+	e.Use(echoMid.StaticWithConfig(echoMid.StaticConfig{
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Request().URL.Path, "/userPics") || strings.HasPrefix(c.Request().URL.Path, "/api")
+		},
+		Root:  os.Getenv("PUBLIC_DIR"),
+		HTML5: true,
+	}))
+	e.Use(echoMid.StaticWithConfig(echoMid.StaticConfig{
+		Skipper: func(c echo.Context) bool {
+			return strings.HasPrefix(c.Request().URL.Path, "/api")
+		},
+		Root:  os.Getenv("USERPIC_DIR"),
+		HTML5: true,
+	}))
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("API_PORT")))
 }

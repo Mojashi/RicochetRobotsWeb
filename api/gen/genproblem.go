@@ -115,6 +115,8 @@ func rngProblem(torus, mirror bool) model.Problem {
 		MainRobot: rand.Intn(5),
 		Board:     board,
 		NumRobot:  5,
+		Torus:     torus,
+		Mirror:    mirror,
 	}
 }
 

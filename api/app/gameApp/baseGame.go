@@ -62,11 +62,14 @@ func (u *BaseGameApp) StartProblem() error {
 	if !u.GameState.Interval {
 		return errors.New("another problem has already been started")
 	}
-	problem, err := u.problemRepository.GetUnusedWithRange(u.Config.SolLenMin, u.Config.SolLenMax)
+	problem, err := u.problemRepository.GetUnusedWithConfig(u.Config.ProblemConfig, false)
 	if err != nil {
-		problem, err = u.problemRepository.GetUnused()
+		problem, err = u.problemRepository.GetUnusedWithConfig(u.Config.ProblemConfig, true)
 		if err != nil {
-			return err
+			problem, err = u.problemRepository.GetUnused()
+			if err != nil {
+				return err
+			}
 		}
 	}
 	u.problemRepository.SetUsed(problem.ID)

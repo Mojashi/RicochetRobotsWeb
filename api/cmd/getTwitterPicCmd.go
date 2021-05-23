@@ -53,7 +53,7 @@ func Run() {
 	}
 	for _, user := range res {
 		if !user.DefaultProfileImage {
-			utils.DownloadImage(user.ProfileImageURL, os.Getenv("PUBLIC_DIR")+"/"+strconv.Itoa(idMap[user.IdStr])+".jpg")
+			utils.DownloadImage(user.ProfileImageURL, os.Getenv("USERPIC_DIR")+"/"+strconv.Itoa(idMap[user.IdStr])+".jpg")
 		}
 	}
 	log.Println("completed")
