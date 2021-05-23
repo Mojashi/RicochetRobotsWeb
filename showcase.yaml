@@ -44,7 +44,6 @@ envs:
   DB_HOST: localhost,
   DB_PASS: $MARIADB_HOSTNAME,
   DB_USER: $MARIADB_USERNAME,
-  DB_PASS: $MARIADB_PASSWORD,
 
 
 # <<< static or http-proxied-runtime only setting >>>
