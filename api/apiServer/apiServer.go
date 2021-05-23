@@ -37,7 +37,8 @@ func build() {
 	if err != nil {
 		log.Fatal(".env doesnt exist")
 	}
-
+	log.Println(os.Getenv("HOME"))
+	log.Println(os.Getenv("DB_HOST"))
 	db := db.NewDB(os.Getenv("DB_HOST"), os.Getenv("DB"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
 	twApi := twitter.NewTwitterAPI()
 
