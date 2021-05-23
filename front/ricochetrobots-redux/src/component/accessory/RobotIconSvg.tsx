@@ -6,7 +6,7 @@ import Robot4Img from "../../img/robot4.svg"
 import Robot5Img from "../../img/robot5.svg"
 import { Robot } from "../../model/game/Robot"
 
-export const RobotIconSvg = ({className, rid, ...rest}:{className?:string, rid:Robot} & React.SVGProps<SVGImageElement>)=>
+export const RobotIconSvg = ({className, rid, children, ...rest}:{className?:string, rid:Robot} & React.SVGProps<SVGImageElement>)=>
     <image className={className} {...rest}
      href={
         rid === 0 ? Robot1Img : 
@@ -14,4 +14,6 @@ export const RobotIconSvg = ({className, rid, ...rest}:{className?:string, rid:R
         rid === 2 ? Robot3Img : 
         rid === 3 ? Robot4Img : 
         rid === 4 ? Robot5Img : Robot1Img
-    }/>
+    }>
+        {children}
+    </image>

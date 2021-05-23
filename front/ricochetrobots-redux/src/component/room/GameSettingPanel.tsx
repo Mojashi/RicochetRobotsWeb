@@ -12,9 +12,11 @@ import Button from "../menu/panel/Button"
 import { NumInput } from "../menu/panel/component/NumInput"
 import ReactTooltip from 'react-tooltip'
 import ScrollArea from "react-scrollbar"
-import { GameConfig } from "../../model/game/GameConfig"
+import { Choice, GameConfig, Never } from "../../model/game/GameConfig"
 import {useImmer} from "use-immer"
 import { FirstToWin } from "../../model/game/Rule"
+import { ChoiceButton } from "../menu/panel/component/ChoiceButton"
+import { Chip } from "../menu/panel/component/Chip"
 
 
 type Props = {
@@ -28,8 +30,12 @@ const defaultGameConfig : GameConfig = {
     goalPoint : 20,
     pointForFirst : 5,
     pointForOther : 2,
-    solLenMin:1,
-    solLenMax:99,
+    problemConfig : {
+        solLenMin:1,
+        solLenMax:99,
+        torus : Never,
+        mirror : Never,
+    }
 }
 export function GameSettingPanelView({className,onClickStart} : Props) {
     const [reflect, toggleReflect, ] = useToggle(false)
@@ -55,12 +61,12 @@ export function GameSettingPanelView({className,onClickStart} : Props) {
              isValid={(v)=>v>0&&v<100} onChange={(v)=>updGameConfig(draft=>{draft.goalPoint = v as number})}/>
         </RowDiv>
         <RowDiv>
-            <NumInput title="最短手数の下限" defaultValue={defaultGameConfig.solLenMin} tail={"手"}
-                isValid={(v)=>(v>=1&& v<=gameConfig.solLenMax)} 
-                onChange={(v)=>updGameConfig(draft=>{draft.solLenMin = v as number})}/>
-            <NumInput title="最短手数の上限" defaultValue={defaultGameConfig.solLenMax} tail={"手"} 
-                isValid={(v)=>(v<=99&& v>=gameConfig.solLenMin)} 
-                onChange={(v)=>updGameConfig(draft=>{draft.solLenMax = v as number})}/>
+            <NumInput title="最短手数の下限" defaultValue={defaultGameConfig.problemConfig.solLenMin} tail={"手"}
+                isValid={(v)=>(v>=1&& v<=gameConfig.problemConfig.solLenMax)} 
+                onChange={(v)=>updGameConfig(draft=>{draft.problemConfig.solLenMin = v as number})}/>
+            <NumInput title="最短手数の上限" defaultValue={defaultGameConfig.problemConfig.solLenMax} tail={"手"} 
+                isValid={(v)=>(v<=99&& v>=gameConfig.problemConfig.solLenMin)} 
+                onChange={(v)=>updGameConfig(draft=>{draft.problemConfig.solLenMax = v as number})}/>
         </RowDiv>
 
         <RowDiv data-tip="工事中です！">
@@ -69,14 +75,18 @@ export function GameSettingPanelView({className,onClickStart} : Props) {
             <NumInput title="ボードの高さ" disabled={true} defaultValue={16} tail={"マス"} isValid={(v)=>v>0}/>
         </RowDiv>
 
-        <RowDiv data-tip="対応予定です！">
-            <ChipButtonStyled disabled={true} fill={PALETTE.lightGray} color={PALETTE.darkGray} selected={reflect} selectedFill={PALETTE.orange} onClick={toggleReflect}>
-                <RowDiv><Icon><ReflectIcon/></Icon>はんしゃマス</RowDiv>
-            </ChipButtonStyled>
-            <ChipButtonStyled disabled={true} fill={PALETTE.lightGray} color={PALETTE.darkGray} selected={torus} selectedFill={PALETTE.orange} onClick={toggleTorus}>
-                <RowDiv><Icon><TorusIcon/></Icon>トーラス</RowDiv>
-            </ChipButtonStyled>
-        </RowDiv>
+        <ChoiceDiv>
+            <ChoiceTitle><Icon><ReflectIcon/></Icon>はんしゃマス</ChoiceTitle>
+            <ChoiceButton fill={PALETTE.lightGray} color={PALETTE.darkGray} selectedFill={PALETTE.orange} choices={["なし", "あり", "必ず"]} 
+            defaultChoice={defaultGameConfig.problemConfig.mirror} onClick={(v)=>updGameConfig(draft=>{draft.problemConfig.mirror = v as Choice})}/>
+        </ChoiceDiv>
+        
+        <ChoiceDiv>
+            <ChoiceTitle><Icon><TorusIcon/></Icon>トーラス</ChoiceTitle>
+            <ChoiceButton fill={PALETTE.lightGray} color={PALETTE.darkGray} selectedFill={PALETTE.orange} choices={["なし", "あり", "必ず"]} 
+            defaultChoice={defaultGameConfig.problemConfig.torus} onClick={(v)=>updGameConfig(draft=>{draft.problemConfig.torus = v as Choice})}/>
+        </ChoiceDiv>
+        
         <ReactTooltip place="right" type="dark" effect="float"/>
 
         <StartButton onClick={onClickStart?()=>{onClickStart(gameConfig)}:undefined}
@@ -92,14 +102,28 @@ const Icon = styled("div")`
     display:flex;
 `
 
-const ChipButtonStyled=styled(ChipButton)`
-    margin-left:1em;
-`
 const Text = styled("div")`
     font-weight:bold;
     word-break:break-all;
     word-wrap:break-word;
     width:fit-content;
+`
+const ChoiceTitle = styled("div")`
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    width:fit-content;
+    color:${PALETTE.darkGray};
+    margin-right:1em;
+`
+const ChoiceDiv = styled("div")`
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    padding:0.5em;
+    width:fit-content;
+    border-radius:1em;
+    background-color:${PALETTE.lightGray};
 `
 const RowDiv = styled("div")`
     display:flex;
@@ -107,7 +131,7 @@ const RowDiv = styled("div")`
     align-items:center;
     height:100%;   
     width:fit-content;
-    width:fit-content;
+    gap:1.5em;
 `
 const Div = styled("div") `
     width:100%;
@@ -120,6 +144,7 @@ const Div = styled("div") `
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
 `
 const ContentDiv = styled("div")`
+    gap:1.5em;
     min-width:100%;
     min-height:100%;
     display:flex;

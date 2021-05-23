@@ -1,3 +1,5 @@
+.PHONY: all
+all: solver_classic solver_g
 solver_classic: solver_classic.cpp
 	g++ -O3 solver_classic.cpp -o solver_classic
 solver_g: solver_g.cpp

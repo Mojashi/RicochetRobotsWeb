@@ -17,6 +17,7 @@ import { RoomInfo } from "../model/RoomInfo"
 import { RoomInfoReducer } from "./reducers/RoomInfoReducer"
 import { SiteReducers } from "./reducers/SiteReducers"
 import { AnimReducers } from "./reducers/AnimReducers"
+import { AnimPath } from "../component/room/game/SvgAnim"
 
 export type PointsDict = {
     [key:number] : number
@@ -78,6 +79,7 @@ export type BoardViewState = {
     readonly hands : Hands
     readonly selectedRobot : boolean[]
     readonly robotPosHistory : Pos[][]
+    readonly animPaths : AnimPath[]
 
     readonly animState : AnimState
 }
@@ -119,6 +121,7 @@ export var initialRoomState:RoomState = {
     boardViewState : {
         hands : [],
         selectedRobot : [],
+        animPaths:[],
         robotPosHistory : [],
         animState:initAnimState,
     }
@@ -207,6 +210,9 @@ export const inputAcceptableSelector = createSelector(selectRoomState, state=>st
 export const possSelector = createSelector(selectBoardViewState, state=>{
     if(state.robotPosHistory.length > 0) return state.robotPosHistory[state.robotPosHistory.length-1]
     else return []
+})
+export const animPathsSelector = createSelector(selectBoardViewState, state=>{
+    return state.animPaths
 })
 export const leaderBoardSelector = createSelector(selectRoomState, state=>{
     if(state.gameState)

@@ -1,13 +1,67 @@
 import { Action, PayloadAction } from "@reduxjs/toolkit"
 import { Hand } from "../../model/game/Hand"
 import {produce} from "immer"
-import { moveRobot } from "../../model/game/board/Board"
+import Board from "../../model/game/board/Board"
 import {getRoomState, initAnimState, RoomState, State} from "../GameSlice"
 import { Draft, WritableDraft } from "immer/dist/internal"
 import { Robot } from "../../model/game/Robot"
 import { Problem } from "../../model/game/Problem"
 import { Hands } from "../../model/game/Hands"
 import { resetRobotsFunc } from "./AnimReducers"
+import { Pos } from "../../model/game/Pos"
+import { DoMirror } from "../../model/game/board/Cell"
+import { Dir, dirToIdx, dirToVec, invDir } from "../../model/game/Dir"
+import { AnimPath } from "../../component/room/game/SvgAnim"
+import { reverse } from "node:dns"
+
+function enc(pos : Pos, dir : Dir){
+    return pos.x + pos.y * 16 + dir * 256
+}
+
+
+export function makeAnim(board : Board, robotPoss : Pos[], mainRobot : Robot, dir : Dir) : [boolean, AnimPath]{
+	var changed = false
+    const al = new Set()
+    const anim = []
+    var path = [robotPoss[mainRobot]]
+
+    al.add(enc(robotPoss[mainRobot], dir))
+	while(true){
+		const vec = dirToVec(dir)
+		const bnext = {x:robotPoss[mainRobot].x + vec.x, y:robotPoss[mainRobot].y + vec.y}
+        const next = {x:(bnext.x + board.width) % board.width, y:(bnext.y + board.height) % board.height}
+		if(board.cells[robotPoss[mainRobot].y][robotPoss[mainRobot].x].walls[dirToIdx(dir)]) break
+		if(robotPoss.some(p=>(p.x === next.x && p.y === next.y))) break
+
+        if(al.has(enc(next, dir))) {
+            return [false, []]
+        }
+		if(bnext.x >= board.width || bnext.x < 0 || bnext.y >= board.height || bnext.y < 0) {
+            path.push(bnext)
+            anim.push(path.slice())
+
+            const vec = dirToVec(invDir(dir))
+            const fnext = {x:next.x + vec.x, y:next.y + vec.y}
+            path = [fnext]
+        }
+
+        const m = board.cells[next.y][next.x].mirror
+        if(m && m?.trans !== mainRobot){
+            dir = DoMirror(dir, m)
+            path.push(next)
+        }
+
+        al.add(robotPoss[mainRobot])
+		robotPoss[mainRobot] = next
+		changed = true
+	}
+    path.push(robotPoss[mainRobot])
+    anim.push(path)
+	return [changed, anim]
+}
+export function reverseAnim(anim : AnimPath) : AnimPath {
+    return anim.reverse().map(p=>p.reverse())
+}
 
 export function addHandFunc(draft : WritableDraft<RoomState>, hand : Hand) {
     const {boardViewState} = draft
@@ -16,26 +70,37 @@ export function addHandFunc(draft : WritableDraft<RoomState>, hand : Hand) {
     if(problem){
 
         const poss = boardViewState.robotPosHistory[boardViewState.robotPosHistory.length - 1].slice()
-        const changed = 
-            moveRobot(problem.board, poss, hand.robot, hand.dir)
+        const [changed,animPath] = 
+            makeAnim(problem.board, poss, hand.robot, hand.dir)
         if(changed){
             boardViewState.hands.push(hand)
             boardViewState.robotPosHistory.push(poss)
+            boardViewState.animPaths[hand.robot] = animPath
         }
     }
 }
 
 export function removeHandFunc(draft : WritableDraft<RoomState>) {
-    if(draft.boardViewState.robotPosHistory.length > 1){
-        draft.boardViewState.hands.pop()
-        draft.boardViewState.robotPosHistory.pop()
+    const {boardViewState} = draft
+    var problem = draft.boardViewState?.problem
+    if(boardViewState.robotPosHistory.length > 1){
+        const hand = boardViewState.hands.pop()
+        boardViewState.robotPosHistory.pop()
+        const poss = boardViewState.robotPosHistory[boardViewState.robotPosHistory.length - 1].slice()
+        if(hand && problem){
+            const [_, animPath] = makeAnim(problem.board, poss, hand.robot, hand.dir)
+            boardViewState.animPaths[hand.robot] = reverseAnim(animPath)
+        }
     }
 }
 
 export function resetHandFunc(draft : WritableDraft<RoomState>) {
     draft.boardViewState.hands=[]
-    if(draft.boardViewState.problem)
+    if(draft.boardViewState.problem){
         draft.boardViewState.robotPosHistory = [draft.boardViewState.problem.robotPoss]
+        
+        draft.boardViewState.animPaths = draft.boardViewState.problem.robotPoss.map(p=>[[p]])
+    }
 }
 
 export function selectRobotFunc(draft : WritableDraft<RoomState>, robot:Robot, selected:boolean) {
@@ -50,6 +115,7 @@ export function initBoardView(draft :WritableDraft<RoomState>, problem? : Proble
             problem : problem,
             hands : [],
             robotPosHistory : [problem.robotPoss],
+            animPaths : problem.robotPoss.map(p=>[[p]]),
             selectedRobot : Array.from({length:problem.numRobot},()=>false),
             animState:draft.boardViewState.animState,
         }
@@ -59,8 +125,9 @@ export function initBoardView(draft :WritableDraft<RoomState>, problem? : Proble
             problem : undefined,
             hands : [],
             robotPosHistory : [],
+            animPaths:[],
             selectedRobot : [],
-            animState:draft.boardViewState.animState,
+            animState:initAnimState,
         }
     }
 }

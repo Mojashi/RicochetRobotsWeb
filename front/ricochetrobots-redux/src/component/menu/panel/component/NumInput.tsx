@@ -4,7 +4,6 @@ import { InputBase } from "./InputBase"
 export const NumInput = styled(InputBase).attrs(props => ({
     type:"number",
 }))`
-    margin:1em;
     text-align:left;
     width:fit-content;
     & .input{

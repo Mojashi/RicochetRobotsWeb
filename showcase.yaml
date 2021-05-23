@@ -1,0 +1,65 @@
+
+# deploy mode <"static", "runtime", "fcgi-*"> (required)
+type: runtime
+
+# script executed on startup (default: null)
+startup: |
+  mkdir ../userPics
+  cd front/ricochetrobots-redux
+  npm install
+  npm run build
+  cd ../../api
+  go build
+  cd ../solver
+  make all
+  
+# use external databases (default: false)
+use_mongodb: false
+use_mariadb: true
+
+# relative path to document root (default: .)
+work_dir: "."
+
+# <<< runtime only setting >>>
+
+# docker entrypoint command (default: "cat")
+entrypoint: "./api/api"
+
+# which port to proxy via http(80) (default: null)
+http_proxy: 3000
+
+# which port to expose <array or int> (default: [])
+expose: []
+
+# enviromnent variables passed to docker container (default: {})
+envs: 
+  SOLVER_DIR: ./solve,
+  PUBLIC_DIR: ./front/ricochetrobots-redux/build,
+  USERPIC_DIR: ../userPics,
+  PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz,
+  REACT_APP_PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz,
+  PUBLIC_URL: https://ricochetrobots.mojashidev.xyz,
+  API_PORT: 3000,
+  DB: $MARIADB_DATABASE,
+  DB_HOST: localhost,
+  DB_PASS: $MARIADB_HOSTNAME,
+  DB_USER: $MARIADB_USERNAME,
+  DB_PASS: $MARIADB_PASSWORD,
+
+
+# <<< static or http-proxied-runtime only setting >>>
+
+# additional server name <array or string> (default: [])
+cname: typingwar.trap.games
+
+# parse user token, restrict access from non-traP user <"off", "soft", "hard"> (default: "off")
+internal: "off"
+
+# use secure access <"off", "soft", "hard"> (default: "off")
+https: "hard"
+
+# <<< branch deploy setting >>>
+
+# custom deploy setting <see document!> (default: {master: null})
+branch:
+  master: null

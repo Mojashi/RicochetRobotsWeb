@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { ProblemView } from "../component/room/game/Problem"
-import { possSelector, viewProblemSelector, selectedRobotSelector, resultProblemSelector, animNext, intervalSelector, animIDSelector } from "./GameSlice"
+import { possSelector, viewProblemSelector, selectedRobotSelector, resultProblemSelector, animNext, intervalSelector, animIDSelector, animPathsSelector } from "./GameSlice"
 
 type Props = {
     className? : string,
@@ -12,7 +12,7 @@ export function Problem({className} : Props){
     const resultProblem = useSelector(resultProblemSelector)
     const animID = useSelector(animIDSelector)
     const dispatch = useDispatch()
-    const poss = useSelector(possSelector)
+    const paths = useSelector(animPathsSelector)
     const selectedRobot = useSelector(selectedRobotSelector)
     const interval = useSelector(intervalSelector)
 
@@ -20,7 +20,7 @@ export function Problem({className} : Props){
         {problem !== undefined && 
             <ProblemView className={className} 
                 problem={resultProblem? resultProblem : problem} 
-                robotPoss={poss} 
+                robotPaths={paths} 
                 selectedRobot={selectedRobot}
                 onTransitionEnd={()=>{setTimeout(()=>dispatch(animNext(animID)), 500)}}
             />
