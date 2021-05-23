@@ -33,17 +33,13 @@ expose: []
 
 # enviromnent variables passed to docker container (default: {})
 envs: 
-  SOLVER_DIR: ./solve,
-  PUBLIC_DIR: ./front/ricochetrobots-redux/build,
-  USERPIC_DIR: ./userPics,
-  PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz,
-  REACT_APP_PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz,
-  PUBLIC_URL: https://ricochetrobots.mojashidev.xyz,
-  API_PORT: 3000,
-  DB: $MARIADB_DATABASE,
-  DB_HOST: localhost,
-  DB_PASS: $MARIADB_HOSTNAME,
-  DB_USER: $MARIADB_USERNAME,
+  SOLVER_DIR: ./solve
+  PUBLIC_DIR: ./front/ricochetrobots-redux/build
+  USERPIC_DIR: ./userPics
+  PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz
+  REACT_APP_PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz
+  PUBLIC_URL: https://ricochetrobots.mojashidev.xyz
+  API_PORT: 3000
 
 # <<< static or http-proxied-runtime only setting >>>
 
