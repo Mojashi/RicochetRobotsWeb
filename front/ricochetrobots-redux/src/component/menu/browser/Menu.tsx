@@ -1,16 +1,16 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { PALETTE } from "../../app/palette"
+import { PALETTE } from "../../../app/palette"
 import Button from "./Button"
-import { BlackRobotColor, BlueRobotColor, GreenRobotColor, RedRobotColor, YellowRobotColor } from "../accessory/solidRobots/SolidRobotIcon"
+import { BlackRobotColor, BlueRobotColor, GreenRobotColor, RedRobotColor, YellowRobotColor } from "../../accessory/solidRobots/SolidRobotIcon"
 import { CSSTransition, SwitchTransition } from "react-transition-group"
-import { HowToPanel } from "./panel/HowTo"
-import { MakeTablePanel } from "./panel/MakeTable"
-import { SettingsPanel } from "./panel/Settings"
+import { HowToPanel } from "../panel/HowTo"
+import { MakeTablePanel } from "../panel/MakeTable"
+import { SettingsPanel } from "../panel/Settings"
 import ScrollArea from "react-scrollbar"
-import { FirstToWin } from "../../model/game/Rule"
-import { RoomsPanel } from "../../container/RoomsPanel"
-import { ArenaPanel } from "../../container/ArenaPanel"
+import { FirstToWin } from "../../../model/game/Rule"
+import { RoomsPanel } from "../../../container/RoomsPanel"
+import { ArenaPanel } from "../../../container/ArenaPanel"
 import Helmet from "react-helmet"
 
 type SECTION = "arena" | "howto" | "maketable" | "findroom" | "settings"
@@ -62,7 +62,7 @@ function ButtonDivRow({selected, setSelected, className} : {
     className? : string;
 }){
     return (
-        <ButtonDivRowDiv className={className} key="aa">
+        <ButtonDivRowDiv className={className} >
             <ScrollArea horizontal={false} horizontalContainerStyle={{overflowX:"visible"}} style={{overflowX:"visible"}}>
                 <Button color={PALETTE.paleBlue} text="アリーナ" selected={selected === "arena"}
                  onClick={()=>setSelected("arena")} robotColor={BlueRobotColor}/>

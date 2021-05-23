@@ -1,4 +1,5 @@
 import React from "react"
+import { isMobile } from "react-device-detect"
 import styled from "styled-components"
 import { RedRobotColor, SolidRobotIcon } from "../../accessory/solidRobots/SolidRobotIcon"
 
@@ -38,6 +39,10 @@ const Div = styled("div")<{color : string}>`
     box-sizing:border-box;
     display:flex;
     flex-direction:column;
+    ${isMobile && `
+        width:100%;
+        border-radius:0;
+    `}
 `
 
 const Title = styled("div")`
