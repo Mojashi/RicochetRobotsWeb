@@ -45,7 +45,6 @@ envs:
   DB_PASS: $MARIADB_HOSTNAME,
   DB_USER: $MARIADB_USERNAME,
 
-
 # <<< static or http-proxied-runtime only setting >>>
 
 # additional server name <array or string> (default: [])
