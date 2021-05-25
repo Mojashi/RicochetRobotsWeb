@@ -39,7 +39,7 @@ export function RoomsPanelView({className,onClickReload, rooms} : Props){
 						<Button color={PALETTE.darkBlue} fill={PALETTE.white} text="待機中のみ" onClick={()=>{setShowWait(a=>!a);setShowProg(false)}} selected={showWait}/>
 					</Header>
 					<Div>
-						{rooms.filter(room=>!(room.private && !showPrivate || room.onGame && showWait || !room.onGame && showProg))
+						{rooms.filter(room=>!((room.private && !showPrivate) || (room.onGame && showWait) || (!room.onGame && showProg)))
 							.map(room => <RoomChip onClickEnter={(id)=>history.push(`/room/${id}`)} key={room.id} room={room} fill={PALETTE.paleBlue} color={PALETTE.white}/>)}
 					</Div>
 				</ScrollArea>

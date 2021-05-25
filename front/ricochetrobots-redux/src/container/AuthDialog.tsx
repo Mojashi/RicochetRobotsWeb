@@ -7,8 +7,8 @@ type Props = {
 	className? : string,
 }
 
-export function AuthDialog({} : Props){
+export function AuthDialog({className} : Props){
 	const wsDispatch = useContext(WsDispatchContext)
 
-	return <AuthDialogView onClickSend={wsDispatch? (pass)=>wsDispatch(new JoinMessage(pass)) : undefined}/>
+	return <AuthDialogView className={className} onClickSend={wsDispatch? (pass)=>wsDispatch(new JoinMessage(pass)) : undefined}/>
 }

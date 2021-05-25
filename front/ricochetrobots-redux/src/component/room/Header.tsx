@@ -5,8 +5,6 @@ import styled from "styled-components"
 import { PALETTE } from "../../app/palette"
 import { GameConfig } from "../../container/GameConfigDisp"
 import { Notification } from "../../container/GameSlice"
-import { UserNav } from "../../container/UserNav"
-
 import { BackButton } from "./BackButton"
 import { TweetButton } from "./tweetButton"
 
@@ -38,13 +36,6 @@ export function HeaderView({className,roomName, notifs, onMsgEntered} : Props){
 }
 const TweetButtonStyled = styled(TweetButton)`
 	margin:0.5em;
-`
-const UserNavStyled = styled(UserNav)`
-	z-index: 1000;
-	position : absolute;
-	right : 0;
-	top : 50%;
-	transform:translateY(-50%);
 `
 const BackButtonStyled = styled(BackButton) `
 	position : absolute;

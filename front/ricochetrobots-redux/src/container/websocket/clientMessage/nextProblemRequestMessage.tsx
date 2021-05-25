@@ -3,8 +3,6 @@ import { ClientMessage, CNextProblem,   MessageType } from "../WebsocketEventHan
 
 export class NextProblemRequestMessage implements ClientMessage {
 	type:MessageType = CNextProblem
-	constructor(){
-	}
 	toJSON(){
 		return {
 			type:this.type,

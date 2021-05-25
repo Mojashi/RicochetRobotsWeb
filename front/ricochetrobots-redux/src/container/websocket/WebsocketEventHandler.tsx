@@ -63,7 +63,7 @@ function serverEventHander(msg: any, dispatch: Dispatch<any>) {
 		msg.forEach(imsg => serverEventHander(imsg, dispatch))
 		return
 	}
-	if (msg.type == undefined) return
+	if (msg.type === undefined) return
 	let smsg : ServerMessage|undefined = undefined
 	switch(msg.type) {
 	case SAddHiddenSubmission : smsg = new AddHiddenSubmissionMessage(msg); break

@@ -27,7 +27,7 @@ export function Room(){
 	//ここと、useServer内に分散してるのよくない
 	useEffect(()=>{
 		return ()=>{dispatch(quitRoom())}
-	}, [])
+	}, [dispatch])
 
 	const View = isMobile ? RoomViewMobile : RoomView
 	return (

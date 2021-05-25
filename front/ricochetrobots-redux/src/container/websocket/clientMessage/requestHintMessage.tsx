@@ -3,8 +3,6 @@ import { ClientMessage, CRequestHint,   MessageType } from "../WebsocketEventHan
 
 export class RequestHintMessage implements ClientMessage {
 	type:MessageType = CRequestHint
-	constructor(){
-	}
 	toJSON(){
 		return {
 			type:this.type,

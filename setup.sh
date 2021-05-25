@@ -1,5 +1,5 @@
 #!/bin/sh
-mkdir ./userPics
+mkdir -p ./userPics
 cd front/ricochetrobots-redux
 npm install
 npm run build

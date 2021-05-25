@@ -16,7 +16,7 @@ export function Result({className} : Props){
 
 	return <ResultView subs={subs?subs:[]} className={className}
 		onClick={(sub:ResultSubmission)=>{
-			if(selectedSub?.id == sub.id) 
+			if(selectedSub?.id === sub.id) 
 				dispatch(stopResultSub())
 			else
 				dispatch(playResultSub(sub))

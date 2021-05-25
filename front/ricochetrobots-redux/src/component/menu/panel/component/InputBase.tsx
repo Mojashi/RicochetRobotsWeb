@@ -19,7 +19,7 @@ export function InputBase({title, placeHolder, disabled, defaultValue,tail, onCh
 	const validateChange = (event:React.ChangeEvent<HTMLInputElement>)=>{
 		let value: string | number = event.target.value
 		if(type === "number"){
-			if(value == "") value = 0
+			if(value === "") value = 0
 			else value = parseInt(value)
 		}
 		if(!isValid || isValid(value)) {

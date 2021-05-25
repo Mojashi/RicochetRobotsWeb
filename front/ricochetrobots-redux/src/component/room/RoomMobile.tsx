@@ -146,9 +146,6 @@ const SubmissionsStyled = styled(Submissions)`
 	margin-left:1em;
 	height:5em;
 `
-const WoodButtonStyled = styled(WoodButton)`
-	padding:0.5em 0 0.5em 0;
-`
 const NextButtonStyled = styled(WoodButton)`
 	height:100%;
 	display:flex;

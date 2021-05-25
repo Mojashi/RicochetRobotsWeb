@@ -31,7 +31,7 @@ export function useController(): [()=>void,()=>void,()=>void,(dir:Dir)=>void,(id
 			if(wsDispatch)
 				wsDispatch(new SubmitMessage(hands))
 		}
-	}, [wsDispatch, hands, isGoal, myLastSubTime])
+	}, [wsDispatch, dispatch, hands, isGoal, myLastSubTime])
 
 	const handleMove=(dir:Dir)=>{
 		selected.forEach((p,id)=>{
@@ -43,8 +43,8 @@ export function useController(): [()=>void,()=>void,()=>void,(dir:Dir)=>void,(id
 		dispatch(selectRobotFromInput({robot:id, selected:wh}))
 	}
 
-	const handleRemove = useCallback(()=>dispatch(removeHandFromInput()),[removeHandFromInput, dispatch])
-	const handleReset = useCallback(()=>dispatch(resetHandFromInput()), [dispatch, resetHandFromInput])
+	const handleRemove = useCallback(()=>dispatch(removeHandFromInput()),[dispatch])
+	const handleReset = useCallback(()=>dispatch(resetHandFromInput()), [dispatch])
 
 	return [handleSubmit, handleRemove, handleReset, handleMove, setSelectRobot, selected]
 }

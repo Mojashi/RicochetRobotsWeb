@@ -2,7 +2,6 @@ import React from "react"
 import styled from "styled-components"
 import { PALETTE } from "../../../../app/palette"
 
-import { UserIcon } from "../../../accessory/UserIcon"
 import { PlayIcon } from "../../../accessory/PlayIcon"
 
 import { Card } from "./Card"
@@ -82,16 +81,4 @@ const MovesDiv = styled("div")`
 	font-size:1.5em;
 	font-weight:bold;
 	padding:0 0.7em 0 0.7em;
-`
-const AuthorDiv = styled("div")`
-	font-size:0.9em;
-	text-align:right;
-	font-weight:bold;
-	display:flex;
-	align-items:center;
-	justify-content:flex-end;
-`
-
-const UserIconStyled = styled(UserIcon)`
-	height:2em;
 `

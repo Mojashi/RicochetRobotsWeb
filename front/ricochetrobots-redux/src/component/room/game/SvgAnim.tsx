@@ -26,13 +26,13 @@ export function SvgAnim({paths,cellSize, onAnimEnd, ...rest} : Props){
 			ref.current.beginElement()
 			//@ts-ignore
 		}
-	}, [paths, ref.current])
+	}, [paths])
 	useEffect(()=>{
 		if(ref.current){
 			//@ts-ignore
 			ref.current.onend = onAnimEnd
 		}
-	},[ref.current, onAnimEnd])
+	},[onAnimEnd])
 	return <animateMotion ref={ref} {...rest}
 		fill={"freeze"}
 		dur={`${paths.length*0.1}s`} repeatCount="1"

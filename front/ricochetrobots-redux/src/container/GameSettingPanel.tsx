@@ -1,10 +1,4 @@
 import React, { useContext } from "react"
-import { useDispatch } from "react-redux"
-
-
-
-
-
 import { GameSettingPanelView } from "../component/room/GameSettingPanel"
 import { WsDispatchContext } from "./Room"
 import { StartGameRequestMessage } from "./websocket/clientMessage/startGameRequestMessage"
@@ -15,7 +9,6 @@ type Props = {
 }
 
 export function GameSettingPanel({className} : Props){
-	const dispatch = useDispatch()
 	const wsDispatch = useContext(WsDispatchContext)
 
 	return <GameSettingPanelView className={className}

@@ -9,16 +9,11 @@ import MenuView from "./component/menu/browser/Menu"
 import { setUser } from "./container/GameSlice"
 import { Room } from "./container/Room"
 import { UserNav } from "./container/UserNav"
-import {
-  
-	
-  
-	isMobile
-} from "react-device-detect"
+import {isMobile} from "react-device-detect"
 import MenuViewMobile from "./component/menu/mobile/MenuMobile"
 function App() {
 	const dispatch  = useDispatch()
-	useEffect(()=>{getMeApi((user)=>{dispatch(setUser(user))})},[])
+	useEffect(()=>{getMeApi((user)=>{dispatch(setUser(user))})},[dispatch])
 
 	return (
 		<Router>

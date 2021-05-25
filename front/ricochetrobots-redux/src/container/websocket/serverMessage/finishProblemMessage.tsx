@@ -21,7 +21,7 @@ export class ServerResultSubmissionDto {
 		Object.assign(this, init)
 	}
 	toSubmission = (isFirst : boolean, users? : ParticipantsDict):ResultSubmission=>{
-		if(users == undefined) users = {} 
+		if(users === undefined) users = {} 
 		let user = users[this.userID]
 		if(!user) user = UnknownUser
 		return {isFirst:isFirst, addedPoint:this.addedPoint, solHash:this.solHash ,id:this.id, length: this.hands.length, hands:this.hands, user:user, optimal:this.optimal, timeStamp:this.timeStamp}

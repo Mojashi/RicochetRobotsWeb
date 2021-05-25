@@ -1,14 +1,9 @@
 import React from "react"
-import { useHistory } from "react-router"
 import { CSSTransition, TransitionGroup } from "react-transition-group"
 import styled from "styled-components"
 import { PALETTE } from "../../app/palette"
 
 import { Notification } from "../../container/GameSlice"
-import { UserNav } from "../../container/UserNav"
-
-import { BackButton } from "./BackButton"
-import { TweetButton } from "./tweetButton"
 
 interface Props {
 	className? : string,
@@ -18,8 +13,6 @@ interface Props {
 }
 
 export function HeaderViewMobile({className,roomName, notifs, onMsgEntered} : Props){
-	const history = useHistory()
-
 	return (
 		<Div className={className}>
 			{/* <TweetButtonStyled text={roomName+"で遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/> */}
@@ -34,23 +27,6 @@ export function HeaderViewMobile({className,roomName, notifs, onMsgEntered} : Pr
 		</Div>
 	)
 }
-const TweetButtonStyled = styled(TweetButton)`
-	margin:0.5em;
-`
-const UserNavStyled = styled(UserNav)`
-	z-index: 1000;
-	position : absolute;
-	right : 0;
-	top : 50%;
-	transform:translateY(-50%);
-`
-const BackButtonStyled = styled(BackButton) `
-	position : absolute;
-	left: 0;
-	top : 50%;
-	transform:translateY(-50%);
-`
-
 const TransitionGroupStyled = styled(TransitionGroup) `
 	position : absolute;
 	width : 100%;
