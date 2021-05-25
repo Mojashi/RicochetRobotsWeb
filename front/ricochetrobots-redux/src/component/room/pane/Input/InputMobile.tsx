@@ -1,6 +1,9 @@
 import React from "react"
 import styled from "styled-components"
+import { PALETTE } from "../../../../app/palette"
+import { RobotButtons } from "../../../../container/RobotButtons"
 import { Hands } from "../../../../model/game/Hands"
+import { BackIcon } from "../../../accessory/BackIcon"
 import { ResetIcon } from "../../../accessory/ResetIcon"
 import { SendIcon } from "../../../accessory/SendIcon"
 import { HandCard } from "../card/HandCard"
@@ -17,44 +20,40 @@ type Props = {
     disableSubmit : boolean,
 }
 
-export function InputView({hands,onReset,onSubmit, className, disableControls, disableSubmit} : Props) {
+export function InputViewMobile({hands,onReset,onBack,onSubmit, className, disableControls, disableSubmit} : Props) {
     return (
-        <Div className = {className}>
             <ButtonDiv>
+                <WoodButtonStyled onClick={onBack} disable={disableControls}><BackIconStyled/></WoodButtonStyled>
                 <WoodButtonStyled onClick={onSubmit} disable={disableControls || disableSubmit}><SendIconStyled/></WoodButtonStyled>
                 <WoodButtonStyled onClick={onReset} disable={disableControls}><ResetIconStyled/></WoodButtonStyled>
             </ButtonDiv>
-            <LaneStyled>
-                {hands.slice().reverse().map((hand, idx) => 
-                    <HandCard hand={hand} idx={hands.length - idx} key={hands.length-idx} selected={idx === 0}/>
-                )}
-            </LaneStyled>
-        </Div>
     )
 }
 
+const BackIconStyled = styled(BackIcon)`
+height:100%;
+`
 const ResetIconStyled = styled(ResetIcon)`
-    height:100%;
+height:100%;
 `
 const SendIconStyled = styled(SendIcon)`
     height:100%;
 `
 const ButtonDiv = styled("div")`
-    width:100%;
-    height:3em;
     display:flex;
-    margin-bottom:0.3em;
+    flex-wrap:nowrap;
+    flex-direction:column;
+    justify-content:space-between;
+    height:100%;
+    box-sizing:border-box;
+    flex: 0 0 9em;
+    width:9em;
 `
 const WoodButtonStyled = styled(WoodButton)`
-    display:inline-block;
-    margin: 0 0.2em 0 0.2em;
-    flex-grow:1;
-`
-
-const Div = styled("div")`
-    width:100%;
-    height:9.3em;
-`
-const LaneStyled = styled(Lane)`
-    height:6em;
+    flex: 1 1 0px;
+    box-sizing:border-box;
+    padding-left:2em;
+    padding-right:2em;
+    /* gap:1em; */
+    margin-bottom: 1em;
 `

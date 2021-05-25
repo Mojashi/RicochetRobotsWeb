@@ -33,6 +33,7 @@ Card.defaultProps = {
 const Div = styled("div")<{color:string}>`
     position:relative;
     background-color: ${p=>p.color};
+    color:black;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 10px;
     padding:0.3em 0.6em 0.3em 0.6em;

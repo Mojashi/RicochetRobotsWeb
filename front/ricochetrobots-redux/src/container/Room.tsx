@@ -8,6 +8,8 @@ import { useServer, WsDispatch } from "./websocket/WebsocketEventHandler"
 import { StartGameRequestMessage } from "./websocket/clientMessage/startGameRequestMessage"
 import { NextProblemRequestMessage } from "./websocket/clientMessage/nextProblemRequestMessage"
 import { WS_SERVER } from "../api/api"
+import { isMobile } from "react-device-detect"
+import { RoomViewMobile } from "../component/room/RoomMobile"
 
 export const WsDispatchContext = React.createContext<WsDispatch|undefined>(undefined);
 
@@ -27,9 +29,10 @@ export function Room(){
         return ()=>{dispatch(quitRoom())}
     }, [])
 
+    const View = isMobile ? RoomViewMobile : RoomView
     return (
         <WsDispatchContext.Provider value={wsDispatch}>
-            <RoomView 
+            <View 
                 room={room} 
                 isAdmin={isAdmin}
                 onGame={onGame}

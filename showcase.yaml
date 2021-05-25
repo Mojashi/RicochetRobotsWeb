@@ -3,15 +3,7 @@
 type: runtime
 
 # script executed on startup (default: null)
-startup: |
-  mkdir ./userPics
-  cd front/ricochetrobots-redux
-  npm install
-  npm run build
-  cd ../../api
-  go build
-  cd ../solve
-  make all
+startup: ./setup.sh
   
 # use external databases (default: false)
 use_mongodb: false
@@ -40,6 +32,10 @@ envs:
   REACT_APP_PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz
   PUBLIC_URL: https://ricochetrobots.mojashidev.xyz
   API_PORT: 3000
+  DB: $MARIADB_DATABASE
+  DB_HOST: $MARIADB_HOSTNAME
+  DB_PASS: $MARIADB_PASSWORD
+  DB_USER: $MARIADB_USERNAME
 
 # <<< static or http-proxied-runtime only setting >>>
 

@@ -16,7 +16,6 @@ export class SetPointMessage implements ServerMessage {
     }
 
     handle(dispatch : Dispatch<any>){
-        console.log("ass")
         dispatch(setPoint({userID:this.userID, point:this.point}))
     }
 }

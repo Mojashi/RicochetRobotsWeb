@@ -19,12 +19,13 @@ type Props = {
     hintPlaying : boolean,
     onClickGetHint : ()=>void,
     onClickPlayHint : ()=>void,
+    titleColor? : string,
 }
 
-export function HintView({hint,showHintButton, hintPlaying,onClickGetHint,onClickPlayHint, className} : Props) {
+export function HintView({hint,titleColor, showHintButton, hintPlaying,onClickGetHint,onClickPlayHint, className} : Props) {
     return (
         <Div className={className}>
-            <Title>HINT</Title>
+            <Title color={titleColor}>HINT</Title>
             <HintCard hint={hint} 
                 showHintButton ={showHintButton}
                 selected = {hintPlaying}

@@ -1,5 +1,7 @@
 import React from "react"
 import styled from "styled-components"
+import { OptSubSample, SubSample } from "../../model/game/Submission"
+import { Room } from "../../model/Room"
 import WoodImg from "../../img/wood.jpg"
 import { Input } from "../../container/Input"
 import { Problem } from "../../container/Problem"
@@ -7,6 +9,7 @@ import {Submissions} from "../../container/Submissions"
 import { Shortest } from "../../container/Shortest"
 import { LeaderBoard } from "../../container/LeaderBoard"
 import { Header } from "../../container/Header"
+import { ResultView } from "./pane/Result"
 import { Result } from "../../container/Result"
 import { WoodButton } from "./pane/Input/WoodButton"
 import { PALETTE } from "../../app/palette"
@@ -14,9 +17,12 @@ import { Title } from "./pane/Title"
 import { GameSettingPanel } from "../../container/GameSettingPanel"
 import { RoomInfo } from "../../model/RoomInfo"
 import ReactTooltip from "react-tooltip"
+import { AuthDialogView } from "./AuthDialog"
 import { AuthDialog } from "../../container/AuthDialog"
 import { GameResult } from "../../container/GameResult"
 import { Hint } from "../../container/Hint"
+import { Drawer } from "./Drawer"
+import { RobotButtons } from "../../container/RobotButtons"
 
 interface Props {
     room? : RoomInfo,
@@ -28,7 +34,7 @@ interface Props {
     needToAuth : boolean,
 }
 
-export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
+export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
     const CenterElem = <CenterDiv>
     {onGame || interval ? 
         <Problem/> : 
@@ -38,47 +44,80 @@ export function RoomView({room, onGame, interval,needToAuth, onNextClick, isAdmi
     }
     </CenterDiv>
 
-    const ResultSideDiv = <>
-        <ResultStyled/>
-        <div data-tip="親の開始を待っています" style={{height:"4em"}}>
-            <WoodButtonStyled pushed={readyNext} onClick={onNextClick}>
+
+    const DrawerDiv = <Drawer>
+        <HintStyled />
+        <ShortestStyled titleColor="white"/>
+        <LeaderBoardStyled titleColor="white"/>
+    </Drawer>
+
+    const NextButton = <div style={{height:"100%"}}>
+            <NextButtonStyled pushed={readyNext} onClick={onNextClick}>
                 <Title style={{border:"none"}}>{onGame ? (readyNext? "WAITING":"NEXT") : "FINISH"}</Title>
-            </WoodButtonStyled> 
+            </NextButtonStyled> 
         </div>
-        {(readyNext && onGame && !isAdmin) && <ReactTooltip place="right" type="dark" effect="float"/>}
-    </>
 
     const ContentElem = 
     <Content>
-    <SideDiv>
-        <SideDivContent>
-        {interval ? ResultSideDiv:
-        <>
-            <HintStyled/>
-            <ShortestStyled/>
-            <SubmissionsStyled/>
-        </>}
-        </SideDivContent>
-    </SideDiv>
+        {interval ? <ResultStyled/>:<SubmissionsStyled/>}
     {CenterElem}
-    <SideDiv>
-        <SideDivContent>
-        <InputStyled/>
-        <LeaderBoardStyled/>
-        </SideDivContent>
-    </SideDiv>
+        <LowerDiv><LowerContentDiv>
+            <RobotDiv>
+                <RobotButtonsStyled/>
+            </RobotDiv>
+            {interval?
+                NextButton:<InputStyled/>
+            }
+        </LowerContentDiv></LowerDiv>
     </Content>
     
 
     return (<>
         <Div>
             <HeaderStyled/>
+            {DrawerDiv}
             {needToAuth ? <Content><AuthDialog/></Content> : ContentElem}       
         </Div>
         <GameResultStyled/>
         </>
     )
 }
+
+
+const RobotDiv = styled("div")`
+    flex: 1 1 0;
+    height:100%;
+    top: 0;
+    left:0;
+`
+const RobotButtonsStyled = styled(RobotButtons)`
+    display:flex;
+    border-radius:20%;
+    border:solid 0.5em ${PALETTE.night};
+    background: #E8E8E8;
+    box-shadow:0 5px 5px rgba(0,0,0,0.5);
+    height:100%;
+    box-sizing:border-box;
+`
+
+
+const LowerContentDiv = styled("div")`
+    position:absolute;
+    display:flex;
+    justify-content:space-around;
+    flex-wrap:nowrap;
+    height:100%;
+    width:100%;
+    padding:1em;
+    padding-top:0;
+    box-sizing:border-box;
+    margin-bottom:0.5em;
+`
+const LowerDiv = styled("div")`
+    position:relative;
+    height:100%;
+    width:100%;
+`
 
 const GameResultStyled = styled(GameResult) `
     left:0;
@@ -88,8 +127,7 @@ const GameResultStyled = styled(GameResult) `
     height:100%;
 `
 const InputStyled = styled(Input)`
-    height:9.3em;
-    margin-bottom:1em;
+    flex: 1 1 0;
 `
 const LeaderBoardStyled = styled(LeaderBoard)`
     height:calc(100% - 10.3em);
@@ -103,15 +141,26 @@ margin-bottom:1.5em;
 flex-shrink:0;
 `
 const SubmissionsStyled = styled(Submissions)`
-    flex-shrink:1;
-    height:100%;
+    padding-top:0.7em;
+    flex-shrink:0;
+    margin-left:1em;
+    height:5em;
 `
 const WoodButtonStyled = styled(WoodButton)`
     padding:0.5em 0 0.5em 0;
 `
+const NextButtonStyled = styled(WoodButton)`
+    height:100%;
+    display:flex;
+    align-items: center;
+`
 const ResultStyled = styled(Result) `
-height:calc(100% - 5em);
-margin-bottom:1em;
+    margin-top:0.7em;
+    flex-shrink:0;
+    padding-left:1em;
+    padding-right:1em;
+    height:fit-content;
+    box-sizing:border-box;
 `
 
 const HeaderStyled = styled(Header)`
@@ -127,31 +176,21 @@ const Content = styled("div")`
     overflow:hidden;
     width:100%;
     height:calc(100% - 3.5em);
+    gap:1em;
     display:flex;
-    align-items:center;
+    flex-direction:column;
+    align-items:flex-start;
 `
 
-const centerSize = "(100vmin - 5.5em)"
+const centerSize = "(100vmin - 1.5em)"
 const CenterDiv = styled("div")`
+    flex-shrink:0;
     height:calc(${centerSize});
     width:calc(${centerSize});
-`
-const SideDiv = styled("div")`
-    width:calc(50% - ${centerSize}/2);
-    height:100%;
-    box-sizing:border-box;
+    margin-left:auto;
+    margin-right:auto;
 `
 
-const SideDivContent = styled("div")`
-    box-sizing:border-box;
-    margin:auto;
-    padding: 0.5em;
-    height:100%;
-    display:flex;
-    justify-content:flex-start;
-    flex-direction:column;
-    width:fit-content;
-`
 const Text = styled("div")`
     font-size:2em;
     font-weight:bold;

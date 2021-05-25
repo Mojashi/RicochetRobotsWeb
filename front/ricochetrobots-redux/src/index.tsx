@@ -11,10 +11,6 @@ import Helmet from "react-helmet"
 
 ReactDOM.render(
   <React.StrictMode>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap');
-    </style>
-  
     <Provider store={store}>
       <App />
     </Provider>

@@ -32,6 +32,7 @@ const Div = styled("div")`
     border-style:outset;
     border-radius:0.3em;
     padding:0.1em 1em 0.1em 1em;
+    box-sizing:border-box;
     cursor:pointer;
 
     &.disable {

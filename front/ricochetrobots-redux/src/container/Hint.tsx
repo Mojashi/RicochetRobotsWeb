@@ -6,11 +6,7 @@ import {hintPlayingSelector, hintSelector, intervalSelector, isAdminSelector, le
 import { WsDispatchContext } from "./Room"
 import { RequestHintMessage } from "./websocket/clientMessage/requestHintMessage"
 
-type Props = {
-    className? : string,
-}
-
-export function Hint({className} : Props){
+export function Hint(props :  Omit<Omit<Omit<Omit<Omit<React.ComponentProps<typeof HintView>, "hint">, "showHintButton">, "hintPlaying">, "onClickGetHint">, "onClickPlayHint">){
     const wsDispatch = useContext(WsDispatchContext)
     const hintPlaying = useSelector(hintPlayingSelector)
     const hint = useSelector(hintSelector)
@@ -23,9 +19,9 @@ export function Hint({className} : Props){
     <HintView 
         hint={hint ? hint : []} 
         showHintButton={isAdmin}
-        className={className}
         hintPlaying={hintPlaying ? hintPlaying : false}
         onClickGetHint={()=>{wsDispatch && wsDispatch(new RequestHintMessage())}}
         onClickPlayHint={()=>dispatch(hintPlaying ? stopHint() : playHint())}
+        {...props}
     />} </>
 }

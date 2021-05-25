@@ -7,8 +7,8 @@ type Props = {
     className? : string,
 }
 
-export function Shortest({className} : Props){
+export function Shortest(props : Omit<React.ComponentProps<typeof ShortestView>, "sub">){
     const sub = useSelector(shortestSelector)
 
-    return <ShortestView sub={sub} className={className}/>
+    return <ShortestView sub={sub} {...props}/>
 }

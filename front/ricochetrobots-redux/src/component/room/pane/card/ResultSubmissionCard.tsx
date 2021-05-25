@@ -54,7 +54,6 @@ const ChipStyled = styled(Chip) `
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 `
 const CardStyled = styled(Card)`
-    margin-top:0.7em;
     cursor: pointer;
     
     &.unique {

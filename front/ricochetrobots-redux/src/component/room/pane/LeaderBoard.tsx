@@ -14,12 +14,13 @@ export type LeaderBoardUser = {
 type Props = {
     className? : string,
     ranking: LeaderBoardUser[],
+    titleColor? : string,
 }
 
-export function LeaderBoardView({ranking, className} : Props) {
+export function LeaderBoardView({titleColor, ranking, className} : Props) {
     return (
         <Div className = {className}>
-            <Title>LEADERBOARD</Title>
+            <Title color={titleColor} >LEADERBOARD</Title>
             <LaneStyled>
                 {ranking.map((user,idx) => 
                     <LeaderBoardUserCard rank={idx + 1} user={user} key={user.user.id}/>

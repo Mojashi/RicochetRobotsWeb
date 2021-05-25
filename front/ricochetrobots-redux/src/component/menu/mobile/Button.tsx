@@ -33,8 +33,8 @@ const Div = styled("div")<{fill:string}>`
 
     height:100%;
     background:${p=>p.fill};
-    border-radius:5px 5px 0 0;
-    border: 2px solid white;
+    /* border-radius:5px 5px 0 0; */
+    /* border: 2px solid white; */
     color:white;
     font-weight:bold;
     box-sizing:border-box;

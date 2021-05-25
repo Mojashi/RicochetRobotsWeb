@@ -46,7 +46,9 @@ const RobotIconStyled = styled(RobotIconSvg)`
 `
 
 const Div = styled("svg")`
-    box-shadow: 0 0 0.5em;
+    /* box-shadow: 0 3px 0 black,0 3px 0 black,0 3px 0 black; */
+    border:solid 2px;
+    box-sizing:border-box;
     position:relative;
     height:100%;
     width:100%;

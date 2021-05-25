@@ -22,7 +22,7 @@ function App() {
 
   return (
     <Router>
-    <div className="App" draggable={false}>
+    <div className="App" draggable={false} style={{touchAction:"none"}}>
       <Switch>
         <Route path="/" exact>
           {isMobile ? 

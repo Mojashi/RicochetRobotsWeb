@@ -8,12 +8,13 @@ import {Title} from "./Title"
 type Props = {
     className? : string,
     sub? : Submission,
+    titleColor?:string,
 }
 
-export function ShortestView({sub, className} : Props) {
+export function ShortestView({sub,titleColor, className} : Props) {
     return (
         <Div className = {className}>
-            <Title>SHORTEST</Title>
+            <Title color={titleColor}>SHORTEST</Title>
             {sub ? 
                 <SubmissionCard sub={sub} rank={1}/> : 
                 ""

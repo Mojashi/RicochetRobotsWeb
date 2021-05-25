@@ -24,13 +24,13 @@ export function SubmissionCard({sub, rank, className} : Props) {
     )
 }
 const CardStyled = styled(Card)`
-    margin-top:0.7em;
 `
 
 const MovesDiv = styled("div")`
     font-size:1.5em;
     font-weight:bold;
     padding:0 0.7em 0 0.7em;
+    white-space:nowrap;
 `
 const AuthorDiv = styled("div")`
     font-size:0.9em;
