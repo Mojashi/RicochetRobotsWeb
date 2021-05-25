@@ -19,7 +19,7 @@ type Props = {
 export function ResultView({className, subs, onClick, selectedID} : Props) {
 	return (
 		<Div className = {className}>
-			{isBrowser&&<Title>RESULT</Title>}
+			{isBrowser&&<TitleStyled>RESULT</TitleStyled>}
 			<LaneStyled dir={isMobile?"row":"col"}>
 				<Cards>
 					{subs.map((sub, idx) => 
@@ -30,6 +30,10 @@ export function ResultView({className, subs, onClick, selectedID} : Props) {
 		</Div>
 	)
 }
+
+const TitleStyled = styled(Title)`
+    margin-bottom:0.7em;
+`
 const LaneStyled = styled(Lane)`
 	flex-grow:1;
 	overflow:hidden;
@@ -37,7 +41,6 @@ const LaneStyled = styled(Lane)`
 
 const Div = styled("div")`
 	width:100%;
-	height:fit-content;
 	display:flex;
 	flex-direction:column;
 `

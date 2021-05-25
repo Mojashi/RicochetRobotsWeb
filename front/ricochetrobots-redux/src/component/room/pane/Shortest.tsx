@@ -14,7 +14,7 @@ type Props = {
 export function ShortestView({sub,titleColor, className} : Props) {
 	return (
 		<Div className = {className}>
-			<Title color={titleColor}>SHORTEST</Title>
+			<TitleStyled color={titleColor}>SHORTEST</TitleStyled>
 			{sub ? 
 				<SubmissionCard sub={sub} rank={1}/> : 
 				""
@@ -22,6 +22,10 @@ export function ShortestView({sub,titleColor, className} : Props) {
 		</Div>
 	)
 }
+
+const TitleStyled = styled(Title)`
+    margin-bottom:0.7em;
+`
 const Div = styled("div")`
 	width:100%;
 	height:fit-content;

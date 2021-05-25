@@ -13,7 +13,7 @@ type Props = {
 export function SubmissionsView({subs, className} : Props) {
 	return (
 		<Div className={className}>
-			{isBrowser && <Title>SUBMISSIONS</Title>}
+			{isBrowser && <TitleStyled>SUBMISSIONS</TitleStyled>}
 			<Cards>
 				{subs.slice(Math.max(subs.length - 5, 0), subs.length).map((sub,idx) => 
 					<SubmissionCard sub={sub} key={sub.id} rank={Math.max(subs.length - 5, 0) + idx + 1}/>
@@ -22,6 +22,9 @@ export function SubmissionsView({subs, className} : Props) {
 		</Div>
 	)
 }
+const TitleStyled = styled(Title)`
+    margin-bottom:0.7em;
+`
 const Cards = styled("div")`
 	display:flex;
 	gap:0.7em;

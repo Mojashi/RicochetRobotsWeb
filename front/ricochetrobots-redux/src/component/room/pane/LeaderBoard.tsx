@@ -20,7 +20,7 @@ type Props = {
 export function LeaderBoardView({titleColor, ranking, className} : Props) {
 	return (
 		<Div className = {className}>
-			<Title color={titleColor} >LEADERBOARD</Title>
+			<TitleStyled color={titleColor} >LEADERBOARD</TitleStyled>
 			<LaneStyled>
 				{ranking.map((user,idx) => 
 					<LeaderBoardUserCard rank={idx + 1} user={user} key={user.user.id}/>
@@ -29,8 +29,10 @@ export function LeaderBoardView({titleColor, ranking, className} : Props) {
 		</Div>
 	)
 }
+const TitleStyled = styled(Title)`
+    margin-bottom:0.7em;
+`
 const LaneStyled = styled(Lane)`
-	margin-top:0.7em;
 	flex-grow:1;
 	overflow:hidden;
 `

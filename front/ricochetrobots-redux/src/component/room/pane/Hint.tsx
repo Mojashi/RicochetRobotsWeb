@@ -25,7 +25,7 @@ type Props = {
 export function HintView({hint,titleColor, showHintButton, hintPlaying,onClickGetHint,onClickPlayHint, className} : Props) {
 	return (
 		<Div className={className}>
-			<Title color={titleColor}>HINT</Title>
+			<TitleStyled color={titleColor}>HINT</TitleStyled>
 			<HintCard hint={hint} 
 				showHintButton ={showHintButton}
 				selected = {hintPlaying}
@@ -35,6 +35,9 @@ export function HintView({hint,titleColor, showHintButton, hintPlaying,onClickGe
 	)
 }
 
+const TitleStyled = styled(Title)`
+    margin-bottom:0.7em;
+`
 
 const Div = styled("div")`
 	width:100%;

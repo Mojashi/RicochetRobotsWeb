@@ -2,7 +2,7 @@ import styled from "styled-components"
 import { PALETTE } from "../../../app/palette"
 
 export const Title = styled("div")<{color? : string}>`
-	margin-bottom:0.7em;
+	/* margin-bottom:0.7em; */
 	color: ${p=>p.color ? p.color : PALETTE.wood};
 	font-family: Roboto;
 	font-style: normal;
