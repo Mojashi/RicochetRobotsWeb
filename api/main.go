@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/Mojashi/RicochetRobots/api/cmd"
@@ -10,10 +9,10 @@ import (
 )
 
 func init() {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal(".env doesnt exist")
-	}
+	godotenv.Load("../.env")
+	// if err != nil {
+	// 	log.Fatal(".env doesnt exist")
+	// }
 	os.Chdir(os.Getenv("ROOT_DIR"))
 }
 
