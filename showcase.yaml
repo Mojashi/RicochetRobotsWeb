@@ -9,6 +9,7 @@ startup: ./setup.sh
 use_mongodb: false
 use_mariadb: true
 
+
 # relative path to document root (default: .)
 work_dir: "."
 
