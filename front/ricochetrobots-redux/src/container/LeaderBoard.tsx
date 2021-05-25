@@ -4,8 +4,8 @@ import { LeaderBoardView } from "../component/room/pane/LeaderBoard"
 import {leaderBoardSelector} from "./GameSlice"
 
 export function LeaderBoard(props : Omit<React.ComponentProps<typeof LeaderBoardView>, "ranking">){
-    const ranking = useSelector(leaderBoardSelector)
-    
+	const ranking = useSelector(leaderBoardSelector)
+	
 
-    return <LeaderBoardView ranking={ranking} {...props}/>
+	return <LeaderBoardView ranking={ranking} {...props}/>
 }

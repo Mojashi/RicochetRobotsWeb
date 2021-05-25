@@ -72,6 +72,11 @@
     ]
   },
   "devDependencies": {
-    "dotenv-cli": "^4.0.0"
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "dotenv-cli": "^4.0.0",
+    "eslint": "^7.27.0",
+    "eslint-plugin-autofix": "^1.0.5",
+    "eslint-plugin-react": "^7.23.2"
   }
 }

@@ -4,11 +4,11 @@ import { WsDispatchContext } from "./Room"
 import { JoinMessage } from "./websocket/clientMessage/joinMessage"
 
 type Props = {
-    className? : string,
+	className? : string,
 }
 
-export function AuthDialog({className} : Props){
-    const wsDispatch = useContext(WsDispatchContext)
+export function AuthDialog({} : Props){
+	const wsDispatch = useContext(WsDispatchContext)
 
-    return <AuthDialogView onClickSend={wsDispatch? (pass)=>wsDispatch(new JoinMessage(pass)) : undefined}/>
+	return <AuthDialogView onClickSend={wsDispatch? (pass)=>wsDispatch(new JoinMessage(pass)) : undefined}/>
 }

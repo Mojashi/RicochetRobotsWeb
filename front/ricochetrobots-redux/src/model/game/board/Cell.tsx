@@ -13,8 +13,8 @@ export type Mirror = {
 }
 export type Side = 0 | 1
 
-var md = [1, 0, 3, 2]
-var nd = [3, 2, 1, 0]
+const md = [1, 0, 3, 2]
+const nd = [3, 2, 1, 0]
 
 export function DoMirror(dir : Dir, mirror :Mirror) :Dir {
 	if (mirror.side === 0) {

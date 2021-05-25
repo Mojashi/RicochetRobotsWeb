@@ -1,19 +1,19 @@
-import { Rule } from "./Rule";
+import { Rule } from "./Rule"
 
 export type GameConfig = {
-    rule : Rule,
-    timeLimit : number,
-    goalPoint : number,
-    pointForFirst : number,
-    pointForOther : number,
-    problemConfig : ProblemConfig,
+	rule : Rule,
+	timeLimit : number,
+	goalPoint : number,
+	pointForFirst : number,
+	pointForOther : number,
+	problemConfig : ProblemConfig,
 }
 
 export type ProblemConfig = {
-    solLenMin : number,
-    solLenMax : number,
-    torus : Choice,
-    mirror : Choice,
+	solLenMin : number,
+	solLenMax : number,
+	torus : Choice,
+	mirror : Choice,
 }
 
 export const Never = 0

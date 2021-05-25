@@ -3,21 +3,21 @@ import { isMobile } from "react-device-detect"
 import { useDispatch, useSelector } from "react-redux"
 import { HeaderView } from "../component/room/Header"
 import { HeaderViewMobile } from "../component/room/HeaderMobile"
-import { ShortestView } from "../component/room/pane/Shortest"
+
 import { notifSelector, removeNotify, roomInfoSelector,Notification } from "./GameSlice"
 
 type Props = {
-    className? : string,
+	className? : string,
 }
 
 export function Header({className} : Props){
-    const room = useSelector(roomInfoSelector)
-    const notifs = useSelector(notifSelector)
-    const dispatch = useDispatch()
-    const View = isMobile ? HeaderViewMobile : HeaderView
-    return <View roomName={room ? room.name : ""} className={className}
-     notifs={notifs} onMsgEntered={(notif:Notification)=>
-        setTimeout(()=>{
-            dispatch(removeNotify(notif.id))
-         }, notif.duration*1000)}/>
+	const room = useSelector(roomInfoSelector)
+	const notifs = useSelector(notifSelector)
+	const dispatch = useDispatch()
+	const View = isMobile ? HeaderViewMobile : HeaderView
+	return <View roomName={room ? room.name : ""} className={className}
+		notifs={notifs} onMsgEntered={(notif:Notification)=>
+			setTimeout(()=>{
+				dispatch(removeNotify(notif.id))
+			}, notif.duration*1000)}/>
 }
