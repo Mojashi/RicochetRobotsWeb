@@ -3,7 +3,13 @@
 type: runtime
 
 # script executed on startup (default: null)
-startup: ./setup.sh
+startup: |
+  cp .env_showcase .env
+  echo -e \$DB=$MARIADB_DATABASE >> .env
+  echo -e \$DB_USER=$MARIADB_USERNAME >> .env
+  echo -e \$DB_PASS=$MARIADB_PASSWORD >> .env
+  echo -e \$DB_HOST=$MARIADB_HOST >> .env
+  ./setup.sh
   
 # use external databases (default: false)
 use_mongodb: false
@@ -25,26 +31,14 @@ http_proxy: 3000
 expose: []
 
 # enviromnent variables passed to docker container (default: {})
-envs: 
-  SOLVER_DIR: ./solve
-  PUBLIC_DIR: ./front/ricochetrobots-redux/build
-  USERPIC_DIR: ./userPics
-  PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz
-  REACT_APP_PUBLIC_DOMAIN: ricochetrobots.mojashidev.xyz
-  PUBLIC_URL: https://ricochetrobots.mojashidev.xyz
-  API_PORT: 3000
-  DB: $MARIADB_DATABASE
-  DB_HOST: $MARIADB_HOSTNAME
-  DB_PASS: $MARIADB_PASSWORD
-  DB_USER: $MARIADB_USERNAME
-
+envs: {}
 # <<< static or http-proxied-runtime only setting >>>
 
 # additional server name <array or string> (default: [])
 cname: ricochetrobots.trap.games
 
 # parse user token, restrict access from non-traP user <"off", "soft", "hard"> (default: "off")
-internal: "off"
+internal: "hard"
 
 # use secure access <"off", "soft", "hard"> (default: "off")
 https: "hard"

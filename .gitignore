@@ -1,7 +1,7 @@
 userPics
 api/api
-api/boardImg.png
-api/solution.gif
+boardImg.png
+solution.gif
 .env
 config.json
 gen/solver
