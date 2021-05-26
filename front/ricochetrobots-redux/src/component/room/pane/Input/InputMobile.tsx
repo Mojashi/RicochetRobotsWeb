@@ -54,6 +54,7 @@ const WoodButtonStyled = styled(WoodButton)`
 	box-sizing:border-box;
 	padding-left:2em;
 	padding-right:2em;
+	/* min-height: 2em; */
 	/* gap:1em; */
-	margin-bottom: 1em;
+	margin-bottom: 0.5em;
 `

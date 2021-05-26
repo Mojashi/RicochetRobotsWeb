@@ -38,7 +38,8 @@ const Div = styled("div")<{fill:string}>`
 	color:white;
 	font-weight:bold;
 	box-sizing:border-box;
-	box-shadow: 0px -3px 4px rgba(255, 255, 255, 0.25);
+	/* box-shadow: 0px -3px 4px rgba(255, 255, 255, 0.25); */
+	border-top:solid 2px rgb(230,230,230);
 
 	&.pushed{
 		height:6em;

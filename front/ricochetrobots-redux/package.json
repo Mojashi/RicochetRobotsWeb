@@ -52,8 +52,8 @@
     "zdog": "^1.1.2"
   },
   "scripts": {
-    "start": "dotenv -e ../../api/.env react-scripts start",
-    "build": "dotenv -e ../../api/.env react-scripts build",
+    "start": "dotenv -e ../../.env react-scripts start",
+    "build": "dotenv -e ../../.env react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
