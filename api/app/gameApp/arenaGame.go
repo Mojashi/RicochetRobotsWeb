@@ -126,15 +126,23 @@ func (a *ArenaGameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 }
 
 func (a *ArenaGameApp) addNextProblem() {
-	problem, err := a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, false)
-	if err != nil {
-		problem, err = a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, true)
-		if err != nil {
-			problem, err = a.problemRepository.GetUnused()
-			if err != nil {
-				log.Fatal("there is no problem!!" + err.Error())
-			}
+	var problem model.ProblemWithSolution
+	var err error
+	for {
+		problem, err = a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, false)
+		if err == nil {
+			break
 		}
+		problem, err = a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, true)
+		if err == nil {
+			break
+		}
+		problem, err = a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, true)
+		if err == nil {
+			break
+		}
+		log.Println("there is no problem!!" + err.Error())
+		time.Sleep(10 * time.Second)
 	}
 	a.problemRepository.SetUsed(problem.ID)
 
