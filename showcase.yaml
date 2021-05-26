@@ -38,10 +38,10 @@ envs: {}
 cname: ricochetrobots.trap.games
 
 # parse user token, restrict access from non-traP user <"off", "soft", "hard"> (default: "off")
-internal: "hard"
+internal: "soft"
 
 # use secure access <"off", "soft", "hard"> (default: "off")
-https: "hard"
+https: "on"
 
 # <<< branch deploy setting >>>
 
