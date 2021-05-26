@@ -48,3 +48,4 @@ https: "hard"
 # custom deploy setting <see document!> (default: {master: null})
 branch:
   master: null
+  replace_text: null
