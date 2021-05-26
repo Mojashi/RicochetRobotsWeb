@@ -63,7 +63,7 @@ func rngBoard(torus, mirror bool) model.Board {
 	SetWall(mp, 7, 8, model.RT)
 
 	elcount := rand.Intn(10) + 24
-	// elcount := rand.Intn(5)
+	// elcount := rand.Intn(3) + 8
 	for i := 0; elcount > i; i++ {
 		x := rand.Intn(16)
 		y := rand.Intn(16)

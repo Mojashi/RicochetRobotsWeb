@@ -33,7 +33,7 @@ func NewTwitterOAuthConf() TwitterOAuthConf {
 	signinOAuthClient.ResourceOwnerAuthorizationURI = "https://api.twitter.com/oauth/authenticate"
 
 	return TwitterOAuthConf{
-		"https://" + os.Getenv("PUBLIC_DOMAIN") + "/api/twitter/callback",
+		os.Getenv("PUBLIC_URL") + "/api/twitter/callback",
 		oauthClient,
 		signinOAuthClient,
 		"authSessId",

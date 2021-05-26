@@ -71,11 +71,11 @@ func (r ProblemWithSolutionRepository) GetUnusedWithConfig(conf model.ProblemCon
 
 	if conf.Torus != model.Optional || rand.Intn(3) == 0 {
 		wheres = append(wheres, "torus=?")
-		whereArgs = append(whereArgs, conf.Torus == model.Required)
+		whereArgs = append(whereArgs, conf.Torus != model.Never)
 	}
 	if conf.Mirror != model.Optional || rand.Intn(3) == 0 {
 		wheres = append(wheres, "mirror=?")
-		whereArgs = append(whereArgs, conf.Mirror == model.Required)
+		whereArgs = append(whereArgs, conf.Mirror != model.Never)
 	}
 
 	rows := r.db.QueryRowx(
