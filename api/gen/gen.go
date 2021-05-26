@@ -49,7 +49,7 @@ func Gen(torus, mirror int, remote string) {
 			if err != nil {
 				panic(err)
 			}
-			resp, err := http.Post(remote, "application/json", bytes.NewReader(str))
+			resp, err := http.Post(remote+"/api/addProblem", "application/json", bytes.NewReader(str))
 			if err != nil {
 				panic(err)
 			}

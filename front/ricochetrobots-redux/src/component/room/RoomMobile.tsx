@@ -51,7 +51,7 @@ export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, 
 		<DrawerContent>
 		<BackButton/>
 		{room && <TweetButton text={room?.name+"で遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>}
-		<HintStyled />
+		<HintStyled titleColor="white"/>
 		<ShortestStyled titleColor="white"/>
 		<LeaderBoardStyled titleColor="white"/>
 		</DrawerContent>

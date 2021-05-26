@@ -27,6 +27,7 @@ var (
 	makeRoomHandler      handler.Handler
 	getRankingHandler    handler.Handler
 	roomListHandler      handler.Handler
+	addProblemHandler    handler.Handler
 	twitterWebhookGroup  *handler.TwWebHookGroup
 	cookieAuthMiddleware middleware.CookieAuthMiddleware
 )
@@ -54,6 +55,7 @@ func build() {
 	makeRoomHandler = handler.NewMakeRoomHandler(roomManager)
 	roomListHandler = handler.NewRoomListHandler(roomManager)
 	getRankingHandler = handler.NewGetRankingHandler(userRepo)
+	addProblemHandler = handler.NewAddProblemHandler(problemRepo)
 
 	roomManager.NewArena()
 	arena, _ := roomManager.Get(0)
@@ -83,6 +85,8 @@ func Run() {
 	g.POST("/rooms/make", makeRoomHandler.Handle)
 	g.GET("/join/:roomID", joinHandler.Handle)
 	g.GET("/rooms", roomListHandler.Handle)
+
+	g.POST("/addProblem", addProblemHandler.Handle)
 
 	twitterWebhookGroup.Make(g.Group("/twitter"))
 
