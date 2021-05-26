@@ -42,9 +42,21 @@ func (pc *Board) Scan(val interface{}) error {
 	}
 }
 
-func (p *Problem) Draw(path string) error {
-	// cellSize := 64
-	// width := p.Width * cellSize
-	// height := b.Height * cellSize
-	return nil
+func (b Board) CountWallMirror() (int, int) {
+	numWall := 0
+	numMirror := 0
+
+	for i := 0; b.Height > i; i++ {
+		for j := 0; b.Width > j; j++ {
+			for k := 0; 4 > k; k++ {
+				if b.Cells[i][j].Walls[k] {
+					numWall++
+				}
+			}
+			if b.Cells[i][j].Mirror != nil {
+				numMirror++
+			}
+		}
+	}
+	return numWall, numMirror
 }

@@ -12,13 +12,16 @@ const ProblemWithSolutionSchema = `
 CREATE TABLE IF NOT EXISTS problems (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     randomValue float NOT NULL,
-	board  JSON NOT NULL,
+	board  longtext NOT NULL,
 	mainRobot int NOT NULL,
-	robotPoss json NOT NULL,
-	solution json NOT NULL,
+	robotPoss longtext NOT NULL,
+	solution longtext NOT NULL,
 	numRobot int NOT NULL,
 	torus boolean NOT NULL default false,
 	mirror boolean NOT NULL default false,
+	solutionLength int NOT NULL,
+	numWall int NOT NULL,
+	numMirror int NOT NULL,
 	used	boolean DEFAULT false
 );
 `
