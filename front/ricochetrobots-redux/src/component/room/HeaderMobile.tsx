@@ -7,7 +7,7 @@ import { Notification } from "../../container/GameSlice"
 
 interface Props {
 	className? : string,
-	roomName : string,
+	roomName? : string,
 	notifs : Notification[],
 	onMsgEntered : (notif : Notification)=>void,
 }

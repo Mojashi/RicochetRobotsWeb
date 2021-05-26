@@ -15,7 +15,7 @@ export function Header({className} : Props){
 	const notifs = useSelector(notifSelector)
 	const dispatch = useDispatch()
 	const View = isMobile ? HeaderViewMobile : HeaderView
-	return <View roomName={room ? room.name : ""} className={className}
+	return <View roomName={room?.name} className={className}
 		notifs={notifs} onMsgEntered={(notif:Notification)=>
 			setTimeout(()=>{
 				dispatch(removeNotify(notif.id))

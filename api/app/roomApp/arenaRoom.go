@@ -46,8 +46,8 @@ var arenaConf = model.GameConfig{
 	PointForFirst: 5,
 	PointForOther: 3,
 	ProblemConfig: model.ProblemConfig{
-		SolLenMin: 1,
-		SolLenMax: 4,
+		SolLenMin: 5,
+		SolLenMax: 99,
 		Torus:     model.Optional,
 		Mirror:    model.Optional,
 	},

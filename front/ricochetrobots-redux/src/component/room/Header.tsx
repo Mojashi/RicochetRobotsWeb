@@ -10,7 +10,7 @@ import { TweetButton } from "./tweetButton"
 
 interface Props {
 	className? : string,
-	roomName : string,
+	roomName? : string,
 	notifs : Notification[],
 	onMsgEntered : (notif : Notification)=>void,
 }
@@ -20,8 +20,8 @@ export function HeaderView({className,roomName, notifs, onMsgEntered} : Props){
 
 	return (
 		<Div className={className}>
-			<BackButtonStyled onClick={()=>history.push("/")}/>
-			<TweetButtonStyled text={roomName+"で遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>
+			<BackButtonStyled/>
+			{roomName && <TweetButtonStyled text={roomName+"で遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>}
 			<CenterText>{roomName}</CenterText>
 			<GameConfig/>
 			<TransitionGroupStyled>

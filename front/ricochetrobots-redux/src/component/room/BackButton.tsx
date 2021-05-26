@@ -1,20 +1,22 @@
 import React, { useState } from "react"
+import { isMobile } from "react-device-detect"
+import { useHistory } from "react-router"
 import styled from "styled-components"
 import { PALETTE } from "../../app/palette"
 
 type Props = {
 	disable : boolean,
-	onClick? : ()=>void,
 	className? : string,
 }
 
 
-export function BackButton({className, disable, onClick} : Props) {
+export function BackButton({className, disable} : Props) {
 	const [pushed, setPushed] = useState(false)
-
+	const history = useHistory()
+	
 	return (
 		<Div className={className + (disable ? " disable":"") + (pushed ? " pushed":"")} 
-			onClick={onClick} onMouseDown={()=>setPushed(true)} onMouseUp={()=>setPushed(false)}
+			onClick={()=>history.push("/")} onMouseDown={()=>setPushed(true)} onMouseUp={()=>setPushed(false)}
 			onMouseLeave={()=>setPushed(false)}>
 			もどる
 		</Div>
@@ -35,6 +37,11 @@ const Div = styled("div")`
 	height:fit-content;
 	font-size:1.5em;
 	cursor: pointer;
+
+	${isMobile?`
+		border-radius:100px;
+		border:solid 3px ${PALETTE.white};
+	`:``}
 
 	&.disable {
 

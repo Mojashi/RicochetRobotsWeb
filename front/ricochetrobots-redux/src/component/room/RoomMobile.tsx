@@ -23,6 +23,8 @@ import { GameResult } from "../../container/GameResult"
 import { Hint } from "../../container/Hint"
 import { Drawer } from "./Drawer"
 import { RobotButtons } from "../../container/RobotButtons"
+import { TweetButton } from "./tweetButton"
+import { BackButton } from "./BackButton"
 
 interface Props {
 	room? : RoomInfo,
@@ -34,7 +36,7 @@ interface Props {
 	needToAuth : boolean,
 }
 
-export function RoomViewMobile({ onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
+export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
 	const CenterElem = <CenterDiv>
 		{onGame || interval ? 
 			<Problem/> : 
@@ -46,9 +48,13 @@ export function RoomViewMobile({ onGame, interval,needToAuth, onNextClick, isAdm
 
 
 	const DrawerDiv = <Drawer>
+		<DrawerContent>
+		<BackButton/>
+		{room && <TweetButton text={room?.name+"で遊ぼう！"} hashTags={["ハイパーロボット大戦"]}/>}
 		<HintStyled />
 		<ShortestStyled titleColor="white"/>
 		<LeaderBoardStyled titleColor="white"/>
+		</DrawerContent>
 	</Drawer>
 
 	const NextButton = <div style={{height:"100%"}}>
@@ -196,4 +202,9 @@ const Text = styled("div")`
 	display:flex;
 	flex-direction:column;
 	justify-content:center;
+`
+const DrawerContent= styled("div")`
+	display: flex;
+	flex-direction:column;
+	gap:0.7em;
 `
