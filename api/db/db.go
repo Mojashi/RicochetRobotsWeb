@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,7 +12,7 @@ const ProblemWithSolutionSchema = `
 CREATE TABLE IF NOT EXISTS problems (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     randomValue float NOT NULL,
-	board  json NOT NULL,
+	board  JSON NOT NULL,
 	mainRobot int NOT NULL,
 	robotPoss json NOT NULL,
 	solution json NOT NULL,
@@ -39,10 +40,15 @@ CREATE TABLE IF NOT EXISTS arenaLog (
 `
 
 func NewDB(DBHost, DBName, DBUser, DBPass string) *sqlx.DB {
-	DBCon, err := sqlx.Connect("mariadb", fmt.Sprintf("%s:%s@tcp(%s)/%s", DBUser, DBPass, DBHost, DBName))
+	DBCon, err := sqlx.Connect("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", DBUser, DBPass, DBHost, DBName))
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	r := DBCon.QueryRowx("select version()")
+	dest := map[string]interface{}{}
+	r.MapScan(dest)
+	log.Println(string(dest["version()"].([]byte)))
 
 	DBCon.MustExec(ProblemWithSolutionSchema)
 	DBCon.MustExec(UserSchema)
