@@ -93,13 +93,7 @@ func Run() {
 		Root:  os.Getenv("PUBLIC_DIR"),
 		HTML5: true,
 	}))
-	e.Use(echoMid.StaticWithConfig(echoMid.StaticConfig{
-		Skipper: func(c echo.Context) bool {
-			return strings.HasPrefix(c.Request().URL.Path, "/api")
-		},
-		Root:  os.Getenv("USERPIC_DIR"),
-		HTML5: true,
-	}))
+	e.Static("/userPics", os.Getenv("USERPIC_DIR"))
 
 	e.Logger.Fatal(e.Start(":" + os.Getenv("API_PORT")))
 }

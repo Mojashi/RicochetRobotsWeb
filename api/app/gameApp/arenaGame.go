@@ -53,7 +53,7 @@ func NewArenaGameApp(
 		g.self = g
 	}
 	g.BaseGameApp = NewBaseGameApp(users, conf, output, problemRepository, g.self)
-	g.addNextProblem()
+	go g.addNextProblem()
 	return g
 }
 
@@ -137,7 +137,7 @@ func (a *ArenaGameApp) addNextProblem() {
 		if err == nil {
 			break
 		}
-		problem, err = a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, true)
+		problem, err = a.problemRepository.GetUnused()
 		if err == nil {
 			break
 		}
