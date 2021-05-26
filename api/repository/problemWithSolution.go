@@ -2,6 +2,7 @@ package repository
 
 import (
 	"log"
+	"math/rand"
 	"strings"
 
 	"github.com/Mojashi/RicochetRobots/api/model"
@@ -68,11 +69,11 @@ func (r ProblemWithSolutionRepository) GetUnusedWithConfig(conf model.ProblemCon
 	wheres = append(wheres, "solutionLength between ? and ?")
 	whereArgs = append(whereArgs, conf.SolLenMin, conf.SolLenMax)
 
-	if conf.Torus != model.Optional {
+	if conf.Torus != model.Optional || rand.Intn(3) == 0 {
 		wheres = append(wheres, "torus=?")
 		whereArgs = append(whereArgs, conf.Torus == model.Required)
 	}
-	if conf.Mirror != model.Optional {
+	if conf.Mirror != model.Optional || rand.Intn(3) == 0 {
 		wheres = append(wheres, "mirror=?")
 		whereArgs = append(whereArgs, conf.Mirror == model.Required)
 	}

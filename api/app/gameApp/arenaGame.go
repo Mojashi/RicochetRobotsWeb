@@ -128,6 +128,7 @@ func (a *ArenaGameApp) OnFinishProblem(pointDiff map[model.UserID]int) {
 func (a *ArenaGameApp) addNextProblem() {
 	var problem model.ProblemWithSolution
 	var err error
+	//transaction wo harou
 	for {
 		problem, err = a.problemRepository.GetUnusedWithConfig(a.Config.ProblemConfig, false)
 		if err == nil {

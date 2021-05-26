@@ -24,12 +24,22 @@ func build() {
 	problemRepository = repository.NewProblemWithSolutionRepository(db)
 }
 
-func Gen(torus, mirror bool, remote string) {
+func Gen(torus, mirror int, remote string) {
+	log.Println(torus, mirror, remote)
 	build()
 
 	for {
 		rand.Seed(time.Now().UnixNano())
-		problem := rngProblemWithSolution(torus, mirror, 10)
+		bt := torus == 1
+		bm := mirror == 1
+		if torus == 2 {
+			bt = rand.Int()%2 == 0
+		}
+		if mirror == 2 {
+			bm = rand.Int()%2 == 0
+		}
+		log.Println(bt, bm)
+		problem := rngProblemWithSolution(bt, bm, 30)
 
 		if remote != "" {
 			str, err := json.Marshal(handler.PBody{

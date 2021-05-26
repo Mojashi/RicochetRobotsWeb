@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	torus  bool   = false
-	mirror bool   = false
+	torus  int    = 0
+	mirror int    = 0
 	remote string = ""
 )
 
@@ -21,8 +21,8 @@ func genCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&torus, "torus", "T", false, "gen torus problem")
-	cmd.Flags().BoolVarP(&mirror, "mirror", "M", false, "gen mirror problem")
+	cmd.Flags().IntVarP(&torus, "torus", "T", 0, "gen torus problem")
+	cmd.Flags().IntVarP(&mirror, "mirror", "M", 0, "gen mirror problem")
 	cmd.Flags().StringVar(&remote, "remote", "", "add problems to remote server")
 	return cmd
 }

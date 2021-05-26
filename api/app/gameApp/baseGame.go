@@ -2,6 +2,8 @@ package gameApp
 
 import (
 	"errors"
+	"log"
+	"time"
 
 	"github.com/Mojashi/RicochetRobots/api/app"
 	"github.com/Mojashi/RicochetRobots/api/app/messages/clientMessage"
@@ -62,17 +64,27 @@ func (u *BaseGameApp) StartProblem() error {
 	if !u.GameState.Interval {
 		return errors.New("another problem has already been started")
 	}
-	problem, err := u.problemRepository.GetUnusedWithConfig(u.Config.ProblemConfig, false)
-	if err != nil {
-		problem, err = u.problemRepository.GetUnusedWithConfig(u.Config.ProblemConfig, true)
-		if err != nil {
-			problem, err = u.problemRepository.GetUnused()
-			if err != nil {
-				return err
-			}
+
+	var problem model.ProblemWithSolution
+	var err error
+	for {
+		problem, err = u.problemRepository.GetUnusedWithConfig(u.Config.ProblemConfig, false)
+		if err == nil {
+			break
 		}
+		problem, err = u.problemRepository.GetUnusedWithConfig(u.Config.ProblemConfig, true)
+		if err == nil {
+			break
+		}
+		problem, err = u.problemRepository.GetUnused()
+		if err == nil {
+			break
+		}
+		log.Println("there is no problem!!" + err.Error())
+		time.Sleep(10 * time.Second)
 	}
 	u.problemRepository.SetUsed(problem.ID)
+
 	u.problem = app.NewProblemApp(problem, u.Config, u.self)
 	u.GameState.Interval = false
 	u.problem.SyncAll()

@@ -50,7 +50,9 @@ const Cards = styled("div")`
 	display:flex;
 	gap:0.7em;
 	flex-direction:column;
-	${isMobile&& `
+	${isMobile? `
 		flex-direction:row;
+	`:`
+		margin-top:0.7em;
 	`};
 `
