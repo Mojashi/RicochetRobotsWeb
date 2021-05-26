@@ -5,10 +5,10 @@ type: runtime
 # script executed on startup (default: null)
 startup: |
   cp .env_showcase .env
-  echo -e \$DB=$MARIADB_DATABASE >> .env
-  echo -e \$DB_USER=$MARIADB_USERNAME >> .env
-  echo -e \$DB_PASS=$MARIADB_PASSWORD >> .env
-  echo -e \$DB_HOST=$MARIADB_HOST >> .env
+  echo -e DB=$MARIADB_DATABASE >> .env
+  echo -e DB_USER=$MARIADB_USERNAME >> .env
+  echo -e DB_PASS=$MARIADB_PASSWORD >> .env
+  echo -e DB_HOST=$MARIADB_HOSTNAME >> .env
   ./setup.sh
   
 # use external databases (default: false)

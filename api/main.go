@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	godotenv.Load("../.env")
+	godotenv.Load(".env")
 	// if err != nil {
 	// 	log.Fatal(".env doesnt exist")
 	// }
