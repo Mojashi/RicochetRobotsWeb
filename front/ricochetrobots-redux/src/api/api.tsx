@@ -1,2 +1,2 @@
-export const API_SERVER = `https://${process.env.REACT_APP_PUBLIC_DOMAIN}/api`
-export const WS_SERVER = `wss://${process.env.REACT_APP_PUBLIC_DOMAIN}/api`
+export const API_SERVER = `${process.env.REACT_APP_HTTP}://${process.env.REACT_APP_PUBLIC_DOMAIN}/api`
+export const WS_SERVER = `${process.env.REACT_APP_HTTP === "http" ? "ws" : "wss"}://${process.env.REACT_APP_PUBLIC_DOMAIN}/api`

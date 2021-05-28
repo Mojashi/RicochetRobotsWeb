@@ -40,13 +40,12 @@ export function animStartFunc(draft : Draft<RoomState>, hands : Hands) {
 		anim.frame = 0
 		addHandFunc(draft, anim.hands[0])
 	}
-
 }
 
-export function animNextFunc(draft : Draft<RoomState>, animID : number) {
+export function animNextFunc(draft : Draft<RoomState>, animID : number, animFrame : number) {
 	const anim = draft.boardViewState.animState
 	if(anim.hands !== undefined && 
-		anim.frame !== undefined && 
+		animFrame === anim.frame && 
 		animID === anim.id){
 		if(hasResetRobot(draft)){
 			anim.id += 1
@@ -85,8 +84,8 @@ export function releaseBoardViewControll(draft : Draft<RoomState>, controller : 
 }
 
 export const AnimReducers = {
-	animNext: (state:State, action : PayloadAction<number>) => (
-		produce(state, draft=>animNextFunc(getRoomState(draft), action.payload))
+	animNext: (state:State, action : PayloadAction<{animID:number, animFrame:number}>) => (
+		produce(state, draft=>animNextFunc(getRoomState(draft), action.payload.animID,action.payload.animFrame))
 	),
 	animStart: (state: State, action : PayloadAction<Hands>) => (
 		produce(state,draft=> animStartFunc(getRoomState(draft), action.payload))

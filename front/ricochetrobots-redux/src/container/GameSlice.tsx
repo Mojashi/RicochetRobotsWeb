@@ -193,6 +193,7 @@ export const resultSubsSelector = createSelector(selectProblemResultState, state
 export const resultProblemSelector = createSelector(selectProblemResultState, state=>state?.problem)
 export const resultAnimSubSelector = createSelector(selectProblemResultState, state=>state?.animSub)
 export const animIDSelector = createSelector(selectBoardViewState, state=>state?.animState?.id)
+export const animFrameSelector = createSelector(selectBoardViewState, state=>state?.animState?.frame)
 export const roomInfoSelector = createSelector(selectRoomInfoState, state=>state)
 export const readyNextSelector = createSelector(selectProblemResultState, state=>state?.readyNext)
 export const onGameSelector = createSelector(selectGameState, state=>state !== undefined)

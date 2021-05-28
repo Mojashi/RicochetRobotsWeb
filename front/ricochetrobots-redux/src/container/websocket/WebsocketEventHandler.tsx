@@ -115,7 +115,7 @@ export function useServer(url: string) : WsDispatch{
 		}
 		ws.current.onclose = () => {
 			console.log("ws closed")
-			dispatch(notify({msg:"room not found"}))
+			dispatch(notify({msg:"room not found",duration:1000000}))
 		}
 		ws.current.onmessage = e => {
 			try {
