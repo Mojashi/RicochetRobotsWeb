@@ -69,11 +69,11 @@ func (r ProblemWithSolutionRepository) GetUnusedWithConfig(conf model.ProblemCon
 	wheres = append(wheres, "solutionLength between ? and ?")
 	whereArgs = append(whereArgs, conf.SolLenMin, conf.SolLenMax)
 
-	if conf.Torus != model.Optional || rand.Intn(3) == 0 {
+	if conf.Torus != model.Optional || rand.Intn(5) == 0 {
 		wheres = append(wheres, "torus=?")
 		whereArgs = append(whereArgs, conf.Torus != model.Never)
 	}
-	if conf.Mirror != model.Optional || rand.Intn(3) == 0 {
+	if conf.Mirror != model.Optional || rand.Intn(5) == 0 {
 		wheres = append(wheres, "mirror=?")
 		whereArgs = append(whereArgs, conf.Mirror != model.Never)
 	}
