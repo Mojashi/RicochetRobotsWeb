@@ -205,7 +205,7 @@ func (r *UserMadeRoomApp) Leave(c app.Client) {
 		}
 		if !setted {
 			if len(r.participants) > 0 {
-				r.self.Broadcast(serverMessage.NewNotifyMessage("ゲストのみになったため解散しました", 30))
+				r.self.Broadcast(serverMessage.NewNotifyMessage("ゲストのみになったため解散しました", 3000))
 			}
 			r.self.Delete()
 			return

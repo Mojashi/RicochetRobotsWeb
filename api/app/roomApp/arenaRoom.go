@@ -121,7 +121,7 @@ func (r *ArenaRoomApp) OnFinishGame(user model.User) {
 	r.userRepository.AddArenaWinCount(user.ID)
 
 	time.AfterFunc(time.Second*10, func() {
-		r.self.Broadcast(serverMessage.NewNotifyMessage("5分後に次ラウンドです", 20))
+		r.self.Broadcast(serverMessage.NewNotifyMessage("5分後に次ラウンドです", 30))
 	})
 
 	intervalLen := time.Second * time.Duration(300)

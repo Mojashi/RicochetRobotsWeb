@@ -107,7 +107,7 @@ export function useServer(url: string) : WsDispatch{
 		ws.current = new WebSocket(url)
 		ws.current.onerror = (ev) => {
 			console.log(ev)
-			dispatch(notify({msg:"connection error"}))
+			dispatch(notify({msg:"connection error", duration:100000000}))
 		}
 		ws.current.onopen = () =>{
 			console.log("ws opened")

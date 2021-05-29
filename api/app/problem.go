@@ -17,7 +17,9 @@ type IProblemApp interface {
 	Sync(dest model.UserID) error
 	SyncAll() error
 	GetProblem() model.ProblemWithSolution
+	GetHintCount() int
 	SuggestHint() error
+	IsActive() bool
 }
 
 type IProblemOutput interface {
@@ -33,6 +35,8 @@ type ProblemApp struct {
 	gameConfig model.GameConfig
 
 	finishProblemMessage *serverMessage.FinishProblemMessage
+
+	active bool
 }
 
 func NewProblemApp(problem model.ProblemWithSolution, gameConfig model.GameConfig, output IProblemOutput) IProblemApp {
@@ -40,7 +44,16 @@ func NewProblemApp(problem model.ProblemWithSolution, gameConfig model.GameConfi
 		output:       output,
 		gameConfig:   gameConfig,
 		ProblemState: model.NewProblemState(problem),
+		active:       true,
 	}
+}
+
+func (a *ProblemApp) GetHintCount() int {
+	return a.HintCount
+}
+
+func (a *ProblemApp) IsActive() bool {
+	return a.active
 }
 
 func (a *ProblemApp) GetProblem() model.ProblemWithSolution {
@@ -92,6 +105,8 @@ func (a *ProblemApp) StartTimelimit() {
 }
 
 func (a *ProblemApp) Finish() {
+	a.active = false
+
 	ranking := a.Submissions[:]
 	sort.SliceStable(ranking, func(i, j int) bool {
 		if ranking[i].Length == ranking[j].Length {
