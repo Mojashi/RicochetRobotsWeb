@@ -83,16 +83,16 @@ func (a *ArenaGameApp) StartProblem() error {
 	a.GameState.Interval = false
 	a.problem.SyncAll()
 
-	a.ScheduleSuggestHint(120, a.problem)
+	ScheduleSuggestHint(120, a.problem)
 	return nil
 }
 
 //もうこんなんクソよ
-func (a *ArenaGameApp) ScheduleSuggestHint(duration int, problem app.IProblemApp) {
+func ScheduleSuggestHint(duration int, problem app.IProblemApp) {
 	time.AfterFunc(time.Duration(duration)*time.Second, func() {
 		if problem.IsActive() || len(problem.GetProblem().Solution)-problem.GetHintCount() > 4 {
 			problem.SuggestHint()
-			a.ScheduleSuggestHint(duration, problem)
+			ScheduleSuggestHint(duration, problem)
 		}
 	})
 }

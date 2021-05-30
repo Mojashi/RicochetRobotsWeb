@@ -38,6 +38,6 @@ branch:
   master: 
     cname: ricochetrobots.trap.games
     startup: ./setup.sh -prod
-  develop: 
+  dev: 
     cname: devricochetrobots.trap.games
     startup: ./setup.sh -dev
