@@ -83,7 +83,7 @@ func (a *ArenaGameApp) StartProblem() error {
 	a.GameState.Interval = false
 	a.problem.SyncAll()
 
-	ScheduleSuggestHint(120, a.problem)
+	// ScheduleSuggestHint(120, a.problem)
 	return nil
 }
 
