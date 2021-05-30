@@ -1,9 +1,6 @@
 
 # deploy mode <"static", "runtime", "fcgi-*"> (required)
 type: runtime
-
-# script executed on startup (default: null)
-startup: ./setup.sh
   
 # use external databases (default: false)
 use_mongodb: false
@@ -40,5 +37,7 @@ https: "on"
 branch:
   master: 
     cname: ricochetrobots.trap.games
+    startup: ./setup.sh -prod
   develop: 
     cname: devricochetrobots.trap.games
+    startup: ./setup.sh -dev
