@@ -18,7 +18,7 @@ type IProblemApp interface {
 	SyncAll() error
 	GetProblem() model.ProblemWithSolution
 	GetHintCount() int
-	SuggestHint() error
+	SuggestHint(c int) error
 	IsActive() bool
 }
 
@@ -153,11 +153,11 @@ func (a *ProblemApp) CalcPointDiff(ranking []model.Submission) map[model.UserID]
 	}
 	return diff
 }
-func (a *ProblemApp) SuggestHint() error {
+func (a *ProblemApp) SuggestHint(c int) error {
 	if a.HintCount == len(a.Problem.Solution) {
 		return errors.New("all hints are suggested")
 	}
-	a.HintCount++
+	a.HintCount += c
 	a.output.Broadcast(serverMessage.NewSetHintMessage(a.Problem.Solution[0:a.HintCount]))
 	return nil
 }
@@ -167,7 +167,7 @@ func (a *ProblemApp) Reducer(user model.User, msg clientMessage.ClientMessage) e
 		a.Submit(m.GetSubmission(user, len(a.Problem.Solution)))
 	case clientMessage.RequestHintMessage:
 		if a.output.IsRoomAdmin(user) {
-			a.SuggestHint()
+			a.SuggestHint(1)
 		}
 	default:
 		return errors.New("unknown messageType")
