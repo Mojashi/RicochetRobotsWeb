@@ -10,6 +10,7 @@ import { API_SERVER } from "../api/api"
 import { getMeApi } from "../api/getMe"
 import { logoutApi } from "../api/logout"
 import { AnonymousUser } from "../model/User"
+import { useHistory } from "react-router"
 
 type Props = {
 	className? : string,
@@ -18,6 +19,7 @@ type Props = {
 export function UserNavPop({className} : Props){
 	const loggedIn = useSelector(loggedInSelector)
 	const dispatch = useDispatch()
+	const history = useHistory()
 
 	const onClickLogin = useCallback(() => {
 		fetch(API_SERVER + "/twitter/signin", {method:"GET", mode:"same-origin"})
@@ -30,7 +32,8 @@ export function UserNavPop({className} : Props){
 					var timer = setInterval(function() { 
 						if(w.closed) {
 							clearInterval(timer)
-							getMeApi((user)=>{dispatch(setUser(user))})
+							// getMeApi((user)=>{dispatch(setUser(user))})
+							history.go(0)
 						}
 					}, 1000)
 				}
@@ -39,6 +42,7 @@ export function UserNavPop({className} : Props){
 	}, [dispatch])
 	const onClickLogout = () => {
 		logoutApi(()=>dispatch(setUser(AnonymousUser)))
+		history.go(0)
 	}
 
 	return <UserNavPopView loggedIn={loggedIn} onClickLogIn={onClickLogin} onClickLogOut={onClickLogout} className={className}/>

@@ -46,15 +46,13 @@ const ButtonDiv = styled("div")`
 	justify-content:space-between;
 	height:100%;
 	box-sizing:border-box;
-	flex: 0 0 9em;
-	width:9em;
+	flex: 0 1 9em;
+	gap:0.5em;
 `
 const WoodButtonStyled = styled(WoodButton)`
 	flex: 1 1 0px;
 	box-sizing:border-box;
-	padding-left:2em;
-	padding-right:2em;
+	padding:0.1em 0em 0.1em 0em;
 	/* min-height: 2em; */
 	/* gap:1em; */
-	margin-bottom: 0.5em;
 `

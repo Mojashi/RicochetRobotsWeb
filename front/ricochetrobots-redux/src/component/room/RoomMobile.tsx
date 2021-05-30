@@ -1,4 +1,4 @@
-import React from "react"
+import React, { RefObject, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 
 
@@ -36,16 +36,27 @@ interface Props {
 	needToAuth : boolean,
 }
 
-export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
-	const CenterElem = <CenterDiv>
-		{onGame || interval ? 
-			<Problem/> : 
-			isAdmin ?
-				<GameSettingPanel/> :
-				<Text>開始を待っています...</Text>
-		}
-	</CenterDiv>
+function useMinWidth() : [RefObject<HTMLDivElement>,number] {
+	const ref = useRef<HTMLDivElement>(null)
+	const [size,setSize] = useState<number>(0)
+	useEffect(()=>{
+		const handleResize = ()=>{
+		if(ref.current){
+			console.log("resize")
+			const rect = ref.current.getBoundingClientRect()
+			setSize(Math.min(rect.width,rect.height))
+		}}
 
+		window.addEventListener("resize", handleResize);
+		handleResize();
+		return () => window.removeEventListener("resize", handleResize);
+	},[])
+
+	return [ref,size]
+}
+
+export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, isAdmin,readyNext} : Props){
+	const [centerRef, centerMinSize] = useMinWidth()
 
 	const DrawerDiv = <Drawer>
 		<DrawerContent>
@@ -62,6 +73,16 @@ export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, 
 			<Title style={{border:"none"}}>{onGame ? (readyNext? "WAITING":"NEXT") : "FINISH"}</Title>
 		</NextButtonStyled> 
 	</div>
+
+	const CenterElem = <CenterDiv ref={centerRef}><CenterContent style={{width:`${centerMinSize}px`, height:`${centerMinSize}px`}}>
+	{onGame || interval ? 
+		<Problem/> : 
+		isAdmin ?
+			<GameSettingPanel/> :
+			<Text>開始を待っています...</Text>
+	}
+	</CenterContent>
+	</CenterDiv>
 
 	const ContentElem = 
 	<Content>
@@ -89,7 +110,6 @@ export function RoomViewMobile({room, onGame, interval,needToAuth, onNextClick, 
 	)
 }
 
-
 const RobotDiv = styled("div")`
 	flex: 1 1 0;
 	height:100%;
@@ -108,7 +128,6 @@ const RobotButtonsStyled = styled(RobotButtons)`
 
 
 const LowerContentDiv = styled("div")`
-	position:absolute;
 	display:flex;
 	justify-content:space-around;
 	flex-wrap:nowrap;
@@ -120,6 +139,10 @@ const LowerContentDiv = styled("div")`
 	margin-bottom:0.5em;
 `
 const LowerDiv = styled("div")`
+	flex: 1 0 7em;
+	gap:0.5em;
+	min-height:7em;
+	max-height:11em;
 	position:relative;
 	height:100%;
 	width:100%;
@@ -148,12 +171,15 @@ flex-shrink:0;
 `
 const SubmissionsStyled = styled(Submissions)`
 	padding-top:0.7em;
-	flex-shrink:0;
+	flex: 0 0 5em;
 	margin-left:1em;
 	height:5em;
 `
 const NextButtonStyled = styled(WoodButton)`
+	flex: 1 1 0;
 	height:100%;
+	padding:0.1em 0em 0.1em 0em;
+	min-width: 0;
 	display:flex;
 	align-items: center;
 `
@@ -185,13 +211,19 @@ const Content = styled("div")`
 	align-items:flex-start;
 `
 
+const CenterContent = styled("div")`
+	aspect-ratio: 1/1;
+	margin:auto;
+`
 const centerSize = "(100vmin - 1.5em)"
 const CenterDiv = styled("div")`
-	flex-shrink:0;
-	height:calc(${centerSize});
-	width:calc(${centerSize});
-	margin-left:auto;
-	margin-right:auto;
+	display:flex;
+	flex-direction:column;
+	justify-content: center;
+	width:100%;
+	flex-shrink:1;
+	flex-grow:1;
+	flex-basis: calc${centerSize};
 `
 
 const Text = styled("div")`

@@ -90,7 +90,7 @@ func (a *ArenaGameApp) StartProblem() error {
 //もうこんなんクソよ
 func ScheduleSuggestHint(problem app.IProblemApp) {
 	time.AfterFunc(120*time.Second, func() {
-		if problem.IsActive() || len(problem.GetProblem().Solution)-problem.GetHintCount() > 4 {
+		if problem.IsActive() && len(problem.GetProblem().Solution)-problem.GetHintCount() > 4 {
 			problem.SuggestHint(3)
 			ScheduleSuggestHint(problem)
 		}
