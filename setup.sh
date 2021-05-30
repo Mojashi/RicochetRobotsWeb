@@ -4,7 +4,7 @@ if [ $# -ne 1 ]; then
   echo "you need to specify build-type" 1>&2
   exit 1
 fi
-if [ $1 = dev ]; then
+if [ $1 = "dev" ]; then
   cp .env_showcase_dev .env
 else
   cp .env_showcase .env

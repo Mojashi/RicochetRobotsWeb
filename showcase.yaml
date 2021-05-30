@@ -37,7 +37,7 @@ https: "on"
 branch:
   master: 
     cname: ricochetrobots.trap.games
-    startup: ./setup.sh -prod
+    startup: ./setup.sh prod
   wip: 
     cname: devricochetrobots.trap.games
-    startup: ./setup.sh -dev
+    startup: ./setup.sh dev
