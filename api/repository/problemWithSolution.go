@@ -94,7 +94,7 @@ func (r ProblemWithSolutionRepository) GetUnusedWithConfig(conf model.ProblemCon
 
 func (r ProblemWithSolutionRepository) SetUsed(id int) error {
 	_, err := r.db.Exec(
-		"UPDATE problems SET used=true randomValue=RAND() where id=?",
+		"UPDATE problems SET used=true, randomValue=RAND() where id=?",
 		id,
 	)
 	return err
