@@ -1,4 +1,4 @@
-module github.com/Mojashi/RicochetRobots/api
+module github.com/Mojashi/RicochetRobotsWeb/api
 
 go 1.15
 
